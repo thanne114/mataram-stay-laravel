@@ -251,7 +251,7 @@ class BookingController extends Controller
             $booking->update([
                 'status' => 'Cancelled',
             ]);
-            return redirect()->back()->with('success', 'Pemesanan Anda berhasil dibatalkan.');
+            return redirect('/dashboard-seeker')->with('success', 'Pemesanan Anda berhasil dibatalkan.');
         }
 
         return redirect()->back()->with('error', 'Pemesanan tidak dapat dibatalkan.');

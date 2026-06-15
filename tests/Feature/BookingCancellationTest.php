@@ -81,7 +81,7 @@ class BookingCancellationTest extends TestCase
     {
         $response = $this->actingAs($this->seeker)->post(route('booking.cancel', $this->booking));
         
-        $response->assertRedirect();
+        $response->assertRedirect('/dashboard-seeker');
         $response->assertSessionHas('success', 'Pemesanan Anda berhasil dibatalkan.');
         
         $this->booking->refresh();

@@ -91,10 +91,7 @@ class AuthControllerRefactorTest extends TestCase
         $response->assertStatus(429);
     }
 
-    /**
-     * Test seeker is redirected to seeker dashboard when accessing home page.
-     */
-    public function test_seeker_can_access_home_page(): void
+    public function test_seeker_is_redirected_to_seeker_dashboard(): void
     {
         $user = User::create([
             'name' => 'Seeker User',
@@ -103,8 +100,7 @@ class AuthControllerRefactorTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->get('/');
-        $response->assertStatus(200);
-        $response->assertSee('Halo, Seeker User');
+        $response->assertRedirect('/dashboard-seeker');
     }
 
     /**
