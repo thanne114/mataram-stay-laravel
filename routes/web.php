@@ -82,10 +82,10 @@ Route::middleware(['auth', 'role:seeker'])->group(function () {
     // Booking
     Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
     Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
-    Route::post('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 
     // Upload Bukti Pembayaran
     Route::post('/booking/{booking}/upload-proof', [BookingController::class, 'uploadProof'])->name('booking.upload-proof');
+    Route::post('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 
     // Transaksi Seeker (booking miliknya)
     Route::get('/seeker/transactions', [TransactionController::class, 'seekerIndex'])->name('transactions.seeker');

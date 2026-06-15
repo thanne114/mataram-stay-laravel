@@ -239,7 +239,7 @@ class BookingController extends Controller
     }
 
     /**
-     * Seeker membatalkan pemesanan (POST /booking/{booking}/cancel)
+     * Seeker membatalkan booking pending secara manual (POST /booking/{booking}/cancel)
      */
     public function cancel(Booking $booking)
     {
@@ -247,13 +247,15 @@ class BookingController extends Controller
             abort(403);
         }
 
-        if ($booking->status === 'Pending' && $booking->payment_status === 'Unpaid') {
-            $booking->update([
-                'status' => 'Cancelled',
-            ]);
-            return redirect('/dashboard-seeker')->with('success', 'Pemesanan Anda berhasil dibatalkan.');
+        if ($booking->status !== 'Pending') {
+            return back()->with('error', 'Booking ini tidak dapat dibatalkan.');
         }
 
-        return redirect()->back()->with('error', 'Pemesanan tidak dapat dibatalkan.');
+        $booking->update([
+            'status'         => 'Cancelled',
+            'payment_status' => 'Unpaid'
+        ]);
+
+        return back()->with('success', 'Pemesanan Anda telah berhasil dibatalkan.');
     }
 }
