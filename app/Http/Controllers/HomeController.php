@@ -9,6 +9,9 @@ class HomeController extends Controller
 {
     public function index()
     {
+        if (Auth::check() && Auth::user()->role === 'seeker') {
+            return redirect('/dashboard-seeker');
+        }
 
         // Jika Guest: tampilkan landing page dengan properti populer
         $popularProperties = Property::where('status', 'published')
