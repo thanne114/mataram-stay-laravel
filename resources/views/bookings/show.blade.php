@@ -83,6 +83,23 @@
         </div>
     </div>
 
+    @if($booking->status === 'Cancelled')
+    <div class="bg-red-50 rounded-xl p-6 border border-red-200 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-in fade-in duration-300">
+        <div class="flex-1">
+            <h3 class="text-red-800 font-bold text-base flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-red-600">error</span>
+                Pemesanan Dibatalkan / Kedaluwarsa
+            </h3>
+            <p class="text-red-700 text-xs font-medium">Transaksi pembayaran ini telah kedaluwarsa atau dibatalkan. Kamar telah dilepas kembali ke sistem.</p>
+        </div>
+        @if(auth()->id() === $booking->user_id)
+        <a href="{{ route('booking.create', ['room_type_id' => $booking->room_type_id]) }}" class="w-full md:w-auto bg-primary hover:bg-primary-container text-on-primary px-6 py-3 rounded-xl font-label font-bold text-xs transition-all shadow-sm text-center shrink-0 active:scale-[0.97]">
+            Pesan Ulang Kamar
+        </a>
+        @endif
+    </div>
+    @endif
+
     {{-- Info Kos --}}
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 mb-6">
         <h3 class="font-headline text-lg font-bold mb-4">Informasi Kos</h3>
@@ -159,10 +176,19 @@
         <p class="text-sm text-secondary mb-6">Bayar secara instan menggunakan E-Wallet (GoPay, ShopeePay), QRIS, Virtual Account Bank (BCA, Mandiri, BNI, BRI), atau gerai retail (Alfamart, Indomaret).</p>
         
         @if($booking->payment_token)
-            <button id="pay-button" class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label font-bold text-sm hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98]">
-                <span class="material-symbols-outlined">payments</span>
-                Bayar Sekarang
-            </button>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="pay-button" class="flex-grow sm:flex-1 bg-primary text-on-primary py-3.5 rounded-xl font-label font-bold text-sm hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98]">
+                    <span class="material-symbols-outlined">payments</span>
+                    Bayar Sekarang
+                </button>
+                <form action="{{ route('booking.cancel', $booking) }}" method="POST" class="flex-grow sm:flex-1">
+                    @csrf
+                    <button type="submit" class="w-full bg-white text-secondary border border-outline py-3.5 rounded-xl font-label font-bold text-sm hover:bg-surface-variant hover:text-on-surface transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]" onclick="return confirm('Apakah Anda yakin ingin membatalkan pemesanan ini?')">
+                        <span class="material-symbols-outlined text-sm">cancel</span>
+                        Batalkan Pemesanan
+                    </button>
+                </form>
+            </div>
         @else
             <div class="p-4 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold flex items-center gap-2">
                 <span class="material-symbols-outlined">error</span>

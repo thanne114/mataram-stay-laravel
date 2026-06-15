@@ -237,4 +237,23 @@ class BookingController extends Controller
             return back()->with('success', 'Status booking berhasil diperbarui menjadi ' . $request->status . '.');
         });
     }
+
+    /**
+     * Seeker membatalkan pemesanan (POST /booking/{booking}/cancel)
+     */
+    public function cancel(Booking $booking)
+    {
+        if (Auth::id() !== $booking->user_id) {
+            abort(403);
+        }
+
+        if ($booking->status === 'Pending' && $booking->payment_status === 'Unpaid') {
+            $booking->update([
+                'status' => 'Cancelled',
+            ]);
+            return redirect()->back()->with('success', 'Pemesanan Anda berhasil dibatalkan.');
+        }
+
+        return redirect()->back()->with('error', 'Pemesanan tidak dapat dibatalkan.');
+    }
 }
