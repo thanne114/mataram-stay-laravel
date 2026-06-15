@@ -19,11 +19,11 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // Ambil booking aktif (pending/menunggu verifikasi)
-        $activeBooking = Booking::where('user_id', $user->id)
+        $activeBookings = Booking::where('user_id', $user->id)
             ->whereIn('status', ['Pending', 'Active'])
             ->with(['roomType.property'])
             ->latest()
-            ->first();
+            ->get();
 
         // Ambil properti terpopuler untuk ditampilkan
         $popularProperties = Property::where('status', 'published')
@@ -33,7 +33,7 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
-        return view('dashboard.seeker', compact('activeBooking', 'popularProperties'));
+        return view('dashboard.seeker', compact('activeBookings', 'popularProperties'));
     }
 
     public function owner() 

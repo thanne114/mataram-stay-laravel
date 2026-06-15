@@ -78,8 +78,8 @@ class BookingController extends Controller
             abort(403);
         }
 
-        // Generate Midtrans Snap Token jika seeker dan belum bayar
-        if (Auth::id() === $booking->user_id && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending') {
+        // Generate Midtrans Snap Token jika seeker dan belum bayar (Unpaid atau Checking)
+        if (Auth::id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending') {
             if ($booking->payment_token) {
                 try {
                     \Midtrans\Config::$serverKey = config('services.midtrans.server_key');

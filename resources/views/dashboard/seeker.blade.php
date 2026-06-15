@@ -153,40 +153,7 @@
 
 </section>
 
-@if(isset($activeBooking) && $activeBooking)
-<section class="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 -mt-8 relative z-20">
-<div class="bg-surface-container-low rounded-2xl border border-outline-variant/60 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
-<div class="flex flex-col md:flex-row items-center gap-6">
-<div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border border-outline-variant/40">
-@if($activeBooking->roomType->property->main_image)
-    <img alt="{{ $activeBooking->roomType->property->name }}" class="w-full h-full object-cover" src="{{ asset('storage/' . $activeBooking->roomType->property->main_image) }}">
-@else
-    <div class="w-full h-full bg-surface-container-high flex items-center justify-center">
-        <span class="material-symbols-outlined text-4xl text-outline">apartment</span>
-    </div>
-@endif
-</div>
-<div class="flex flex-col gap-1 text-center md:text-left">
-<span class="font-label text-xs font-bold text-primary uppercase tracking-widest">Pemesanan Aktif</span>
-<h2 class="font-headline text-2xl font-bold text-on-surface">{{ $activeBooking->roomType->property->name }}</h2>
-<div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-1">
-<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold 
-    @if($activeBooking->status == 'Pending') bg-yellow-50 text-yellow-700 border border-yellow-100
-    @elseif($activeBooking->status == 'Active') bg-green-50 text-green-700 border border-green-100
-    @elseif($activeBooking->status == 'Completed') bg-blue-50 text-blue-700 border border-blue-100
-    @else bg-red-50 text-red-700 border border-red-100 @endif">
-    {{ $activeBooking->status }}
-</span>
-<span class="text-secondary text-sm font-label">• Check-in: {{ \Carbon\Carbon::parse($activeBooking->check_in_date)->format('d M Y') }}</span>
-</div>
-</div>
-</div>
-<a href="{{ route('booking.show', $activeBooking->id) }}" class="w-full md:w-auto bg-primary text-on-primary px-8 py-3.5 rounded-lg font-label font-bold hover:bg-primary-fixed-dim transition-all shadow-sm flex items-center justify-center gap-2 group">
-    Lihat Detail Status
-</a>
-</div>
-</section>
-@endif
+
 <section class="w-full max-w-7xl mx-auto px-6 md:px-8 py-24 flex flex-col gap-12">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
 <div class="flex flex-col gap-3">

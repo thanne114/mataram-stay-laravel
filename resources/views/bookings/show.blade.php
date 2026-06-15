@@ -169,7 +169,7 @@
     </div>
 
     {{-- Pembayaran Midtrans (Otomatis) --}}
-    @if(auth()->id() === $booking->user_id && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending')
+    @if(auth()->id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending')
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-primary/30 mb-6 bg-gradient-to-br from-white to-[#faf5ee]">
         <div class="flex items-center gap-3 mb-4">
             <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">credit_card</span>
@@ -190,9 +190,9 @@
                 </div>
             @endif
             
-            <form action="{{ route('booking.cancel', $booking) }}" method="POST" class="shrink-0 w-full sm:w-auto">
+            <form action="{{ route('booking.cancel', $booking) }}" method="POST" class="shrink-0 w-full sm:w-auto" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pemesanan ini?')">
                 @csrf
-                <button type="submit" class="w-full sm:w-auto bg-white text-tertiary border border-tertiary px-6 py-3.5 rounded-xl font-label font-bold text-sm hover:bg-red-50 transition-all text-center flex items-center justify-center gap-1 active:scale-[0.98]" onclick="return confirm('Apakah Anda yakin ingin membatalkan pemesanan ini?')">
+                <button type="submit" class="w-full sm:w-auto bg-white text-tertiary border border-tertiary px-6 py-3.5 rounded-xl font-label font-bold text-sm hover:bg-red-50 transition-all text-center flex items-center justify-center gap-1 active:scale-[0.98]">
                     <span class="material-symbols-outlined text-lg">cancel</span>
                     Batalkan Pesanan
                 </button>
@@ -378,7 +378,7 @@
     });
 </script>
 
-@if(auth()->id() === $booking->user_id && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending' && $booking->payment_token)
+@if(auth()->id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending' && $booking->payment_token)
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
     <script>
         document.getElementById('pay-button').onclick = function(){
