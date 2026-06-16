@@ -137,8 +137,8 @@
         },
         'UIN_MATARAM': {
             name: 'UIN Mataram Kampus 2',
-            lat: -8.609817,
-            lng: 116.100646
+            lat: -8.610029404934442,
+            lng: 116.10061365572658
         },
         'UIN_MATARAM_1': {
             name: 'UIN Mataram Kampus 1',
@@ -147,8 +147,8 @@
         },
         'UIN_MATARAM_2': {
             name: 'UIN Mataram Kampus 2',
-            lat: -8.609817,
-            lng: 116.100646
+            lat: -8.610029404934442,
+            lng: 116.10061365572658
         },
         'POLNAM': {
             name: 'Politeknik Negeri Mataram (Polnam)',

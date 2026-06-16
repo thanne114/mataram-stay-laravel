@@ -229,8 +229,8 @@
             'initials' => 'UR'
         ],
         [
-            'name' => 'UIN Mataram',
-            'location' => 'Jempong',
+            'name' => 'UIN Mataram Kampus 2',
+            'location' => 'Jempong Baru',
             'query' => 'UIN_MATARAM_2',
             'logo' => 'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_UIN_Mataram.png',
             'initials' => 'UIN'
