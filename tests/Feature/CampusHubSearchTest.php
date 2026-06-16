@@ -208,6 +208,7 @@ class CampusHubSearchTest extends TestCase
         $response->assertSee('Kos Dekat UNBIM Mataram');
         $response->assertSee('Kos Dekat IAHN Gde Pudja Mataram');
         $response->assertSee('Kos Dekat INKES Yarsi Mataram');
+        $response->assertSee('Kos Dekat STIKES Mataram');
         $response->assertSee('Kos Dekat Universitas Mahasaraswati Mataram');
     }
 }

@@ -120,6 +120,7 @@ class Property extends Model
             'UNBIM' => ['name' => 'Universitas Bhakti Mataram (UNBIM)', 'lat' => -8.6050, 'lng' => 116.0850],
             'IAHN_GDE_PUDJA' => ['name' => 'IAHN Gde Pudja', 'lat' => -8.585315823591262, 'lng' => 116.10274343138725],
             'STIKES_YARSI' => ['name' => 'INKES Yarsi Mataram', 'lat' => -8.616198152336244, 'lng' => 116.1037731163117],
+            'STIKES_MATARAM' => ['name' => 'STIKES Mataram', 'lat' => -8.589637018133999, 'lng' => 116.08274860194847],
             'UNMAS' => ['name' => 'Universitas Mahasaraswati Mataram', 'lat' => -8.5925, 'lng' => 116.1105],
         ];
 

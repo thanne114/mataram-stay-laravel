@@ -107,6 +107,13 @@ class HomeController extends Controller
                     'logo' => asset('images/campuses/unmas.png'),
                     'initials' => 'UMS'
                 ],
+                [
+                    'name' => 'STIKES Mataram',
+                    'display' => 'Kos Dekat STIKES Mataram',
+                    'query' => 'STIKES_MATARAM',
+                    'logo' => asset('images/campuses/stikes_mataram.png'),
+                    'initials' => 'SM'
+                ],
             ]
         ];
 

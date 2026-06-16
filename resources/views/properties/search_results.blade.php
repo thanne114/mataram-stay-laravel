@@ -66,6 +66,7 @@
                     <option value="UNBIM">Universitas Bhakti Mataram (UNBIM)</option>
                     <option value="IAHN_GDE_PUDJA">IAHN Gde Pudja</option>
                     <option value="STIKES_YARSI">INKES Yarsi Mataram</option>
+                    <option value="STIKES_MATARAM">STIKES Mataram</option>
                     <option value="UNMAS">Universitas Mahasaraswati Mataram</option>
                 </select>
             </div>
@@ -184,6 +185,11 @@
             name: 'INKES Yarsi Mataram',
             lat: -8.616198152336244,
             lng: 116.1037731163117
+        },
+        'STIKES_MATARAM': {
+            name: 'STIKES Mataram',
+            lat: -8.589637018133999,
+            lng: 116.08274860194847
         },
         'UNMAS': {
             name: 'Universitas Mahasaraswati Mataram',
