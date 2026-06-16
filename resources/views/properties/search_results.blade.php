@@ -386,9 +386,11 @@
             init() {
                 // Initialize display values formatted as Rupiah
                 if (this.harga_minimal) {
+                    this.harga_minimal = this.harga_minimal.toString().replace(/[^0-9]/g, '');
                     this.harga_minimal_display = this.formatRupiah(this.harga_minimal);
                 }
                 if (this.harga_maksimal) {
+                    this.harga_maksimal = this.harga_maksimal.toString().replace(/[^0-9]/g, '');
                     this.harga_maksimal_display = this.formatRupiah(this.harga_maksimal);
                 }
 

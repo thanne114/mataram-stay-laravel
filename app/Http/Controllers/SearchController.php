@@ -95,10 +95,12 @@ class SearchController extends Controller
         if ($request->filled('harga_minimal') || $request->filled('harga_maksimal')) {
             $query->whereHas('roomTypes', function ($q) use ($request) {
                 if ($request->filled('harga_minimal')) {
-                    $q->where('price_per_month', '>=', (int)$request->harga_minimal);
+                    $minPrice = (int) preg_replace('/[^0-9]/', '', $request->harga_minimal);
+                    $q->where('price_per_month', '>=', $minPrice);
                 }
                 if ($request->filled('harga_maksimal')) {
-                    $q->where('price_per_month', '<=', (int)$request->harga_maksimal);
+                    $maxPrice = (int) preg_replace('/[^0-9]/', '', $request->harga_maksimal);
+                    $q->where('price_per_month', '<=', $maxPrice);
                 }
             });
         }
