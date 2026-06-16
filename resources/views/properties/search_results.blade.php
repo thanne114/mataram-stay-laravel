@@ -63,6 +63,9 @@
                     <option value="UMMAT">UM Muhammadiyah Mataram (UMMAT)</option>
                     <option value="UTM">Universitas Teknologi Mataram (UTM)</option>
                     <option value="UNBIM">Universitas Bhakti Mataram (UNBIM)</option>
+                    <option value="IAHN_GDE_PUDJA">IAHN Gde Pudja</option>
+                    <option value="STIKES_YARSI">STIKES Yarsi Mataram</option>
+                    <option value="UNMAS">Universitas Mahasaraswati Mataram</option>
                 </select>
             </div>
             <div>
@@ -125,7 +128,6 @@
 <x-footer />
 
 <script>
-    // Dictionary of campus locations and coordinates
     var campuses = {
         'UNRAM': {
             name: 'Universitas Mataram (UNRAM)',
@@ -133,14 +135,49 @@
             lng: 116.0967
         },
         'UIN_MATARAM': {
-            name: 'UIN Mataram (Kampus 2)',
+            name: 'UIN Mataram',
             lat: -8.6116,
             lng: 116.1154
+        },
+        'POLNAM': {
+            name: 'Politeknik Negeri Mataram (Polnam)',
+            lat: -8.5833,
+            lng: 116.0950
+        },
+        'UT_MATARAM': {
+            name: 'Universitas Terbuka Mataram (UT)',
+            lat: -8.5796,
+            lng: 116.1026
         },
         'UMMAT': {
             name: 'Universitas Muhammadiyah Mataram (UMMAT)',
             lat: -8.5982,
             lng: 116.1084
+        },
+        'UTM': {
+            name: 'Universitas Teknologi Mataram (UTM)',
+            lat: -8.5835,
+            lng: 116.1054
+        },
+        'UNBIM': {
+            name: 'Universitas Bhakti Mataram (UNBIM)',
+            lat: -8.6050,
+            lng: 116.0850
+        },
+        'IAHN_GDE_PUDJA': {
+            name: 'IAHN Gde Pudja',
+            lat: -8.5990,
+            lng: 116.1165
+        },
+        'STIKES_YARSI': {
+            name: 'STIKES Yarsi Mataram',
+            lat: -8.6120,
+            lng: 116.1060
+        },
+        'UNMAS': {
+            name: 'Universitas Mahasaraswati Mataram',
+            lat: -8.5925,
+            lng: 116.1105
         }
     };
 

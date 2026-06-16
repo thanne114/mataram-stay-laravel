@@ -20,6 +20,8 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/api/map-data', [SearchController::class, 'mapData'])->name('api.map-data');
 Route::get('/kos/{kos:slug}', [PropertyController::class, 'show'])->name('property.show');
 Route::post('/payment/notification', [\App\Http\Controllers\PaymentController::class, 'notification'])->name('payment.notification');
+Route::get('/kampus', [HomeController::class, 'kampusDirectory'])->name('kampus.index');
+
 
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ForgotPasswordController;

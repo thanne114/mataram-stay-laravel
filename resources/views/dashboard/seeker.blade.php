@@ -254,7 +254,7 @@
         @endforeach
         
         <!-- 8th Card: Lihat Semua -->
-        <a href="{{ route('search') }}" class="flex items-center justify-center bg-white border border-outline-variant/30 rounded-xl p-4 hover:shadow-md transition group min-h-[72px]">
+        <a href="{{ route('kampus.index') }}" class="flex items-center justify-center bg-white border border-outline-variant/30 rounded-xl p-4 hover:shadow-md transition group min-h-[72px]">
             <span class="font-bold text-primary flex items-center gap-1 font-body text-sm md:text-base">
                 Lihat semua
                 <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>

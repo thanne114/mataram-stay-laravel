@@ -183,4 +183,31 @@ class CampusHubSearchTest extends TestCase
         $response->assertSee('alt="Foto utama ' . $property->name . '"', false);
         $response->assertSee('alt="Foto fasilitas ' . $property->name . '"', false);
     }
+
+    /**
+     * Test sitemap directory page is accessible and lists correct content.
+     */
+    public function test_kampus_directory_page_is_accessible(): void
+    {
+        $response = $this->get('/kampus');
+
+        $response->assertStatus(200);
+        $response->assertSee('Kos Dekat Kampus di Mataram');
+        $response->assertSee('Perguruan Tinggi Negeri (PTN)');
+        $response->assertSee('Perguruan Tinggi Swasta (PTS)');
+
+        // Check PTN campus links
+        $response->assertSee('Kos Dekat UNRAM Mataram');
+        $response->assertSee('Kos Dekat UIN Mataram');
+        $response->assertSee('Kos Dekat Polnam Mataram');
+        $response->assertSee('Kos Dekat UT Mataram');
+
+        // Check PTS campus links
+        $response->assertSee('Kos Dekat UMMAT Mataram');
+        $response->assertSee('Kos Dekat UTM Mataram');
+        $response->assertSee('Kos Dekat UNBIM Mataram');
+        $response->assertSee('Kos Dekat IAHN Gde Pudja Mataram');
+        $response->assertSee('Kos Dekat STIKES Yarsi Mataram');
+        $response->assertSee('Kos Dekat Universitas Mahasaraswati Mataram');
+    }
 }

@@ -127,6 +127,9 @@ class SearchController extends Controller
                 'UT_MATARAM' => ['lat' => -8.5796, 'lng' => 116.1026],
                 'UTM' => ['lat' => -8.5835, 'lng' => 116.1054],
                 'UNBIM' => ['lat' => -8.6050, 'lng' => 116.0850],
+                'IAHN_GDE_PUDJA' => ['lat' => -8.5990, 'lng' => 116.1165],
+                'STIKES_YARSI' => ['lat' => -8.6120, 'lng' => 116.1060],
+                'UNMAS' => ['lat' => -8.5925, 'lng' => 116.1105],
             ];
 
             $selectedCampus = $request->kampus;
