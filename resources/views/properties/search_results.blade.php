@@ -177,8 +177,8 @@
         },
         'IAHN_GDE_PUDJA': {
             name: 'IAHN Gde Pudja',
-            lat: -8.5990,
-            lng: 116.1165
+            lat: -8.585315823591262,
+            lng: 116.10274343138725
         },
         'STIKES_YARSI': {
             name: 'STIKES Yarsi Mataram',

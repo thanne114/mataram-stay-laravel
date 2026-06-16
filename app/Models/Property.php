@@ -118,7 +118,7 @@ class Property extends Model
             'UT_MATARAM' => ['name' => 'Universitas Terbuka Mataram (UT)', 'lat' => -8.615985997292142, 'lng' => 116.0837822198231],
             'UTM' => ['name' => 'Universitas Teknologi Mataram (UTM)', 'lat' => -8.592227544759059, 'lng' => 116.09210315753597],
             'UNBIM' => ['name' => 'Universitas Bhakti Mataram (UNBIM)', 'lat' => -8.6050, 'lng' => 116.0850],
-            'IAHN_GDE_PUDJA' => ['name' => 'IAHN Gde Pudja', 'lat' => -8.5990, 'lng' => 116.1165],
+            'IAHN_GDE_PUDJA' => ['name' => 'IAHN Gde Pudja', 'lat' => -8.585315823591262, 'lng' => 116.10274343138725],
             'STIKES_YARSI' => ['name' => 'STIKES Yarsi Mataram', 'lat' => -8.6120, 'lng' => 116.1060],
             'UNMAS' => ['name' => 'Universitas Mahasaraswati Mataram', 'lat' => -8.5925, 'lng' => 116.1105],
         ];
