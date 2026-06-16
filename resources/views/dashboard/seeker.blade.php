@@ -217,6 +217,51 @@
     </a>
 </div>
 </section>
+
+<!-- Section: Kos Sekitar Kampus -->
+@php
+    $campuses = [
+        ['name' => 'UNRAM', 'location' => 'Kekalik', 'query' => 'UNRAM'],
+        ['name' => 'UIN Mataram', 'location' => 'Jempong', 'query' => 'UIN_MATARAM'],
+        ['name' => 'Polnam', 'location' => 'Gomong', 'query' => 'POLNAM'],
+        ['name' => 'UT Mataram', 'location' => 'Karang Baru', 'query' => 'UT_MATARAM'],
+        ['name' => 'UMMAT', 'location' => 'Pagesangan', 'query' => 'UMMAT'],
+        ['name' => 'UTM', 'location' => 'Dasan Agung', 'query' => 'UTM'],
+        ['name' => 'UNBIM', 'location' => 'Sekarbela', 'query' => 'UNBIM'],
+    ];
+@endphp
+<section class="w-full max-w-7xl mx-auto px-6 md:px-8 pb-24 flex flex-col gap-8">
+    <div class="flex flex-col gap-2">
+        <h2 class="font-headline text-3xl md:text-4xl font-medium text-on-surface">Kos Sekitar Kampus</h2>
+        <p class="font-body text-secondary text-sm">Cari hunian kos strategis yang dekat dengan lokasi kampus Anda.</p>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        @foreach($campuses as $campus)
+            <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="flex items-center gap-4 bg-white border border-outline-variant/30 rounded-xl p-4 hover:shadow-md transition group">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <!-- Heroicons: academic-cap -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.9c2.785 0 5.48-.233 8.1-.685a60.435 60.435 0 00-.49-6.368M12 3.75L3.75 8.25 12 12.75l8.25-4.5L12 3.75z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20.25 12.5v3a3 3 0 01-3 3h-10.5a3 3 0 01-3-3v-3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="font-bold text-on-surface truncate font-body text-sm md:text-base leading-tight group-hover:text-primary transition-colors">{{ $campus['name'] }}</span>
+                    <span class="text-xs text-secondary truncate font-body">{{ $campus['location'] }}</span>
+                </div>
+            </a>
+        @endforeach
+        
+        <!-- 8th Card: Lihat Semua -->
+        <a href="{{ route('search') }}" class="flex items-center justify-center bg-white border border-outline-variant/30 rounded-xl p-4 hover:shadow-md transition group min-h-[72px]">
+            <span class="font-bold text-primary flex items-center gap-1 font-body text-sm md:text-base">
+                Lihat semua
+                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </span>
+        </a>
+    </div>
+</section>
 </main>
 
 <x-footer />
