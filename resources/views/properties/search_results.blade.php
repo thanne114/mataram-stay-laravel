@@ -157,8 +157,8 @@
         },
         'UT_MATARAM': {
             name: 'Universitas Terbuka Mataram (UT)',
-            lat: -8.5796,
-            lng: 116.1026
+            lat: -8.616495169279178,
+            lng: 116.0830955743289
         },
         'UMMAT': {
             name: 'Universitas Muhammadiyah Mataram (UMMAT)',

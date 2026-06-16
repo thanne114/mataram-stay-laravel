@@ -190,7 +190,7 @@
                 ],
                 [
                     'name' => 'UT Mataram',
-                    'location' => 'Karang Baru',
+                    'location' => 'Jempong Baru',
                     'query' => 'UT_MATARAM',
                     'logo' => asset('images/campuses/ut.png'),
                     'initials' => 'UT'
