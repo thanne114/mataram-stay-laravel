@@ -167,8 +167,8 @@
         },
         'UTM': {
             name: 'Universitas Teknologi Mataram (UTM)',
-            lat: -8.5835,
-            lng: 116.1054
+            lat: -8.592227544759059,
+            lng: 116.09210315753597
         },
         'UNBIM': {
             name: 'Universitas Bhakti Mataram (UNBIM)',

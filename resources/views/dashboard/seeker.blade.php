@@ -258,7 +258,7 @@
         ],
         [
             'name' => 'UTM',
-            'location' => 'Dasan Agung',
+            'location' => 'Kekalik',
             'query' => 'UTM',
             'logo' => asset('images/campuses/utm.png'),
             'initials' => 'UTM'

@@ -127,7 +127,7 @@ class SearchController extends Controller
                 'UMMAT' => ['lat' => -8.5982, 'lng' => 116.1084],
                 'POLNAM' => ['lat' => -8.5833, 'lng' => 116.0950],
                 'UT_MATARAM' => ['lat' => -8.5796, 'lng' => 116.1026],
-                'UTM' => ['lat' => -8.5835, 'lng' => 116.1054],
+                'UTM' => ['lat' => -8.592227544759059, 'lng' => 116.09210315753597],
                 'UNBIM' => ['lat' => -8.6050, 'lng' => 116.0850],
                 'IAHN_GDE_PUDJA' => ['lat' => -8.5990, 'lng' => 116.1165],
                 'STIKES_YARSI' => ['lat' => -8.6120, 'lng' => 116.1060],
