@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtpEmail;
+use App\Mail\ModerationNotificationMail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Crypt;
 
@@ -132,6 +133,16 @@ class ProfileController extends Controller
         $user->selfie_photo = $selfiePath;
         $user->is_verified = false; // Requires manual admin approval
         $user->save();
+
+        // Send email notification to Admin(s)
+        try {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)->send(new ModerationNotificationMail($user, 'verification_queue_admin'));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send verification queue email to admin: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Dokumen identitas Anda berhasil diunggah. Menunggu verifikasi dari Administrator!');
     }

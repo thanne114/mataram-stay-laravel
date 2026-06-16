@@ -93,4 +93,15 @@ class User extends Authenticatable
     {
         return (bool)$this->is_verified;
     }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ForgotPasswordMail($token, $this));
+    }
 }

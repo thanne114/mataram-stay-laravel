@@ -9,6 +9,9 @@ use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ModerationNotificationMail;
 
 class PropertyController extends Controller
 {
@@ -40,6 +43,16 @@ class PropertyController extends Controller
         $data['user_id'] = Auth::id();
         $data['status'] = 'draft'; // Requires admin approval to publish
         $property = Property::create($data);
+
+        // Send email notification to Admin(s)
+        try {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)->send(new ModerationNotificationMail($property, 'property_submitted_admin'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send property submitted email to admin: ' . $e->getMessage());
+        }
 
         // Buat tipe kamar default
         $property->roomTypes()->create([

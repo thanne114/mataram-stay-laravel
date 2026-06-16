@@ -6,6 +6,9 @@ use App\Models\Review;
 use App\Models\Booking;
 use App\Http\Requests\StoreReviewRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ReviewNotificationMail;
 
 class ReviewController extends Controller
 {
@@ -36,7 +39,16 @@ class ReviewController extends Controller
             $data['comment'] = strip_tags($data['comment']);
         }
 
-        Review::create($data);
+        $review = Review::create($data);
+
+        // Send email notification to Owner
+        try {
+            if ($review->property && $review->property->owner) {
+                Mail::to($review->property->owner->email)->send(new ReviewNotificationMail($review));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send review notification email to owner: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Ulasan berhasil dikirim. Terima kasih!');
     }

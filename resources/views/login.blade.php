@@ -110,7 +110,7 @@
         <div class="group">
             <div class="flex justify-between items-center mb-1">
                 <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1" for="password">Kata Sandi</label>
-                <a class="text-xs font-bold text-primary hover:underline" href="#">Lupa Kata Sandi?</a>
+                <a class="text-xs font-bold text-primary hover:underline" href="{{ route('password.request') }}">Lupa Kata Sandi?</a>
             </div>
             <div class="relative">
                 <input class="w-full px-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline/60 pr-12" id="password" name="password" placeholder="••••••••" type="password" required>

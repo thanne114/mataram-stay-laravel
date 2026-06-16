@@ -7,6 +7,9 @@ use App\Models\RoomType;
 use App\Http\Requests\StoreBookingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\BookingNotificationMail;
 
 class BookingController extends Controller
 {
@@ -59,6 +62,16 @@ class BookingController extends Controller
             $data['payment_status'] = 'Unpaid';
 
             $booking = Booking::create($data);
+
+            // Send notification email to Seeker & Owner
+            try {
+                Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'created_seeker'));
+                if ($booking->roomType->property->owner) {
+                    Mail::to($booking->roomType->property->owner->email)->send(new BookingNotificationMail($booking, 'created_owner'));
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send booking created emails: ' . $e->getMessage());
+            }
 
             return redirect()->route('booking.show', $booking)
                 ->with('success', 'Pemesanan berhasil dibuat! Silakan lakukan pembayaran.');
@@ -172,6 +185,14 @@ class BookingController extends Controller
             'status'         => 'Pending',
         ]);
 
+        try {
+            if ($booking->roomType->property->owner) {
+                Mail::to($booking->roomType->property->owner->email)->send(new BookingNotificationMail($booking, 'proof_uploaded'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send proof uploaded email: ' . $e->getMessage());
+        }
+
         return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi pemilik kos.');
     }
 
@@ -204,6 +225,15 @@ class BookingController extends Controller
             // Kurangi kamar tersedia
             $roomType->decrement('available_rooms');
 
+            try {
+                Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'payment_success_seeker'));
+                if ($booking->roomType->property->owner) {
+                    Mail::to($booking->roomType->property->owner->email)->send(new BookingNotificationMail($booking, 'payment_success_owner'));
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send payment success emails: ' . $e->getMessage());
+            }
+
             return back()->with('success', 'Pembayaran berhasil diverifikasi. Booking sekarang aktif.');
         });
     }
@@ -234,6 +264,14 @@ class BookingController extends Controller
                 $roomType->increment('available_rooms');
             }
 
+            if ($request->status === 'Cancelled') {
+                try {
+                    Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
+                } catch (\Exception $e) {
+                    Log::error('Failed to send booking cancelled email: ' . $e->getMessage());
+                }
+            }
+
             return back()->with('success', 'Status booking berhasil diperbarui menjadi ' . $request->status . '.');
         });
     }
@@ -255,6 +293,12 @@ class BookingController extends Controller
             'status'         => 'Cancelled',
             'payment_status' => 'Unpaid'
         ]);
+
+        try {
+            Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking cancelled email: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Pemesanan Anda telah berhasil dibatalkan.');
     }

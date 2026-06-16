@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ModerationNotificationMail;
 
 class DashboardController extends Controller
 {
@@ -173,6 +176,12 @@ class DashboardController extends Controller
         $user->is_verified = true;
         $user->save();
 
+        try {
+            Mail::to($user->email)->send(new ModerationNotificationMail($user, 'seeker_verified'));
+        } catch (\Exception $e) {
+            Log::error('Failed to send seeker verified email: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', "Identitas user {$user->name} berhasil diverifikasi!");
     }
 
@@ -187,6 +196,14 @@ class DashboardController extends Controller
 
         $property->status = 'published';
         $property->save();
+
+        try {
+            if ($property->owner) {
+                Mail::to($property->owner->email)->send(new ModerationNotificationMail($property, 'property_approved'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send property approved email: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Properti {$property->name} telah berhasil disetujui dan dipublikasikan!");
     }

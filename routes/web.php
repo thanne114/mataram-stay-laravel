@@ -22,6 +22,8 @@ Route::get('/kos/{kos:slug}', [PropertyController::class, 'show'])->name('proper
 Route::post('/payment/notification', [\App\Http\Controllers\PaymentController::class, 'notification'])->name('payment.notification');
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 
 // ============================================
 // RUTE GUEST (Belum Login)
@@ -36,6 +38,12 @@ Route::middleware('guest')->group(function () {
     // Google OAuth Routes
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+
+    // Forgot / Reset Password Routes
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 // ============================================
