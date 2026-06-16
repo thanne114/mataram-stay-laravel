@@ -182,11 +182,11 @@
                     'initials' => 'UIN'
                 ],
                 [
-                    'name' => 'Polnam',
-                    'location' => 'Gomong',
+                    'name' => 'Poltekkes Kemenkes Mataram',
+                    'location' => 'Dasan Cermen',
                     'query' => 'POLNAM',
                     'logo' => asset('images/campuses/polnam.png'),
-                    'initials' => 'PN'
+                    'initials' => 'PK'
                 ],
                 [
                     'name' => 'UT Mataram',

@@ -151,9 +151,9 @@
             lng: 116.10061365572658
         },
         'POLNAM': {
-            name: 'Politeknik Negeri Mataram (Polnam)',
-            lat: -8.5833,
-            lng: 116.0950
+            name: 'Poltekkes Kemenkes Mataram',
+            lat: -8.60697944667692,
+            lng: 116.13034004303186
         },
         'UT_MATARAM': {
             name: 'Universitas Terbuka Mataram (UT)',

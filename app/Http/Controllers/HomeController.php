@@ -50,11 +50,11 @@ class HomeController extends Controller
                     'initials' => 'U2'
                 ],
                 [
-                    'name' => 'Polnam',
-                    'display' => 'Kos Dekat Polnam Mataram',
+                    'name' => 'Poltekkes Kemenkes Mataram',
+                    'display' => 'Kos Dekat Poltekkes Kemenkes Mataram',
                     'query' => 'POLNAM',
                     'logo' => asset('images/campuses/polnam.png'),
-                    'initials' => 'PN'
+                    'initials' => 'PK'
                 ],
                 [
                     'name' => 'UT Mataram',

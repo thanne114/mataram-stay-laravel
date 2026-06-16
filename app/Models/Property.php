@@ -114,7 +114,7 @@ class Property extends Model
             'UIN_MATARAM_1' => ['name' => 'UIN Mataram Kampus 1', 'lat' => -8.582297, 'lng' => 116.094629],
             'UIN_MATARAM_2' => ['name' => 'UIN Mataram Kampus 2', 'lat' => -8.610029404934442, 'lng' => 116.10061365572658],
             'UMMAT' => ['name' => 'Universitas Muhammadiyah Mataram (UMMAT)', 'lat' => -8.5982, 'lng' => 116.1084],
-            'POLNAM' => ['name' => 'Politeknik Negeri Mataram (Polnam)', 'lat' => -8.5833, 'lng' => 116.0950],
+            'POLNAM' => ['name' => 'Poltekkes Kemenkes Mataram', 'lat' => -8.60697944667692, 'lng' => 116.13034004303186],
             'UT_MATARAM' => ['name' => 'Universitas Terbuka Mataram (UT)', 'lat' => -8.5796, 'lng' => 116.1026],
             'UTM' => ['name' => 'Universitas Teknologi Mataram (UTM)', 'lat' => -8.592227544759059, 'lng' => 116.09210315753597],
             'UNBIM' => ['name' => 'Universitas Bhakti Mataram (UNBIM)', 'lat' => -8.6050, 'lng' => 116.0850],
