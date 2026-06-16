@@ -199,7 +199,7 @@ class CampusHubSearchTest extends TestCase
         // Check PTN campus links
         $response->assertSee('Kos Dekat UNRAM Mataram');
         $response->assertSee('Kos Dekat UIN Mataram');
-        $response->assertSee('Kos Dekat Polnam Mataram');
+        $response->assertSee('Kos Dekat Poltekkes Kemenkes Mataram');
         $response->assertSee('Kos Dekat UT Mataram');
 
         // Check PTS campus links
