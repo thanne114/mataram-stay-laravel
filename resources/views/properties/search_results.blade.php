@@ -59,13 +59,13 @@
                     <option value="UNRAM">Universitas Mataram (UNRAM)</option>
                     <option value="UIN_MATARAM_1">UIN Mataram Kampus 1</option>
                     <option value="UIN_MATARAM_2">UIN Mataram Kampus 2</option>
-                    <option value="POLNAM">Politeknik Negeri Mataram (Polnam)</option>
+                    <option value="POLNAM">Poltekkes Kemenkes Mataram</option>
                     <option value="UT_MATARAM">Universitas Terbuka Mataram (UT)</option>
                     <option value="UMMAT">UM Muhammadiyah Mataram (UMMAT)</option>
                     <option value="UTM">Universitas Teknologi Mataram (UTM)</option>
                     <option value="UNBIM">Universitas Bhakti Mataram (UNBIM)</option>
                     <option value="IAHN_GDE_PUDJA">IAHN Gde Pudja</option>
-                    <option value="STIKES_YARSI">STIKES Yarsi Mataram</option>
+                    <option value="STIKES_YARSI">INKES Yarsi Mataram</option>
                     <option value="UNMAS">Universitas Mahasaraswati Mataram</option>
                 </select>
             </div>
@@ -181,9 +181,9 @@
             lng: 116.10274343138725
         },
         'STIKES_YARSI': {
-            name: 'STIKES Yarsi Mataram',
-            lat: -8.6120,
-            lng: 116.1060
+            name: 'INKES Yarsi Mataram',
+            lat: -8.616198152336244,
+            lng: 116.1037731163117
         },
         'UNMAS': {
             name: 'Universitas Mahasaraswati Mataram',

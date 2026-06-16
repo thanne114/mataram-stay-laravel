@@ -94,11 +94,11 @@ class HomeController extends Controller
                     'initials' => 'IA'
                 ],
                 [
-                    'name' => 'STIKES Yarsi Mataram',
-                    'display' => 'Kos Dekat STIKES Yarsi Mataram',
+                    'name' => 'INKES Yarsi Mataram',
+                    'display' => 'Kos Dekat INKES Yarsi Mataram',
                     'query' => 'STIKES_YARSI',
                     'logo' => asset('images/campuses/stikes_yarsi.png'),
-                    'initials' => 'SY'
+                    'initials' => 'IY'
                 ],
                 [
                     'name' => 'Universitas Mahasaraswati',
