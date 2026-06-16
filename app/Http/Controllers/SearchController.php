@@ -123,6 +123,10 @@ class SearchController extends Controller
                 'UNRAM' => ['lat' => -8.5878, 'lng' => 116.0967],
                 'UIN_MATARAM' => ['lat' => -8.6116, 'lng' => 116.1154],
                 'UMMAT' => ['lat' => -8.5982, 'lng' => 116.1084],
+                'POLNAM' => ['lat' => -8.5833, 'lng' => 116.0950],
+                'UT_MATARAM' => ['lat' => -8.5796, 'lng' => 116.1026],
+                'UTM' => ['lat' => -8.5835, 'lng' => 116.1054],
+                'UNBIM' => ['lat' => -8.6050, 'lng' => 116.0850],
             ];
 
             $selectedCampus = $request->kampus;

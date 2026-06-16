@@ -58,7 +58,11 @@
                     <option value="">Pilih Kampus</option>
                     <option value="UNRAM">Universitas Mataram (UNRAM)</option>
                     <option value="UIN_MATARAM">UIN Mataram</option>
-                    <option value="UMMAT">UM Muhammadiyah Mataram</option>
+                    <option value="POLNAM">Politeknik Negeri Mataram (Polnam)</option>
+                    <option value="UT_MATARAM">Universitas Terbuka Mataram (UT)</option>
+                    <option value="UMMAT">UM Muhammadiyah Mataram (UMMAT)</option>
+                    <option value="UTM">Universitas Teknologi Mataram (UTM)</option>
+                    <option value="UNBIM">Universitas Bhakti Mataram (UNBIM)</option>
                 </select>
             </div>
             <div>
