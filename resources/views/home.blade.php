@@ -167,13 +167,55 @@
         <!-- Section: Kos Sekitar Kampus -->
         @php
             $campuses = [
-                ['name' => 'UNRAM', 'location' => 'Kekalik', 'query' => 'UNRAM'],
-                ['name' => 'UIN Mataram', 'location' => 'Jempong', 'query' => 'UIN_MATARAM_2'],
-                ['name' => 'Polnam', 'location' => 'Gomong', 'query' => 'POLNAM'],
-                ['name' => 'UT Mataram', 'location' => 'Karang Baru', 'query' => 'UT_MATARAM'],
-                ['name' => 'UMMAT', 'location' => 'Pagesangan', 'query' => 'UMMAT'],
-                ['name' => 'UTM', 'location' => 'Dasan Agung', 'query' => 'UTM'],
-                ['name' => 'UNBIM', 'location' => 'Sekarbela', 'query' => 'UNBIM'],
+                [
+                    'name' => 'UNRAM',
+                    'location' => 'Kekalik',
+                    'query' => 'UNRAM',
+                    'logo' => 'https://upload.wikimedia.org/wikipedia/id/c/c2/LogoUnram.png',
+                    'initials' => 'UR'
+                ],
+                [
+                    'name' => 'UIN Mataram',
+                    'location' => 'Jempong',
+                    'query' => 'UIN_MATARAM_2',
+                    'logo' => 'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_UIN_Mataram.png',
+                    'initials' => 'UIN'
+                ],
+                [
+                    'name' => 'Polnam',
+                    'location' => 'Gomong',
+                    'query' => 'POLNAM',
+                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_Politeknik_Kesehatan_Mataram.png',
+                    'initials' => 'PN'
+                ],
+                [
+                    'name' => 'UT Mataram',
+                    'location' => 'Karang Baru',
+                    'query' => 'UT_MATARAM',
+                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Universitas_Terbuka.svg/240px-Logo_Universitas_Terbuka.svg.png',
+                    'initials' => 'UT'
+                ],
+                [
+                    'name' => 'UMMAT',
+                    'location' => 'Pagesangan',
+                    'query' => 'UMMAT',
+                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/46/Logo_Universitas_Muhammadiyah_Mataram.png',
+                    'initials' => 'UM'
+                ],
+                [
+                    'name' => 'UTM',
+                    'location' => 'Dasan Agung',
+                    'query' => 'UTM',
+                    'logo' => 'https://utm.ac.id/wp-content/uploads/2023/10/logo-utm.png',
+                    'initials' => 'UTM'
+                ],
+                [
+                    'name' => 'UNBIM',
+                    'location' => 'Sekarbela',
+                    'query' => 'UNBIM',
+                    'logo' => 'https://unbim.ac.id/wp-content/uploads/2023/10/logo-unbim.png',
+                    'initials' => 'UB'
+                ],
             ];
         @endphp
         <section class="w-full max-w-7xl mx-auto px-6 md:px-8 pb-24 flex flex-col gap-8">
@@ -185,12 +227,11 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach($campuses as $campus)
                     <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="flex items-center gap-4 bg-white border border-outline-variant/30 rounded-xl p-4 hover:shadow-md transition group">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition-transform">
-                            <!-- Heroicons: academic-cap -->
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.9c2.785 0 5.48-.233 8.1-.685a60.435 60.435 0 00-.49-6.368M12 3.75L3.75 8.25 12 12.75l8.25-4.5L12 3.75z" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M20.25 12.5v3a3 3 0 01-3 3h-10.5a3 3 0 01-3-3v-3" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                        <div class="flex-shrink-0 w-10 h-10 rounded-xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition-all shadow-sm">
+                            <img src="{{ $campus['logo'] }}" alt="{{ $campus['name'] }}" class="w-full h-full object-contain p-1" id="logo-{{ $campus['query'] }}" onerror="this.style.display='none'; document.getElementById('fallback-{{ $campus['query'] }}').style.display='flex';">
+                            <div id="fallback-{{ $campus['query'] }}" class="hidden w-full h-full items-center justify-center font-headline font-bold text-xs text-primary uppercase">
+                                {{ $campus['initials'] }}
+                            </div>
                         </div>
                         <div class="flex flex-col min-w-0">
                             <span class="font-bold text-on-surface truncate font-body text-sm md:text-base leading-tight group-hover:text-primary transition-colors">{{ $campus['name'] }}</span>

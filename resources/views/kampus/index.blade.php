@@ -42,9 +42,14 @@
                         <ul class="flex flex-col gap-3 font-body text-sm">
                             @foreach($campuses['ptn'] as $campus)
                                 <li>
-                                    <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="text-secondary hover:text-primary hover:underline transition-colors flex items-center gap-2 py-0.5 group">
-                                        <span class="material-symbols-outlined text-secondary/40 group-hover:text-primary transition-colors text-base" style="font-variation-settings: 'FILL' 1;">school</span>
-                                        {{ $campus['display'] }}
+                                    <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="hover:text-primary transition-colors flex items-center gap-3 py-1 group">
+                                        <div class="flex-shrink-0 w-7 h-7 rounded-lg overflow-hidden bg-primary/10 text-primary flex items-center justify-center shadow-sm">
+                                            <img src="{{ $campus['logo'] }}" alt="{{ $campus['name'] }}" class="w-full h-full object-contain p-0.5" id="logo-{{ $campus['query'] }}" onerror="this.style.display='none'; document.getElementById('fallback-{{ $campus['query'] }}').style.display='flex';">
+                                            <div id="fallback-{{ $campus['query'] }}" class="hidden w-full h-full items-center justify-center font-headline font-bold text-[9px] text-primary uppercase">
+                                                {{ $campus['initials'] }}
+                                            </div>
+                                        </div>
+                                        <span class="text-secondary group-hover:text-primary group-hover:underline text-sm leading-tight transition-colors">{{ $campus['display'] }}</span>
                                     </a>
                                 </li>
                             @endforeach
@@ -60,9 +65,14 @@
                         <ul class="flex flex-col gap-3 font-body text-sm">
                             @foreach($campuses['pts'] as $campus)
                                 <li>
-                                    <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="text-secondary hover:text-primary hover:underline transition-colors flex items-center gap-2 py-0.5 group">
-                                        <span class="material-symbols-outlined text-secondary/40 group-hover:text-primary transition-colors text-base" style="font-variation-settings: 'FILL' 1;">school</span>
-                                        {{ $campus['display'] }}
+                                    <a href="{{ route('search', ['kampus' => $campus['query']]) }}" class="hover:text-primary transition-colors flex items-center gap-3 py-1 group">
+                                        <div class="flex-shrink-0 w-7 h-7 rounded-lg overflow-hidden bg-primary/10 text-primary flex items-center justify-center shadow-sm">
+                                            <img src="{{ $campus['logo'] }}" alt="{{ $campus['name'] }}" class="w-full h-full object-contain p-0.5" id="logo-{{ $campus['query'] }}" onerror="this.style.display='none'; document.getElementById('fallback-{{ $campus['query'] }}').style.display='flex';">
+                                            <div id="fallback-{{ $campus['query'] }}" class="hidden w-full h-full items-center justify-center font-headline font-bold text-[9px] text-primary uppercase">
+                                                {{ $campus['initials'] }}
+                                            </div>
+                                        </div>
+                                        <span class="text-secondary group-hover:text-primary group-hover:underline text-sm leading-tight transition-colors">{{ $campus['display'] }}</span>
                                     </a>
                                 </li>
                             @endforeach
