@@ -28,7 +28,7 @@ class CampusHubSearchTest extends TestCase
             'role' => 'owner',
         ]);
 
-        // Property near UNRAM (-8.5878, 116.0967)
+        // Property near UNRAM (-8.587063, 116.092185)
         $this->propertyNearUnram = Property::create([
             'user_id' => $this->owner->id,
             'name' => 'Kos Dekat UNRAM',
@@ -36,8 +36,8 @@ class CampusHubSearchTest extends TestCase
             'type' => 'Putra',
             'area' => 'Mataram',
             'address' => 'Jln. Pendidikan No. 5',
-            'latitude' => '-8.5879',
-            'longitude' => '116.0968',
+            'latitude' => '-8.5871',
+            'longitude' => '116.0922',
             'description' => 'Kos putra dekat UNRAM',
             'main_image' => 'properties/near.png',
             'is_verified' => true,

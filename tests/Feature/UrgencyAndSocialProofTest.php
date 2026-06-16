@@ -33,8 +33,8 @@ class UrgencyAndSocialProofTest extends TestCase
             'type' => 'Campur',
             'area' => 'Selaparang',
             'address' => 'Jln. Kebon No. 4, Mataram',
-            'latitude' => '-8.5880', // Very close to UNRAM (-8.5878, 116.0967)
-            'longitude' => '116.0970',
+            'latitude' => '-8.5871', // Very close to UNRAM (-8.587063, 116.092185)
+            'longitude' => '116.0922',
             'description' => 'Kos dekat kampus',
             'main_image' => 'properties/test.png',
             'is_verified' => true,

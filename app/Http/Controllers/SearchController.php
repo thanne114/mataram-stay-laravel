@@ -120,7 +120,7 @@ class SearchController extends Controller
         // Filter Kampus Hub (Radius Geolocation Query)
         if ($request->filled('kampus')) {
             $campuses = [
-                'UNRAM' => ['lat' => -8.5878, 'lng' => 116.0967],
+                'UNRAM' => ['lat' => -8.587063, 'lng' => 116.092185],
                 'UIN_MATARAM' => ['lat' => -8.6116, 'lng' => 116.1154],
                 'UMMAT' => ['lat' => -8.5982, 'lng' => 116.1084],
                 'POLNAM' => ['lat' => -8.5833, 'lng' => 116.0950],

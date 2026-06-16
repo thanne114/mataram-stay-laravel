@@ -131,8 +131,8 @@
     var campuses = {
         'UNRAM': {
             name: 'Universitas Mataram (UNRAM)',
-            lat: -8.5878,
-            lng: 116.0967
+            lat: -8.587063,
+            lng: 116.092185
         },
         'UIN_MATARAM': {
             name: 'UIN Mataram',
@@ -181,8 +181,8 @@
         }
     };
 
-    var defaultLat = -8.5878;
-    var defaultLng = 116.0967;
+    var defaultLat = -8.587063;
+    var defaultLng = 116.092185;
 
     // Detect campus from query params on load to set initial focus
     var urlParams = new URLSearchParams(window.location.search);
@@ -225,7 +225,7 @@
             map.flyTo([c.lat, c.lng], 14, { animate: true, duration: 1.5 });
         } else {
             // Default center if no campus selected (UNRAM coords)
-            map.flyTo([-8.5878, 116.0967], 14, { animate: true, duration: 1.5 });
+            map.flyTo([-8.587063, 116.092185], 14, { animate: true, duration: 1.5 });
         }
     }
 
