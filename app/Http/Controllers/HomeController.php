@@ -32,35 +32,35 @@ class HomeController extends Controller
                     'name' => 'UNRAM',
                     'display' => 'Kos Dekat UNRAM Mataram',
                     'query' => 'UNRAM',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/id/c/c2/LogoUnram.png',
+                    'logo' => asset('images/campuses/unram.png'),
                     'initials' => 'UR'
                 ],
                 [
                     'name' => 'UIN Mataram Kampus 1',
                     'display' => 'Kos Dekat UIN Mataram Kampus 1',
                     'query' => 'UIN_MATARAM_1',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_UIN_Mataram.png',
+                    'logo' => asset('images/campuses/uin.png'),
                     'initials' => 'U1'
                 ],
                 [
                     'name' => 'UIN Mataram Kampus 2',
                     'display' => 'Kos Dekat UIN Mataram Kampus 2',
                     'query' => 'UIN_MATARAM_2',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_UIN_Mataram.png',
+                    'logo' => asset('images/campuses/uin.png'),
                     'initials' => 'U2'
                 ],
                 [
                     'name' => 'Polnam',
                     'display' => 'Kos Dekat Polnam Mataram',
                     'query' => 'POLNAM',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_Politeknik_Kesehatan_Mataram.png',
+                    'logo' => asset('images/campuses/polnam.png'),
                     'initials' => 'PN'
                 ],
                 [
                     'name' => 'UT Mataram',
                     'display' => 'Kos Dekat UT Mataram',
                     'query' => 'UT_MATARAM',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Universitas_Terbuka.svg/240px-Logo_Universitas_Terbuka.svg.png',
+                    'logo' => asset('images/campuses/ut.png'),
                     'initials' => 'UT'
                 ],
             ],
@@ -69,28 +69,28 @@ class HomeController extends Controller
                     'name' => 'UMMAT',
                     'display' => 'Kos Dekat UMMAT Mataram',
                     'query' => 'UMMAT',
-                    'logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/46/Logo_Universitas_Muhammadiyah_Mataram.png',
+                    'logo' => asset('images/campuses/ummat.png'),
                     'initials' => 'UM'
                 ],
                 [
                     'name' => 'UTM',
                     'display' => 'Kos Dekat UTM Mataram',
                     'query' => 'UTM',
-                    'logo' => 'https://utm.ac.id/wp-content/uploads/2023/10/logo-utm.png',
+                    'logo' => asset('images/campuses/utm.png'),
                     'initials' => 'UTM'
                 ],
                 [
                     'name' => 'UNBIM Mataram',
                     'display' => 'Kos Dekat UNBIM Mataram',
                     'query' => 'UNBIM',
-                    'logo' => 'https://unbim.ac.id/wp-content/uploads/2023/10/logo-unbim.png',
+                    'logo' => asset('images/campuses/unbim.png'),
                     'initials' => 'UB'
                 ],
                 [
                     'name' => 'IAHN Gde Pudja',
                     'display' => 'Kos Dekat IAHN Gde Pudja Mataram',
                     'query' => 'IAHN_GDE_PUDJA',
-                    'logo' => 'https://iahn-gdepudja.ac.id/wp-content/uploads/2021/04/Logo-IAHN.png',
+                    'logo' => asset('images/campuses/iahn.png'),
                     'initials' => 'IA'
                 ],
                 [
@@ -104,7 +104,7 @@ class HomeController extends Controller
                     'name' => 'Universitas Mahasaraswati',
                     'display' => 'Kos Dekat Universitas Mahasaraswati Mataram',
                     'query' => 'UNMAS',
-                    'logo' => 'https://unmas.ac.id/wp-content/uploads/2021/08/cropped-logo-unmas-192x192.png',
+                    'logo' => asset('images/campuses/unmas.png'),
                     'initials' => 'UMS'
                 ],
             ]

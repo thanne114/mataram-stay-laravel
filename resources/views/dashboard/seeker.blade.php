@@ -225,49 +225,49 @@
             'name' => 'UNRAM',
             'location' => 'Kekalik',
             'query' => 'UNRAM',
-            'logo' => 'https://upload.wikimedia.org/wikipedia/id/c/c2/LogoUnram.png',
+            'logo' => asset('images/campuses/unram.png'),
             'initials' => 'UR'
         ],
         [
             'name' => 'UIN Mataram Kampus 2',
             'location' => 'Jempong Baru',
             'query' => 'UIN_MATARAM_2',
-            'logo' => 'https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_UIN_Mataram.png',
+            'logo' => asset('images/campuses/uin.png'),
             'initials' => 'UIN'
         ],
         [
             'name' => 'Polnam',
             'location' => 'Gomong',
             'query' => 'POLNAM',
-            'logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Logo_Politeknik_Kesehatan_Mataram.png',
+            'logo' => asset('images/campuses/polnam.png'),
             'initials' => 'PN'
         ],
         [
             'name' => 'UT Mataram',
             'location' => 'Karang Baru',
             'query' => 'UT_MATARAM',
-            'logo' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Logo_Universitas_Terbuka.svg/240px-Logo_Universitas_Terbuka.svg.png',
+            'logo' => asset('images/campuses/ut.png'),
             'initials' => 'UT'
         ],
         [
             'name' => 'UMMAT',
             'location' => 'Pagesangan',
             'query' => 'UMMAT',
-            'logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/46/Logo_Universitas_Muhammadiyah_Mataram.png',
+            'logo' => asset('images/campuses/ummat.png'),
             'initials' => 'UM'
         ],
         [
             'name' => 'UTM',
             'location' => 'Dasan Agung',
             'query' => 'UTM',
-            'logo' => 'https://utm.ac.id/wp-content/uploads/2023/10/logo-utm.png',
+            'logo' => asset('images/campuses/utm.png'),
             'initials' => 'UTM'
         ],
         [
             'name' => 'UNBIM',
             'location' => 'Sekarbela',
             'query' => 'UNBIM',
-            'logo' => 'https://unbim.ac.id/wp-content/uploads/2023/10/logo-unbim.png',
+            'logo' => asset('images/campuses/unbim.png'),
             'initials' => 'UB'
         ],
     ];
