@@ -110,7 +110,9 @@ class Property extends Model
     {
         $campuses = [
             'UNRAM' => ['name' => 'Universitas Mataram (UNRAM)', 'lat' => -8.587063, 'lng' => 116.092185],
-            'UIN_MATARAM' => ['name' => 'UIN Mataram', 'lat' => -8.6116, 'lng' => 116.1154],
+            'UIN_MATARAM' => ['name' => 'UIN Mataram Kampus 2', 'lat' => -8.609817, 'lng' => 116.100646],
+            'UIN_MATARAM_1' => ['name' => 'UIN Mataram Kampus 1', 'lat' => -8.582297, 'lng' => 116.094629],
+            'UIN_MATARAM_2' => ['name' => 'UIN Mataram Kampus 2', 'lat' => -8.609817, 'lng' => 116.100646],
             'UMMAT' => ['name' => 'Universitas Muhammadiyah Mataram (UMMAT)', 'lat' => -8.5982, 'lng' => 116.1084],
             'POLNAM' => ['name' => 'Politeknik Negeri Mataram (Polnam)', 'lat' => -8.5833, 'lng' => 116.0950],
             'UT_MATARAM' => ['name' => 'Universitas Terbuka Mataram (UT)', 'lat' => -8.5796, 'lng' => 116.1026],

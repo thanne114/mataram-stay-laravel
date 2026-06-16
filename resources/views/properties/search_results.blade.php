@@ -57,7 +57,8 @@
                 <select name="kampus" x-model="kampus" class="w-full bg-surface-bright border border-outline-variant rounded-lg px-3 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary">
                     <option value="">Pilih Kampus</option>
                     <option value="UNRAM">Universitas Mataram (UNRAM)</option>
-                    <option value="UIN_MATARAM">UIN Mataram</option>
+                    <option value="UIN_MATARAM_1">UIN Mataram Kampus 1</option>
+                    <option value="UIN_MATARAM_2">UIN Mataram Kampus 2</option>
                     <option value="POLNAM">Politeknik Negeri Mataram (Polnam)</option>
                     <option value="UT_MATARAM">Universitas Terbuka Mataram (UT)</option>
                     <option value="UMMAT">UM Muhammadiyah Mataram (UMMAT)</option>
@@ -135,9 +136,19 @@
             lng: 116.092185
         },
         'UIN_MATARAM': {
-            name: 'UIN Mataram',
-            lat: -8.6116,
-            lng: 116.1154
+            name: 'UIN Mataram Kampus 2',
+            lat: -8.609817,
+            lng: 116.100646
+        },
+        'UIN_MATARAM_1': {
+            name: 'UIN Mataram Kampus 1',
+            lat: -8.582297,
+            lng: 116.094629
+        },
+        'UIN_MATARAM_2': {
+            name: 'UIN Mataram Kampus 2',
+            lat: -8.609817,
+            lng: 116.100646
         },
         'POLNAM': {
             name: 'Politeknik Negeri Mataram (Polnam)',

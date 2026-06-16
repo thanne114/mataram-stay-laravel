@@ -222,7 +222,7 @@
 @php
     $campuses = [
         ['name' => 'UNRAM', 'location' => 'Kekalik', 'query' => 'UNRAM'],
-        ['name' => 'UIN Mataram', 'location' => 'Jempong', 'query' => 'UIN_MATARAM'],
+        ['name' => 'UIN Mataram', 'location' => 'Jempong', 'query' => 'UIN_MATARAM_2'],
         ['name' => 'Polnam', 'location' => 'Gomong', 'query' => 'POLNAM'],
         ['name' => 'UT Mataram', 'location' => 'Karang Baru', 'query' => 'UT_MATARAM'],
         ['name' => 'UMMAT', 'location' => 'Pagesangan', 'query' => 'UMMAT'],

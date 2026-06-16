@@ -29,7 +29,8 @@ class HomeController extends Controller
         $campuses = [
             'ptn' => [
                 ['name' => 'UNRAM', 'display' => 'Kos Dekat UNRAM Mataram', 'query' => 'UNRAM'],
-                ['name' => 'UIN Mataram', 'display' => 'Kos Dekat UIN Mataram', 'query' => 'UIN_MATARAM'],
+                ['name' => 'UIN Mataram Kampus 1', 'display' => 'Kos Dekat UIN Mataram Kampus 1', 'query' => 'UIN_MATARAM_1'],
+                ['name' => 'UIN Mataram Kampus 2', 'display' => 'Kos Dekat UIN Mataram Kampus 2', 'query' => 'UIN_MATARAM_2'],
                 ['name' => 'Polnam', 'display' => 'Kos Dekat Polnam Mataram', 'query' => 'POLNAM'],
                 ['name' => 'UT Mataram', 'display' => 'Kos Dekat UT Mataram', 'query' => 'UT_MATARAM'],
             ],
