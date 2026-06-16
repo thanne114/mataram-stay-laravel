@@ -30,7 +30,7 @@ class SearchController extends Controller
 
         return view('properties.search_results', [
             'properties' => $properties,
-            'filters'    => $request->only(['lokasi', 'tipe_kos', 'harga_maksimal', 'tersedia', 'kampus', 'fasilitas']),
+            'filters'    => $request->only(['lokasi', 'tipe_kos', 'harga_minimal', 'harga_maksimal', 'tersedia', 'kampus', 'fasilitas']),
             'facilitiesList' => $facilitiesList,
         ]);
     }
@@ -91,10 +91,15 @@ class SearchController extends Controller
             $query->where('type', $request->tipe_kos);
         }
 
-        // Filter berdasarkan harga maksimal (dari tipe kamar termurah)
-        if ($request->filled('harga_maksimal') && (int)$request->harga_maksimal < 3000000) {
+        // Filter berdasarkan rentang harga
+        if ($request->filled('harga_minimal') || $request->filled('harga_maksimal')) {
             $query->whereHas('roomTypes', function ($q) use ($request) {
-                $q->where('price_per_month', '<=', $request->harga_maksimal);
+                if ($request->filled('harga_minimal')) {
+                    $q->where('price_per_month', '>=', (int)$request->harga_minimal);
+                }
+                if ($request->filled('harga_maksimal')) {
+                    $q->where('price_per_month', '<=', (int)$request->harga_maksimal);
+                }
             });
         }
 

@@ -116,6 +116,18 @@ class CampusHubSearchTest extends TestCase
     }
 
     /**
+     * Test searching by price range (min and max).
+     */
+    public function test_can_filter_by_price_range(): void
+    {
+        $response = $this->get('/search?harga_minimal=1200000&harga_maksimal=2000000');
+
+        $response->assertStatus(200);
+        $response->assertSee('Kos Jauh di Cakra');
+        $response->assertDontSee('Kos Dekat UNRAM');
+    }
+
+    /**
      * Test search by campus hub (radius query).
      */
     public function test_can_filter_by_campus_hub_radius(): void

@@ -81,14 +81,31 @@
             </div>
             <div>
                 <label class="text-[10px] uppercase tracking-widest font-bold text-secondary mb-1 block">
-                    Harga Maksimal: <span class="text-primary font-bold" x-text="harga_maksimal >= 3000000 ? 'Tanpa Batas' : 'Rp ' + Number(harga_maksimal).toLocaleString('id-ID')"></span>
+                    Rentang Harga
                 </label>
-                <div class="pt-2 px-1">
-                    <input type="range" min="500000" max="3000000" step="100000" x-model="harga_maksimal" class="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none">
-                    <div class="flex justify-between text-[10px] text-secondary/70 mt-1">
-                        <span>500k</span>
-                        <span>1.5M</span>
-                        <span>3M+</span>
+                <div class="flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-secondary font-medium">Rp</span>
+                        <input type="text" 
+                               x-model="harga_minimal_display" 
+                               @input="harga_minimal_display = formatRupiah($event.target.value); harga_minimal = $event.target.value.replace(/[^0-9]/g, '')"
+                               @input.debounce.500ms="applyFilters()"
+                               @blur="applyFilters()"
+                               @keyup.enter="applyFilters()"
+                               class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-7 pr-2 py-2.5 text-xs focus:border-primary focus:ring-1 focus:ring-primary font-body text-on-surface" 
+                               placeholder="0">
+                    </div>
+                    <span class="text-secondary font-bold">—</span>
+                    <div class="relative flex-1">
+                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-secondary font-medium">Rp</span>
+                        <input type="text" 
+                               x-model="harga_maksimal_display" 
+                               @input="harga_maksimal_display = formatRupiah($event.target.value); harga_maksimal = $event.target.value.replace(/[^0-9]/g, '')"
+                               @input.debounce.500ms="applyFilters()"
+                               @blur="applyFilters()"
+                               @keyup.enter="applyFilters()"
+                               class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-7 pr-2 py-2.5 text-xs focus:border-primary focus:ring-1 focus:ring-primary font-body text-on-surface" 
+                               placeholder="15.000.000">
                     </div>
                 </div>
             </div>
@@ -359,11 +376,22 @@
             lokasi: '{{ $filters['lokasi'] ?? '' }}',
             kampus: '{{ $filters['kampus'] ?? '' }}',
             tipe_kos: '{{ $filters['tipe_kos'] ?? '' }}',
-            harga_maksimal: '{{ $filters['harga_maksimal'] ?? '3000000' }}',
+            harga_minimal: '{{ $filters['harga_minimal'] ?? '' }}',
+            harga_maksimal: '{{ $filters['harga_maksimal'] ?? '' }}',
+            harga_minimal_display: '',
+            harga_maksimal_display: '',
             fasilitas: {!! json_encode(request('fasilitas') ?? []) !!},
             isLoading: false,
 
             init() {
+                // Initialize display values formatted as Rupiah
+                if (this.harga_minimal) {
+                    this.harga_minimal_display = this.formatRupiah(this.harga_minimal);
+                }
+                if (this.harga_maksimal) {
+                    this.harga_maksimal_display = this.formatRupiah(this.harga_maksimal);
+                }
+
                 // Watchers to trigger filtering on change
                 this.$watch('lokasi', () => this.applyFilters());
                 this.$watch('kampus', (value) => {
@@ -373,7 +401,6 @@
                     }
                 });
                 this.$watch('tipe_kos', () => this.applyFilters());
-                this.$watch('harga_maksimal', () => this.applyFilters());
                 this.$watch('fasilitas', () => this.applyFilters());
 
                 // Intercept pagination link clicks for AJAX loading
@@ -386,6 +413,13 @@
                 });
             },
 
+            formatRupiah(val) {
+                if (val === null || val === undefined || val === '') return '';
+                let num = val.toString().replace(/[^0-9]/g, '');
+                if (!num) return '';
+                return Number(num).toLocaleString('id-ID');
+            },
+
             applyFilters() {
                 this.isLoading = true;
                 
@@ -394,7 +428,10 @@
                 if (this.lokasi) queryParams.set('lokasi', this.lokasi);
                 if (this.kampus) queryParams.set('kampus', this.kampus);
                 if (this.tipe_kos) queryParams.set('tipe_kos', this.tipe_kos);
-                if (this.harga_maksimal && this.harga_maksimal < 3000000) {
+                if (this.harga_minimal) {
+                    queryParams.set('harga_minimal', this.harga_minimal);
+                }
+                if (this.harga_maksimal) {
                     queryParams.set('harga_maksimal', this.harga_maksimal);
                 }
                 if (this.fasilitas && this.fasilitas.length > 0) {

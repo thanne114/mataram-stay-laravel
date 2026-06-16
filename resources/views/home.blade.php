@@ -55,15 +55,14 @@
                             </div>
                         </div>
                         <div class="flex-1 px-4 py-3 md:py-4 flex flex-col gap-1">
-                            <span class="text-[10px] uppercase tracking-widest font-bold text-secondary px-1">Harga Maksimal</span>
+                            <span class="text-[10px] uppercase tracking-widest font-bold text-secondary px-1">Rentang Harga</span>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-primary text-xl">payments</span>
-                                <select name="harga_maksimal" class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body text-base outline-none cursor-pointer p-0 appearance-none">
-                                    <option value="">Tanpa Batas</option>
-                                    <option value="1000000">&lt; Rp 1.000.000</option>
-                                    <option value="1500000">&lt; Rp 1.500.000</option>
-                                    <option value="2000000">&lt; Rp 2.000.000</option>
-                                </select>
+                                <div class="flex items-center gap-1.5 w-full">
+                                    <input type="number" name="harga_minimal" placeholder="Min" class="w-1/2 bg-transparent border-none focus:ring-0 text-on-surface font-body text-base outline-none p-0 placeholder-secondary/50" min="0">
+                                    <span class="text-secondary/60 text-sm font-bold">-</span>
+                                    <input type="number" name="harga_maksimal" placeholder="Max" class="w-1/2 bg-transparent border-none focus:ring-0 text-on-surface font-body text-base outline-none p-0 placeholder-secondary/50" min="0">
+                                </div>
                             </div>
                         </div>
                     </div>
