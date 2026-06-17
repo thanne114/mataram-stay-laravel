@@ -33,7 +33,7 @@ class PropertyController extends Controller
 
         // Upload foto utama jika ada
         if ($request->hasFile('main_image')) {
-            $data['main_image'] = $request->file('main_image')->store('properties', 'public');
+            $data['main_image'] = $this->compressAndStore($request->file('main_image'), 'properties');
         }
 
         // Parse koordinat dari input
@@ -70,7 +70,7 @@ class PropertyController extends Controller
         // Upload galeri foto tambahan
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $image) {
-                $path = $image->store('properties/gallery', 'public');
+                $path = $this->compressAndStore($image, 'properties/gallery');
                 $property->images()->create(['image_path' => $path]);
             }
         }
@@ -130,7 +130,7 @@ class PropertyController extends Controller
             if ($property->main_image) {
                 Storage::disk('public')->delete($property->main_image);
             }
-            $data['main_image'] = $request->file('main_image')->store('properties', 'public');
+            $data['main_image'] = $this->compressAndStore($request->file('main_image'), 'properties');
         }
 
         // Parse koordinat
@@ -163,7 +163,7 @@ class PropertyController extends Controller
         // Upload galeri foto tambahan
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $image) {
-                $path = $image->store('properties/gallery', 'public');
+                $path = $this->compressAndStore($image, 'properties/gallery');
                 $property->images()->create(['image_path' => $path]);
             }
         }
@@ -203,5 +203,46 @@ class PropertyController extends Controller
                 $data['longitude'] = $matches[2];
             }
         }
+    }
+
+    /**
+     * Compress and store an uploaded image using GD Library.
+     * Converts to WebP format, resizes if width > 1200px, compresses at 80% quality.
+     */
+    private function compressAndStore($file, string $directory = 'properties'): string
+    {
+        $filename = uniqid() . '.webp';
+        $path = $directory . '/' . $filename;
+
+        $image = match ($file->getMimeType()) {
+            'image/jpeg' => imagecreatefromjpeg($file->getPathname()),
+            'image/png'  => imagecreatefrompng($file->getPathname()),
+            'image/webp' => imagecreatefromwebp($file->getPathname()),
+            default      => imagecreatefromjpeg($file->getPathname()),
+        };
+
+        // Resize if width exceeds 1200px
+        $origW = imagesx($image);
+        $origH = imagesy($image);
+        $maxWidth = 1200;
+
+        if ($origW > $maxWidth) {
+            $newH = (int) ($origH * ($maxWidth / $origW));
+            $resized = imagecreatetruecolor($maxWidth, $newH);
+            imagecopyresampled($resized, $image, 0, 0, 0, 0, $maxWidth, $newH, $origW, $origH);
+            imagedestroy($image);
+            $image = $resized;
+        }
+
+        // Save as WebP with 80% quality
+        $storagePath = storage_path('app/public/' . $path);
+        $dir = dirname($storagePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        imagewebp($image, $storagePath, 80);
+        imagedestroy($image);
+
+        return $path;
     }
 }

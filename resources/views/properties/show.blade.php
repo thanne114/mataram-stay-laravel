@@ -3,6 +3,24 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>{{ $title ?? ($property->name . ' - Mataram Stay') }}</title>
 <meta name="description" content="{{ $meta_description ?? Str::limit(strip_tags($property->description), 150, '') }}">
+<link rel="canonical" href="{{ url('/kos/' . $property->slug) }}">
+
+<!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:title" content="{{ $title ?? ($property->name . ' - Mataram Stay') }}">
+<meta property="og:description" content="{{ $meta_description ?? Str::limit(strip_tags($property->description), 150, '') }}">
+@if($property->main_image)
+<meta property="og:image" content="{{ asset('storage/' . $property->main_image) }}">
+@endif
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $title ?? ($property->name . ' - Mataram Stay') }}">
+<meta name="twitter:description" content="{{ $meta_description ?? Str::limit(strip_tags($property->description), 150, '') }}">
+@if($property->main_image)
+<meta name="twitter:image" content="{{ asset('storage/' . $property->main_image) }}">
+@endif
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -101,7 +119,7 @@
         <div class="grid grid-cols-2 gap-4">
             @forelse($property->images->take(4) as $image)
                 <div class="aspect-[4/3] overflow-hidden rounded-lg">
-                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="Foto fasilitas {{ $property->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="Foto fasilitas {{ $property->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
                 </div>
             @empty
                 @for($i = 0; $i < 4; $i++)

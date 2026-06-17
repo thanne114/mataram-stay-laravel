@@ -8,7 +8,7 @@
     <a href="{{ route('property.show', $property->slug) }}" class="group bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
         <div class="relative aspect-[4/3] overflow-hidden">
             @if($property->main_image)
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="{{ asset('storage/' . $property->main_image) }}" alt="{{ $property->name }}">
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="{{ asset('storage/' . $property->main_image) }}" alt="{{ $property->name }}" loading="lazy">
             @else
             <div class="w-full h-full bg-surface-container-high flex items-center justify-center">
                 <span class="material-symbols-outlined text-5xl text-outline">apartment</span>

@@ -22,6 +22,7 @@ class StorePropertyRequest extends FormRequest
             'longitude'     => 'nullable|string|max:50',
             'description'   => 'nullable|string',
             'main_image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'gallery'       => 'nullable|array|max:10',
             'gallery.*'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             // Tipe Kamar (array)

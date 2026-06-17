@@ -49,6 +49,15 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
+        // Verify gross_amount matches booking total_price (financial integrity check)
+        $expectedAmount = (float) $booking->total_price;
+        $receivedAmount = (float) $grossAmount;
+
+        if (abs($expectedAmount - $receivedAmount) > 0.01) {
+            Log::warning("Midtrans amount mismatch for Booking ID {$booking->id}: expected={$expectedAmount}, received={$receivedAmount}");
+            return response()->json(['message' => 'Amount mismatch'], 400);
+        }
+
         // Process status
         // settlement = e-wallet, virtual account, etc.
         // capture = credit card
