@@ -200,6 +200,15 @@
             <section>
                 <h2 class="font-headline text-2xl font-bold text-on-surface mb-4">Lokasi</h2>
                 <div id="map-detail" class="w-full h-[350px] rounded-xl border border-outline-variant/40"></div>
+                <div class="mt-4">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ $property->latitude }},{{ $property->longitude }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-container-lowest border border-outline-variant text-on-surface font-label font-bold text-sm rounded-lg hover:bg-surface-variant hover:text-primary transition-all duration-300">
+                        <span class="material-symbols-outlined text-lg text-primary">directions</span>
+                        Dapatkan Rute di Google Maps
+                    </a>
+                </div>
             </section>
             @endif
 
@@ -301,7 +310,7 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
     L.marker([{{ $property->latitude }}, {{ $property->longitude }}]).addTo(map)
-        .bindPopup('<b>{{ $property->name }}</b><br>{{ $property->address }}').openPopup();
+        .bindPopup('<b>{{ $property->name }}</b><br>{{ $property->address }}<br><a href="https://www.google.com/maps/dir/?api=1&destination={{ $property->latitude }},{{ $property->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-bold text-primary hover:underline" style="color: #c2652a; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px;">Buka di Google Maps ↗</a>').openPopup();
 </script>
 @endif
 </body></html>
