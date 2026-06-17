@@ -179,18 +179,10 @@ class PropertyController extends Controller
     {
         $this->authorize('delete', $property);
 
-        // Hapus foto dari storage
-        if ($property->main_image) {
-            Storage::disk('public')->delete($property->main_image);
-        }
-        foreach ($property->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-
         $property->delete();
 
         return redirect()->route('dashboard.owner')
-            ->with('success', 'Properti berhasil dihapus.');
+            ->with('success', 'Properti berhasil diarsipkan.');
     }
 
     /**

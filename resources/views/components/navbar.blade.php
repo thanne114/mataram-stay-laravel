@@ -7,8 +7,8 @@
             
             <ul class="flex gap-10 ml-12">
                 <li class="relative">
-                    <a class="{{ request()->is('/') ? 'text-on-surface' : 'text-secondary hover:text-[#c2652a]' }} font-label font-bold pb-2 transition-colors" href="/">Cari Kos</a>
-                    @if(request()->is('/'))
+                    <a class="{{ (request()->is('/') || request()->routeIs('dashboard.seeker')) ? 'text-on-surface' : 'text-secondary hover:text-[#c2652a]' }} font-label font-bold pb-2 transition-colors" href="/">Cari Kos</a>
+                    @if(request()->is('/') || request()->routeIs('dashboard.seeker'))
                         <div class="absolute -bottom-1 left-0 w-full h-[3px] bg-[#c2652a] rounded-full"></div>
                     @endif
                 </li>

@@ -183,6 +183,13 @@
                             <div class="flex gap-3 mt-auto">
                               <a href="{{ route('property.show', $prop->slug) }}" class="flex-1 py-2.5 rounded-xl border border-outline text-secondary text-xs font-bold hover:bg-surface-container transition-colors text-center">Lihat Detail</a>
                               <a href="{{ route('property.edit', $prop) }}" class="flex-1 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-xs font-bold hover:bg-secondary-container transition-colors text-center flex items-center justify-center">Edit</a>
+                              <form action="{{ route('property.destroy', $prop) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus/mengarsipkan properti ini? Semua data histori sewa akan tetap tersimpan.')" class="inline-flex">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2.5 rounded-xl bg-tertiary/10 text-tertiary hover:bg-tertiary hover:text-white transition-colors flex items-center justify-center" title="Hapus Properti">
+                                  <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                              </form>
                             </div>
                           </div>
                         </div>
@@ -256,7 +263,7 @@
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Tanggal</th>
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Durasi</th>
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Total Bayar</th>
-                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Komisi (5%)</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Komisi OTA</th>
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Pendapatan Bersih</th>
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary text-center">Status</th>
                                 <th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Aksi</th>
@@ -289,7 +296,13 @@
                                     <td class="px-8 py-6 text-sm">{{ $booking->check_in_date->format('d M Y') }}</td>
                                     <td class="px-8 py-6 text-sm">{{ $booking->duration_months }} Bulan</td>
                                     <td class="px-8 py-6 font-semibold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
-                                    <td class="px-8 py-6 text-sm text-tertiary">- Rp {{ number_format($booking->commission_fee, 0, ',', '.') }}</td>
+                                    <td class="px-8 py-6 text-sm text-tertiary">
+                                        - Rp {{ number_format($booking->commission_fee, 0, ',', '.') }}
+                                        @php
+                                            $commissionRate = $booking->room_subtotal > 0 ? round(($booking->commission_fee / $booking->room_subtotal) * 100) : \App\Models\Setting::getValue('commission_rate', 5);
+                                        @endphp
+                                        ({{ $commissionRate }}%)
+                                    </td>
                                     <td class="px-8 py-6 font-bold text-green-700">Rp {{ number_format($booking->net_owner_amount, 0, ',', '.') }}</td>
                                     <td class="px-8 py-6 text-center">
                                         <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $booking->status }}</span>

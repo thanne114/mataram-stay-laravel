@@ -1,21 +1,11 @@
 <x-layout>
     <main class="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex-grow">
-        <!-- Breadcrumb -->
-        <nav class="flex text-sm text-secondary mb-6 font-body" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-primary transition-colors">Home</a>
-            <span class="mx-2">/</span>
-            <span class="text-on-surface font-semibold">Sitemap Kampus</span>
-        </nav>
-
         <div class="flex flex-col md:flex-row gap-8 bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
             <!-- Sidebar Kiri -->
             <aside class="w-full md:w-1/4 bg-surface-container-low/40 p-6 md:p-8 border-b md:border-b-0 md:border-r border-outline-variant/30 flex flex-col gap-6">
                 <div>
                     <h2 class="font-label text-xs font-bold uppercase tracking-widest text-secondary mb-4">SITEMAPS</h2>
                     <ul class="flex flex-col gap-3 font-body text-sm">
-                        <li>
-                            <span class="text-secondary cursor-not-allowed">Kos di Area Populer</span>
-                        </li>
                         <li>
                             <a href="{{ route('kampus.index') }}" class="font-bold text-primary flex items-center gap-1.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
