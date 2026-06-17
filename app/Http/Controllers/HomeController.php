@@ -52,7 +52,7 @@ class HomeController extends Controller
                 [
                     'name' => 'Poltekkes Kemenkes Mataram',
                     'display' => 'Kos Dekat Poltekkes Kemenkes Mataram',
-                    'query' => 'POLNAM',
+                    'query' => 'POLTEKKES_KEMENKES_MATARAM',
                     'logo' => asset('images/campuses/polnam.png'),
                     'initials' => 'PK'
                 ],

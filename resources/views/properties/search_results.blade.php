@@ -59,7 +59,7 @@
                     <option value="UNRAM">Universitas Mataram (UNRAM)</option>
                     <option value="UIN_MATARAM_1">UIN Mataram Kampus 1</option>
                     <option value="UIN_MATARAM_2">UIN Mataram Kampus 2</option>
-                    <option value="POLNAM">Poltekkes Kemenkes Mataram</option>
+                    <option value="POLTEKKES_KEMENKES_MATARAM">Poltekkes Kemenkes Mataram</option>
                     <option value="UT_MATARAM">Universitas Terbuka Mataram (UT)</option>
                     <option value="UMMAT">UM Muhammadiyah Mataram (UMMAT)</option>
                     <option value="UTM">Universitas Teknologi Mataram (UTM)</option>
@@ -168,7 +168,7 @@
             lat: -8.610029404934442,
             lng: 116.10061365572658
         },
-        'POLNAM': {
+        'POLTEKKES_KEMENKES_MATARAM': {
             name: 'Poltekkes Kemenkes Mataram',
             lat: -8.60697944667692,
             lng: 116.13034004303186

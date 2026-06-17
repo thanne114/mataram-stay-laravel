@@ -117,9 +117,6 @@
                             <div class="absolute top-4 left-4 bg-on-background text-surface-bright px-3 py-1 rounded-full text-[10px] font-label font-bold tracking-widest uppercase">
                                 {{ $property->type }}
                             </div>
-                            <button class="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/40 transition-colors">
-                                <span class="material-symbols-outlined text-xl">favorite</span>
-                            </button>
                         </div>
                         <div class="p-5 flex flex-col gap-3">
                             <div class="flex justify-between items-start">
@@ -183,7 +180,7 @@
                 [
                     'name' => 'Poltekkes Kemenkes Mataram',
                     'location' => 'Dasan Cermen',
-                    'query' => 'POLNAM',
+                    'query' => 'POLTEKKES_KEMENKES_MATARAM',
                     'logo' => asset('images/campuses/polnam.png'),
                     'initials' => 'PK'
                 ],

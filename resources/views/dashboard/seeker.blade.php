@@ -237,7 +237,7 @@
         [
             'name' => 'Poltekkes Kemenkes Mataram',
             'location' => 'Dasan Cermen',
-            'query' => 'POLNAM',
+            'query' => 'POLTEKKES_KEMENKES_MATARAM',
             'logo' => asset('images/campuses/polnam.png'),
             'initials' => 'PK'
         ],

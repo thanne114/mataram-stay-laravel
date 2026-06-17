@@ -15,12 +15,22 @@ use App\Http\Controllers\TransactionController;
 // RUTE PUBLIK (Tanpa Login)
 // ============================================
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/api/map-data', [SearchController::class, 'mapData'])->name('api.map-data');
 Route::get('/kos/{kos:slug}', [PropertyController::class, 'show'])->name('property.show');
 Route::post('/payment/notification', [\App\Http\Controllers\PaymentController::class, 'notification'])->name('payment.notification');
 Route::get('/kampus', [HomeController::class, 'kampusDirectory'])->name('kampus.index');
+Route::get('/bantuan', function () {
+    $commissionRate = \App\Models\Setting::getValue('commission_rate', 5);
+    return view('bantuan', compact('commissionRate'));
+})->name('bantuan');
+
+Route::view('/wisata', 'wisata')->name('wisata');
+Route::view('/syarat-ketentuan', 'syarat-ketentuan')->name('syarat-ketentuan');
+Route::view('/kebijakan-privasi', 'kebijakan-privasi')->name('kebijakan-privasi');
+Route::view('/tentang', 'tentang')->name('tentang');
+Route::view('/blog', 'blog')->name('blog');
 
 
 use App\Http\Controllers\GoogleAuthController;

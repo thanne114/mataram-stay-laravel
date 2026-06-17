@@ -19,7 +19,7 @@
                     @endif
                 </li>
                 <li class="relative">
-                    <a class="{{ request()->is('bantuan') ? 'text-on-surface' : 'text-secondary hover:text-[#c2652a]' }} font-label font-medium pb-2 transition-colors" href="#">Bantuan</a>
+                    <a class="{{ request()->is('bantuan') ? 'text-on-surface' : 'text-secondary hover:text-[#c2652a]' }} font-label font-medium pb-2 transition-colors" href="{{ route('bantuan') }}">Bantuan</a>
                     @if(request()->is('bantuan'))
                         <div class="absolute -bottom-1 left-0 w-full h-[3px] bg-[#c2652a] rounded-full"></div>
                     @endif
