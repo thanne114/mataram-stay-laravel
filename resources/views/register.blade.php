@@ -92,9 +92,9 @@
 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 </div>
 <div class="relative z-10">
-<h1 class="font-headline text-4xl text-white mb-4 leading-tight">Mulailah perjalanan Anda menemukan hunian impian.</h1>
+<h1 class="font-headline text-4xl text-white mb-4 leading-tight">Bergabunglah Bersama Mataram Stay.</h1>
 <p class="text-white/80 text-base font-light tracking-wide">
-                    Temukan kenyamanan terbaik di jantung kota Mataram dengan kurasi properti pilihan yang hangat dan modern.
+                    Jadilah bagian dari ribuan pengguna Mataram Stay. Proses pendaftaran cepat, data pribadimu dijamin 100% aman.
                 </p>
 </div>
 </section>
