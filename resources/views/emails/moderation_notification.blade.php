@@ -87,6 +87,26 @@
                                     </tr>
                                 </table>
 
+                            @elseif($type === 'property_rejected')
+                                <!-- Property Rejected -->
+                                <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>{{ $model->owner->name }}</strong>,</p>
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Pengajuan properti kos Anda, <strong>{{ $model->name }}</strong>, belum dapat disetujui oleh Administrator dengan alasan berikut:</p>
+                                
+                                <div style="background-color: #ffebee; border-left: 4px solid #c62828; border-radius: 4px; padding: 15px; margin-bottom: 30px;">
+                                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #c62828; font-weight: 600;">Status Listing: Rejected (Ditolak)</p>
+                                    <p style="margin: 0; font-size: 14px; color: #555555; font-style: italic;">"{{ $model->rejection_reason }}"</p>
+                                </div>
+
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Silakan lakukan perbaikan pada data properti kos Anda dan ajukan kembali untuk peninjauan ulang.</p>
+
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="{{ route('property.edit', $model->id) }}" style="background-color: #c2652a; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(194, 101, 42, 0.2);">Perbarui Data Properti</a>
+                                        </td>
+                                    </tr>
+                                </table>
+
                             @elseif($type === 'property_submitted_admin')
                                 <!-- Admin Property Moderation Alert -->
                                 <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>Administrator</strong>,</p>

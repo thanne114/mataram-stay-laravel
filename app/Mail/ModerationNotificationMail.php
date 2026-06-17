@@ -34,6 +34,7 @@ class ModerationNotificationMail extends Mailable implements ShouldQueue
             'seeker_verified' => 'Identitas Akun Anda Telah Diverifikasi - Mataram Stay',
             'verification_queue_admin' => '[ANTREAN] Verifikasi Identitas Pengguna Baru - Mataram Stay',
             'property_approved' => 'Properti Kos Anda Telah Disetujui & Terbit - Mataram Stay',
+            'property_rejected' => 'Pengajuan Properti Kos Ditolak - Mataram Stay',
             'property_submitted_admin' => '[ANTREAN] Pengajuan Moderasi Properti Kos Baru - Mataram Stay',
             default => 'Pemberitahuan Moderasi - Mataram Stay',
         };

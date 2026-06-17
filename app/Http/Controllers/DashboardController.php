@@ -209,6 +209,34 @@ class DashboardController extends Controller
     }
 
     /**
+     * Reject Property Listing (Draft -> Rejected)
+     */
+    public function reject(Request $request, Property $property)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|min:10',
+        ]);
+
+        $property->status = 'rejected';
+        $property->rejection_reason = $request->rejection_reason;
+        $property->save();
+
+        try {
+            if ($property->owner) {
+                Mail::to($property->owner->email)->send(new ModerationNotificationMail($property, 'property_rejected'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send property rejected email: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', "Properti berhasil ditolak dengan alasan.");
+    }
+
+    /**
      * Update Global Monetization Settings
      */
     public function updateSettings(Request $request)

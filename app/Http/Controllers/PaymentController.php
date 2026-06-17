@@ -60,7 +60,12 @@ class PaymentController extends Controller
                     // Lock the room type row for update to prevent race conditions during settlement
                     $roomType = \App\Models\RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
 
-                    if ($roomType->available_rooms <= 0) {
+                    if ($booking->status === 'Cancelled') {
+                        $booking->update([
+                            'payment_status' => 'Paid',
+                        ]);
+                        Log::info("Booking ID {$booking->id} settled via Midtrans, but status is Cancelled. Keeping Cancelled status.");
+                    } elseif ($roomType->available_rooms <= 0) {
                         // Room became full before this payment settled
                         $booking->update([
                             'payment_status' => 'Paid',
@@ -102,28 +107,32 @@ class PaymentController extends Controller
         } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
             $oldStatus = $booking->status;
             
-            \Illuminate\Support\Facades\DB::transaction(function () use ($booking, $oldStatus) {
-                $booking->update([
-                    'payment_status' => 'Unpaid',
-                    'status'         => 'Cancelled',
-                ]);
+            if ($oldStatus !== 'Completed') {
+                \Illuminate\Support\Facades\DB::transaction(function () use ($booking, $oldStatus) {
+                    $booking->update([
+                        'payment_status' => 'Unpaid',
+                        'status'         => 'Cancelled',
+                    ]);
 
-                // Re-increment room count if it was previously active (just in case)
-                if ($oldStatus === 'Active') {
-                    $roomType = \App\Models\RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
-                    $roomType->increment('available_rooms');
-                    Log::info("Room type {$roomType->name} incremented because Active booking was cancelled.");
+                    // Re-increment room count if it was previously active (just in case)
+                    if ($oldStatus === 'Active') {
+                        $roomType = \App\Models\RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
+                        $roomType->increment('available_rooms');
+                        Log::info("Room type {$roomType->name} incremented because Active booking was cancelled.");
+                    }
+                });
+
+                // Send cancellation email to Seeker
+                try {
+                    Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
+                } catch (\Exception $e) {
+                    Log::error('Failed to send Midtrans payment failure/cancelled email: ' . $e->getMessage());
                 }
-            });
 
-            // Send cancellation email to Seeker
-            try {
-                Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
-            } catch (\Exception $e) {
-                Log::error('Failed to send Midtrans payment failure/cancelled email: ' . $e->getMessage());
+                Log::info("Booking ID {$booking->id} marked as Cancelled due to status: {$transactionStatus}");
+            } else {
+                Log::info("Booking ID {$booking->id} is already Completed. Ignoring expiration webhook status change.");
             }
-
-            Log::info("Booking ID {$booking->id} marked as Cancelled due to status: {$transactionStatus}");
         } elseif ($transactionStatus === 'pending') {
             $booking->update([
                 'payment_status' => 'Unpaid',

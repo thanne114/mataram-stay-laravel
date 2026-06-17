@@ -111,6 +111,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard-admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::post('/admin/verify-seeker/{user}', [DashboardController::class, 'verifySeeker'])->name('admin.verify-seeker');
     Route::post('/admin/approve-property/{property}', [DashboardController::class, 'approveProperty'])->name('admin.approve-property');
+    Route::post('/admin/property/{property}/reject', [DashboardController::class, 'reject'])->name('admin.property.reject');
     Route::post('/admin/update-settings', [DashboardController::class, 'updateSettings'])->name('admin.update-settings');
 });
 

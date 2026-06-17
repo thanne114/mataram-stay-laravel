@@ -323,13 +323,19 @@
                                             <span class="material-symbols-outlined text-sm">open_in_new</span>
                                             Pratinjau Halaman Detail
                                         </a>
-                                        <form method="POST" action="{{ route('admin.approve-property', $prop->id) }}">
-                                            @csrf
-                                            <button type="submit" class="bg-primary hover:bg-primary-container text-white px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95">
-                                                <span class="material-symbols-outlined text-sm">publish</span>
-                                                Setujui & Terbitkan
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="openRejectModal('{{ $prop->id }}', '{{ addslashes($prop->name) }}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95">
+                                                <span class="material-symbols-outlined text-sm">cancel</span>
+                                                Tolak
                                             </button>
-                                        </form>
+                                            <form method="POST" action="{{ route('admin.approve-property', $prop->id) }}">
+                                                @csrf
+                                                <button type="submit" class="bg-primary hover:bg-primary-container text-white px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95">
+                                                    <span class="material-symbols-outlined text-sm">publish</span>
+                                                    Setujui & Terbitkan
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -360,6 +366,36 @@
                         Tutup
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Rejection Modal -->
+        <div id="reject-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-on-background/70 backdrop-blur-sm hidden" onclick="closeRejectModal()">
+            <div class="bg-white rounded-3xl p-6 max-w-md w-full mx-4 shadow-2xl relative border border-outline-variant" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center pb-3 border-b border-outline-variant mb-4">
+                    <h3 class="font-headline text-xl font-bold text-on-surface">Tolak Properti</h3>
+                    <button onclick="closeRejectModal()" class="text-secondary hover:text-on-surface transition-colors flex items-center justify-center p-1 rounded-full bg-surface-variant/50">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="reject-form" method="POST" action="" class="space-y-4">
+                    @csrf
+                    <div>
+                        <p class="text-sm text-secondary font-body mb-3">
+                            Anda akan menolak pengajuan kos <strong id="reject-property-name" class="text-on-surface"></strong>. Silakan masukkan alasan penolakan (minimal 10 karakter):
+                        </p>
+                        <textarea id="rejection_reason" name="rejection_reason" rows="4" class="w-full p-4 bg-white rounded-xl border border-outline-variant/60 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none font-body text-sm text-on-surface" placeholder="Contoh: Alamat kurang lengkap atau foto properti buram..." required></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeRejectModal()" class="bg-surface-variant hover:bg-outline-variant/60 text-on-surface px-5 py-2.5 rounded-xl font-label font-bold text-xs transition-all">
+                            Batal
+                        </button>
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-label font-bold text-xs transition-all shadow-sm flex items-center gap-1 active:scale-95">
+                            <span class="material-symbols-outlined text-sm">send</span>
+                            Kirim Penolakan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
@@ -405,6 +441,24 @@
         function closePhotoModal() {
             document.getElementById('photo-modal').classList.add('hidden');
             document.getElementById('photo-modal-img').src = '';
+        }
+
+        function openRejectModal(propertyId, propertyName) {
+            const modal = document.getElementById('reject-modal');
+            const form = document.getElementById('reject-form');
+            const nameSpan = document.getElementById('reject-property-name');
+            const reasonInput = document.getElementById('rejection_reason');
+
+            nameSpan.innerText = propertyName;
+            reasonInput.value = '';
+            
+            // Set action URL dynamically
+            form.action = `/admin/property/${propertyId}/reject`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeRejectModal() {
+            document.getElementById('reject-modal').classList.add('hidden');
         }
 
         // Restore active tab on load

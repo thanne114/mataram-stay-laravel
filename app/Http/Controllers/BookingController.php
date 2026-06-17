@@ -208,6 +208,10 @@ class BookingController extends Controller
             abort(403);
         }
 
+        if ($booking->payment_status === 'Paid' || $booking->status === 'Active') {
+            return back()->with('error', 'Pemesanan ini sudah diverifikasi sebelumnya.');
+        }
+
         return \Illuminate\Support\Facades\DB::transaction(function () use ($booking) {
             // Lock room type row in database for update to prevent race conditions
             $roomType = RoomType::lockForUpdate()->findOrFail($booking->room_type_id);

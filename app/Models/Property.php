@@ -27,6 +27,7 @@ class Property extends Model
         'main_image',
         'is_verified',
         'status',
+        'rejection_reason',
     ];
 
     protected $casts = [
