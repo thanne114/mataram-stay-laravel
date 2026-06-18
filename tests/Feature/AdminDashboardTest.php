@@ -186,7 +186,7 @@ class AdminDashboardTest extends TestCase
         $this->assertEquals('rejected', $property->status);
         $this->assertEquals('Foto properti kurang jelas dan tidak sesuai.', $property->rejection_reason);
 
-        \Illuminate\Support\Facades\Mail::assertQueued(\App\Mail\ModerationNotificationMail::class, function ($mail) use ($owner, $property) {
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\ModerationNotificationMail::class, function ($mail) use ($owner, $property) {
             return $mail->hasTo($owner->email) &&
                    $mail->type === 'property_rejected' &&
                    $mail->model->id === $property->id;

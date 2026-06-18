@@ -3,16 +3,14 @@
 namespace App\Mail;
 
 use App\Models\Review;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReviewNotificationMail extends Mailable implements ShouldQueue
+class ReviewNotificationMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $review;
 

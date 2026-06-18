@@ -111,7 +111,7 @@ class SendRentExtensionRemindersTest extends TestCase
         );
 
         // Assert Mail was queued
-        Mail::assertQueued(SendRentExtensionReminderEmail::class, function ($mail) use ($booking) {
+        Mail::assertSent(SendRentExtensionReminderEmail::class, function ($mail) use ($booking) {
             return $mail->hasTo($this->seeker->email) &&
                    $mail->booking->id === $booking->id &&
                    $mail->renewalBooking->payment_status === 'Unpaid';
@@ -191,6 +191,6 @@ class SendRentExtensionRemindersTest extends TestCase
         // Booking count should still be 2 (no new booking created)
         $this->assertEquals(2, Booking::count());
 
-        Mail::assertQueued(SendRentExtensionReminderEmail::class, 1);
+        Mail::assertSent(SendRentExtensionReminderEmail::class, 1);
     }
 }

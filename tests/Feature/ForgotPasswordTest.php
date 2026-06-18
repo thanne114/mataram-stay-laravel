@@ -39,7 +39,7 @@ class ForgotPasswordTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        Mail::assertQueued(ForgotPasswordMail::class, function ($mail) use ($user) {
+        Mail::assertSent(ForgotPasswordMail::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email) && $mail->user->id === $user->id;
         });
     }
