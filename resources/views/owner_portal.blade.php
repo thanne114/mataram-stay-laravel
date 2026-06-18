@@ -799,11 +799,6 @@
             <h3 class="font-headline text-2xl font-bold text-on-surface">Verifikasi Email Anda</h3>
             <p class="font-body text-sm text-secondary mt-2">Masukkan 4 digit kode OTP yang kami kirimkan ke email Anda.</p>
             
-            <!-- Simulasi teks OTP -->
-            <div class="bg-primary-fixed text-on-primary-fixed text-xs font-bold px-4 py-2.5 rounded-lg mt-4 inline-block font-body">
-                [SIMULASI] Kode OTP Anda: <span id="simulated-email-otp" class="text-sm font-extrabold tracking-wider text-primary">----</span><br>
-                <span class="text-[10px] text-secondary font-normal">(Juga terkirim ke log: storage/logs/laravel.log)</span>
-            </div>
         </div>
         
         <form action="{{ route('profile.verify-email') }}" method="POST" class="space-y-6">

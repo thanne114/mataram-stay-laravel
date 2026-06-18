@@ -252,7 +252,6 @@ class ProfileController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'otp' => $otp,
             'message' => 'Kode OTP berhasil dikirim ke email ' . $user->email
         ]);
     }

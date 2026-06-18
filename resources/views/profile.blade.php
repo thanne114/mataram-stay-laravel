@@ -868,12 +868,7 @@
     // OTP Modal Logic (Phone verification)
     window.openOtpModal = function() {
         const modal = document.getElementById('otp-modal');
-        const simulated = document.getElementById('simulated-otp');
-        if (modal && simulated) {
-            // Generate random 4-digit code
-            const code = Math.floor(1000 + Math.random() * 9000).toString();
-            simulated.textContent = code;
-            
+        if (modal) {
             // Clear inputs
             const fields = document.querySelectorAll('.otp-field');
             fields.forEach((field, index) => {
@@ -985,10 +980,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const simulatedSpan = document.getElementById('simulated-email-otp');
-                if (simulatedSpan && data.otp) {
-                    simulatedSpan.textContent = data.otp;
-                }
                 openEmailOtpModal();
             } else {
                 alert('Gagal mengirim OTP: ' + data.message);
@@ -1073,11 +1064,6 @@
             <h3 class="font-headline text-2xl font-bold text-on-surface">Verifikasi Email Anda</h3>
             <p class="font-body text-sm text-secondary mt-2">Masukkan 4 digit kode OTP yang kami kirimkan ke email Anda.</p>
             
-            <!-- Simulasi teks OTP -->
-            <div class="bg-primary-fixed text-on-primary-fixed text-xs font-bold px-4 py-2.5 rounded-lg mt-4 inline-block font-body">
-                [SIMULASI] Kode OTP Anda: <span id="simulated-email-otp" class="text-sm font-extrabold tracking-wider text-primary">----</span><br>
-                <span class="text-[10px] text-secondary font-normal">(Juga terkirim ke log: storage/logs/laravel.log)</span>
-            </div>
         </div>
         
         <form action="{{ route('profile.verify-email') }}" method="POST" class="space-y-6">
@@ -1116,10 +1102,7 @@
             <h3 class="font-headline text-2xl font-bold text-on-surface">Verifikasi Nomor Handphone</h3>
             <p class="font-body text-sm text-secondary mt-2">Masukkan 4 digit kode OTP yang kami kirimkan ke nomor WhatsApp Anda.</p>
             
-            <!-- Simulasi teks OTP -->
-            <div class="bg-primary-fixed text-on-primary-fixed text-xs font-bold px-4 py-2.5 rounded-lg mt-4 inline-block font-body">
-                [SIMULASI] Kode OTP Anda: <span id="simulated-otp" class="text-sm font-extrabold tracking-wider text-primary">----</span>
-            </div>
+
         </div>
         
         <form action="{{ route('profile.verify-phone') }}" method="POST" class="space-y-6">
