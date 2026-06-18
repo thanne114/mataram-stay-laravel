@@ -65,8 +65,8 @@
     
     <aside class="w-full lg:w-64 flex flex-col gap-2 shrink-0">
         <div class="mb-6 px-4">
-            <h2 class="text-xl font-display font-semibold text-on-surface">{{ auth()->user()->role === 'admin' ? 'Admin Portal' : 'Owner Portal' }}</h2>
-            <p class="text-xs text-secondary font-body">{{ auth()->user()->role === 'admin' ? 'Platform management' : 'Manage your listings' }}</p>
+            <h2 class="text-xl font-display font-semibold text-on-surface">{{ auth()->user()->role === 'admin' ? 'Admin Portal' : 'Mitra Properti' }}</h2>
+            <p class="text-xs text-secondary font-body">{{ auth()->user()->role === 'admin' ? 'Platform management' : 'Pusat pengelolaan Anda' }}</p>
         </div>
         <nav class="flex flex-col gap-1" id="sidebar-nav">
             <button onclick="switchTab('dashboard', this)" class="nav-item flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 font-semibold font-body text-sm shadow-sm transition-all w-full text-left">
