@@ -15,12 +15,12 @@
                 {{-- JIKA BELUM LOGIN: Tampilkan Teks Promosi Default --}}
                 @guest
                     <h1 class="font-headline text-5xl md:text-8xl font-medium text-surface-bright mb-8 leading-[1.1] drop-shadow-2xl">
-                        Temukan Kos Ternyaman di Jantung Kota Mataram
+                        Sewa Kos di Mataram Kini Bebas Ribet.
                     </h1>
                 @endguest
 
                 <p class="font-body text-xl md:text-2xl text-surface-variant max-w-3xl mx-auto drop-shadow-lg font-light tracking-wide">
-                    Pilihan akomodasi terbaik dengan desain hangat dan fasilitas lengkap untuk kenyamanan Anda.
+                    Temukan hunian terverifikasi. Pilih kamar, bayar aman, dan langsung pindah hari ini juga.
                 </p>
             </div>
             
