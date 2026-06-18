@@ -1063,7 +1063,7 @@
             </div>
             <h3 class="font-headline text-2xl font-bold text-on-surface">Verifikasi Email Anda</h3>
             <p class="font-body text-sm text-secondary mt-2">Masukkan 4 digit kode OTP yang kami kirimkan ke email Anda.</p>
-            
+
         </div>
         
         <form action="{{ route('profile.verify-email') }}" method="POST" class="space-y-6">

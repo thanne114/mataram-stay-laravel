@@ -246,7 +246,15 @@ class ProfileController extends Controller
         ]);
         
         // Kirim email
-        Mail::to($user->email)->send(new SendOtpEmail($otp, $user->name));
+        try {
+            Mail::to($user->email)->send(new SendOtpEmail($otp, $user->name));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengirim email verifikasi. Silakan coba beberapa saat lagi.'
+            ], 500);
+        }
         
         RateLimiter::hit($throttleKey, 900); // 15 minutes decay
 
