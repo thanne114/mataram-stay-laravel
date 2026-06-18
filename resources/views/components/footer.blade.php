@@ -3,7 +3,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div class="flex flex-col gap-6 col-span-1 md:col-span-1">
                 <span class="font-headline text-2xl text-primary font-bold">Mataram Stay</span>
-                <p class="font-body text-on-surface-variant text-sm leading-relaxed">Menemukan hunian ternyaman di Lombok tidak pernah semudah ini.</p>
+                <p class="font-body text-on-surface-variant text-sm leading-relaxed">Menghubungkan Anda dengan pilihan kos terbaik dan pemilik properti terpercaya di Lombok.</p>
             </div>
             <div class="flex flex-col gap-6">
                 <h4 class="font-label font-bold uppercase tracking-widest text-[10px] text-on-surface">Kos Dekat Kampus</h4>
