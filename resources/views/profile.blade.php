@@ -75,8 +75,8 @@
     
     <aside class="w-full lg:w-64 flex flex-col gap-2 shrink-0">
         <div class="mb-6 px-4">
-            <h2 class="text-xl font-display font-semibold text-on-surface">Seeker Portal</h2>
-            <p class="text-xs text-secondary font-body">Manage your account details and contact preferences.</p>
+            <h2 class="text-xl font-display font-semibold text-on-surface">Ruang Penyewa</h2>
+            <p class="text-xs text-secondary font-body">Pusat kendali akun dan riwayat pesanan Anda.</p>
         </div>
         <nav class="flex flex-col gap-1" id="sidebar-nav">
             <a href="#" onclick="switchView('view-transaksi', this)" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
