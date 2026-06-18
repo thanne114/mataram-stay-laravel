@@ -105,7 +105,7 @@
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div class="flex flex-col gap-3">
                     <h2 class="font-headline text-4xl md:text-5xl font-medium text-on-surface">Pilihan Terpopuler</h2>
-                    <p class="font-body text-secondary text-lg max-w-xl">Kurasi hunian terbaik di Mataram dengan fasilitas premium dan kenyamanan maksimal.</p>
+                    <p class="font-body text-secondary text-lg max-w-xl">Temukan hunian dengan rating tertinggi yang paling direkomendasikan.</p>
                 </div>
             </div>
             
