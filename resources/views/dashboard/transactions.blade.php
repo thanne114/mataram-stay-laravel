@@ -59,6 +59,14 @@
         ::-webkit-scrollbar-thumb { background: #d8d0c8; border-radius: 10px; }
     </style>
 </head>
+@php
+    $hasPendingTransaction = \App\Models\Booking::where('user_id', auth()->id())
+        ->where(function($q) {
+            $q->where('status', 'Pending')
+              ->orWhere('payment_status', 'Unpaid');
+        })
+        ->exists();
+@endphp
 <body class="text-on-surface antialiased flex min-h-screen">
 
 <!-- SideNavBar (Desktop Only) -->
@@ -84,6 +92,9 @@
     <a class="group flex items-center px-4 py-3 text-primary font-bold border-r-4 border-primary bg-primary-container/10 transition-all rounded-l-lg -mr-4 mb-2" href="{{ route('transactions.seeker') }}">
         <span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
         <span class="text-label-lg">Transaksi</span>
+        @if($hasPendingTransaction)
+            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-1"></span>
+        @endif
     </a>
     @endif
 </nav>
@@ -134,6 +145,15 @@
         </a>
     </div>
 </header>
+
+@if($role === 'seeker' && $hasPendingTransaction)
+    <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+        <span class="text-xl shrink-0">⚠️</span>
+        <p class="font-body text-sm leading-relaxed">
+            Pengingat: Anda memiliki transaksi yang belum diselesaikan (Pending). Silakan cek detail pesanan dan segera lakukan pembayaran agar pengajuan sewa Anda tidak dibatalkan otomatis.
+        </p>
+    </div>
+@endif
 
 @if($role === 'owner')
 <!-- Financial Summary Cards -->
@@ -285,9 +305,12 @@
         <span class="material-symbols-outlined">explore</span>
         <span class="font-body text-[10px] uppercase tracking-wider mt-1">Explore</span>
     </a>
-    <a class="flex flex-col items-center justify-center text-primary" href="{{ route('transactions.seeker') }}">
+    <a class="flex flex-col items-center justify-center text-primary relative" href="{{ route('transactions.seeker') }}">
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
         <span class="font-body text-[10px] uppercase tracking-wider mt-1 font-bold">Transaksi</span>
+        @if($hasPendingTransaction)
+            <span class="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        @endif
     </a>
     @endif
     <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary transition-colors" href="/profile">

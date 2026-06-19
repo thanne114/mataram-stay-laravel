@@ -333,9 +333,12 @@
 <span class="material-symbols-outlined mb-1">explore</span>
 <span class="font-label text-[10px] font-bold uppercase tracking-widest">Explore</span>
 </a>
-<a class="flex flex-col items-center justify-center text-secondary hover:text-primary transition-all px-4 py-2" href="{{ route('transactions.seeker') }}">
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary transition-all px-4 py-2 relative" href="{{ route('transactions.seeker') }}">
 <span class="material-symbols-outlined mb-1">receipt_long</span>
 <span class="font-label text-[10px] font-bold uppercase tracking-widest">Transaksi</span>
+@if(\App\Models\Booking::where('user_id', auth()->id())->where(fn($q) => $q->where('status', 'Pending')->orWhere('payment_status', 'Unpaid'))->exists())
+    <span class="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+@endif
 </a>
 
 <a class="flex flex-col items-center justify-center text-secondary hover:text-primary transition-all px-4 py-2" href="/profile">

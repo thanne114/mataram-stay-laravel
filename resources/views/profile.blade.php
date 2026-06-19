@@ -67,6 +67,10 @@
         input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
+@php
+    $hasPendingTransaction = $bookings->where('status', 'Pending')->isNotEmpty() || $bookings->where('payment_status', 'Unpaid')->isNotEmpty();
+@endphp
+
 <body class="bg-background text-on-surface selection:bg-primary/20 flex flex-col min-h-screen">
 
 <x-navbar />
@@ -82,6 +86,9 @@
             <a href="#" onclick="switchView('view-transaksi', this)" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary">receipt_long</span>
                 Transaksi
+                @if($hasPendingTransaction)
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-1"></span>
+                @endif
             </a>
             <a href="#" onclick="switchView('view-kossaya', this)" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary">apartment</span>
@@ -373,6 +380,15 @@
                 <h1 class="text-4xl font-headline italic tracking-tight text-on-surface">Transaksi</h1>
                 <p class="text-secondary font-body mt-2">Daftar semua transaksi yang pernah Anda lakukan.</p>
             </div>
+
+            @if($hasPendingTransaction)
+                <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <span class="text-xl shrink-0">⚠️</span>
+                    <p class="font-body text-sm leading-relaxed">
+                        Pengingat: Anda memiliki transaksi yang belum diselesaikan (Pending). Silakan cek detail pesanan dan segera lakukan pembayaran agar pengajuan sewa Anda tidak dibatalkan otomatis.
+                    </p>
+                </div>
+            @endif
             
             <div class="space-y-6">
             @forelse($bookings as $booking)
