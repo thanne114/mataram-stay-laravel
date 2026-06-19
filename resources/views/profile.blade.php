@@ -125,7 +125,7 @@
                 <div class="flex items-start gap-3">
                     <span class="text-xl shrink-0">⚠️</span>
                     <p class="font-body text-sm leading-relaxed">
-                        Perhatian: Anda belum mengunggah Kartu Identitas (KTP). Harap segera lengkapi verifikasi identitas Anda untuk dapat melakukan pengajuan sewa kos.
+                        Perhatian: Anda belum mengunggah Kartu Identitas. Harap segera lengkapi verifikasi identitas Anda (KTP / SIM / Paspor) untuk dapat melakukan pengajuan sewa kos.
                     </p>
                 </div>
                 <button onclick="switchView('view-verifikasi', document.querySelector('a[onclick*=\'view-verifikasi\']'))" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-95 whitespace-nowrap self-end sm:self-center">
