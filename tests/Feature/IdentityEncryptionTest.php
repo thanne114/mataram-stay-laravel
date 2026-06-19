@@ -58,8 +58,14 @@ class IdentityEncryptionTest extends TestCase
     {
         $this->actingAs($this->seeker);
 
-        $fakeKtp = UploadedFile::fake()->create('ktp.png', 100, 'image/png');
-        $fakeSelfie = UploadedFile::fake()->create('selfie.jpg', 100, 'image/jpeg');
+        $ktpContent = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+        $ktpPath = tempnam(sys_get_temp_dir(), 'ktp');
+        file_put_contents($ktpPath, $ktpContent);
+        $fakeKtp = new UploadedFile($ktpPath, 'ktp.png', 'image/png', null, true);
+
+        $selfiePath = tempnam(sys_get_temp_dir(), 'selfie');
+        file_put_contents($selfiePath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='));
+        $fakeSelfie = new UploadedFile($selfiePath, 'selfie.png', 'image/png', null, true);
 
         $response = $this->from('/profile')->post('/profile/verify-identity', [
             'identity_type' => 'ktp',
@@ -82,22 +88,22 @@ class IdentityEncryptionTest extends TestCase
 
         // Verify the raw file content on disk is encrypted
         $rawFileContent = Storage::disk('local')->get($this->seeker->identity_photo);
-        $this->assertNotEquals($fakeKtp->get(), $rawFileContent); // should be different due to encryption
-        $this->assertEquals($fakeKtp->get(), Crypt::decryptString($rawFileContent)); // should decrypt back to original
+        $this->assertNotEquals($ktpContent, $rawFileContent); // should be different due to encryption
+        $this->assertEquals($ktpContent, Crypt::decryptString($rawFileContent)); // should decrypt back to original
 
         // Verify dynamic decryption access for owner (seeker)
         $filename = basename($this->seeker->identity_photo);
         $downloadResponse = $this->get("/profile/identity-photo/{$filename}");
         $downloadResponse->assertStatus(200);
         $downloadResponse->assertHeader('Content-Type', 'image/png');
-        $this->assertEquals($fakeKtp->get(), $downloadResponse->getContent());
+        $this->assertEquals($ktpContent, $downloadResponse->getContent());
 
         // Verify dynamic decryption access for admin
         $this->actingAs($this->admin);
         $downloadResponseAdmin = $this->get("/profile/identity-photo/{$filename}");
         $downloadResponseAdmin->assertStatus(200);
         $downloadResponseAdmin->assertHeader('Content-Type', 'image/png');
-        $this->assertEquals($fakeKtp->get(), $downloadResponseAdmin->getContent());
+        $this->assertEquals($ktpContent, $downloadResponseAdmin->getContent());
 
         // Verify access is blocked (403) for another user
         $this->actingAs($this->anotherUser);

@@ -128,17 +128,28 @@
     <section class="flex-1 max-w-4xl">
 
         @if(!auth()->user()->is_verified)
-            <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl shrink-0">⚠️</span>
-                    <p class="font-body text-sm leading-relaxed">
-                        Perhatian: Anda belum mengunggah Kartu Identitas. Harap segera lengkapi verifikasi identitas Anda (KTP / SIM / Paspor) untuk dapat melakukan pengajuan sewa kos.
-                    </p>
+            @if(empty(auth()->user()->identity_photo))
+                <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl shrink-0">⚠️</span>
+                        <p class="font-body text-sm leading-relaxed">
+                            Perhatian: Anda belum mengunggah Kartu Identitas. Harap segera lengkapi verifikasi identitas Anda (KTP / SIM / Paspor) untuk dapat melakukan pengajuan sewa kos.
+                        </p>
+                    </div>
+                    <button onclick="switchView('view-verifikasi', document.querySelector('a[onclick*=\'view-verifikasi\']'))" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-95 whitespace-nowrap self-end sm:self-center">
+                        Verifikasi Sekarang
+                    </button>
                 </div>
-                <button onclick="switchView('view-verifikasi', document.querySelector('a[onclick*=\'view-verifikasi\']'))" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-95 whitespace-nowrap self-end sm:self-center">
-                    Verifikasi Sekarang
-                </button>
-            </div>
+            @else
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl shrink-0">⏳</span>
+                        <p class="font-body text-sm leading-relaxed">
+                            Dokumen sedang ditinjau. Menunggu verifikasi dari Administrator.
+                        </p>
+                    </div>
+                </div>
+            @endif
         @endif
 
         {{-- 1. VIEW SETTINGS --}}
@@ -639,6 +650,25 @@
                         <div>
                             <p class="text-green-800 font-bold text-sm">Identitas Terverifikasi</p>
                             <p class="text-green-700 text-xs font-body">Selamat! Identitas Anda ({{ strtoupper(auth()->user()->identity_type) }}) telah berhasil diverifikasi oleh sistem.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 mt-4">
+                        <div>
+                            <p class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Foto Identitas</p>
+                            <img src="{{ route('profile.identity-photo', basename(auth()->user()->identity_photo)) }}" class="w-full h-48 object-cover rounded-lg border border-outline-variant/50 shadow-sm" alt="Foto Identitas">
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Swafoto Identitas</p>
+                            <img src="{{ route('profile.identity-photo', basename(auth()->user()->selfie_photo)) }}" class="w-full h-48 object-cover rounded-lg border border-outline-variant/50 shadow-sm" alt="Swafoto Identitas">
+                        </div>
+                    </div>
+                @elseif(!empty(auth()->user()->identity_photo))
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <span class="material-symbols-outlined text-blue-600 text-3xl">schedule</span>
+                        <div>
+                            <p class="text-blue-800 font-bold text-sm">Dokumen Sedang Ditinjau</p>
+                            <p class="text-blue-700 text-xs font-body">Dokumen sedang ditinjau. Menunggu verifikasi dari Administrator.</p>
                         </div>
                     </div>
                     
