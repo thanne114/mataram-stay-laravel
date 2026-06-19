@@ -241,13 +241,19 @@
                                                 @endif
                                             </td>
                                             <td class="py-5 px-3 text-right">
-                                                <form method="POST" action="{{ route('admin.verify-seeker', $seeker->id) }}">
-                                                    @csrf
-                                                    <button type="submit" class="bg-primary hover:bg-primary-container text-white px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center justify-center gap-1 inline-flex active:scale-95">
-                                                        <span class="material-symbols-outlined text-sm">verified</span>
-                                                        Verifikasi
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <form method="POST" action="{{ route('admin.verify-seeker', $seeker->id) }}">
+                                                        @csrf
+                                                        <button type="submit" class="bg-primary hover:bg-primary-container text-white px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center justify-center gap-1 inline-flex active:scale-95">
+                                                            <span class="material-symbols-outlined text-sm">verified</span>
+                                                            Verifikasi
+                                                        </button>
+                                                    </form>
+                                                    <button type="button" onclick="openRejectSeekerModal('{{ $seeker->id }}', '{{ addslashes($seeker->name) }}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-xs font-label font-bold transition-all shadow-sm flex items-center justify-center gap-1 inline-flex active:scale-95">
+                                                        <span class="material-symbols-outlined text-sm">cancel</span>
+                                                        Tolak
                                                     </button>
-                                                </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -398,6 +404,36 @@
                 </form>
             </div>
         </div>
+
+        <!-- Seeker Rejection Modal -->
+        <div id="reject-seeker-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-on-background/70 backdrop-blur-sm hidden" onclick="closeRejectSeekerModal()">
+            <div class="bg-white rounded-3xl p-6 max-w-md w-full mx-4 shadow-2xl relative border border-outline-variant" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center pb-3 border-b border-outline-variant mb-4">
+                    <h3 class="font-headline text-xl font-bold text-on-surface">Tolak Identitas Pencari</h3>
+                    <button onclick="closeRejectSeekerModal()" class="text-secondary hover:text-on-surface transition-colors flex items-center justify-center p-1 rounded-full bg-surface-variant/50">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="reject-seeker-form" method="POST" action="" class="space-y-4">
+                    @csrf
+                    <div>
+                        <p class="text-sm text-secondary font-body mb-3">
+                            Anda akan menolak verifikasi identitas pencari kos <strong id="reject-seeker-name" class="text-on-surface"></strong>. Silakan masukkan alasan penolakan (wajib diisi):
+                        </p>
+                        <textarea id="seeker_rejection_reason" name="reason" rows="4" class="w-full p-4 bg-white rounded-xl border border-outline-variant/60 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none font-body text-sm text-on-surface" placeholder="Contoh: Foto KTP tidak jelas atau tidak sesuai dengan foto selfie..." required></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeRejectSeekerModal()" class="bg-surface-variant hover:bg-outline-variant/60 text-on-surface px-5 py-2.5 rounded-xl font-label font-bold text-xs transition-all">
+                            Batal
+                        </button>
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-label font-bold text-xs transition-all shadow-sm flex items-center gap-1 active:scale-95">
+                            <span class="material-symbols-outlined text-sm">send</span>
+                            Kirim Penolakan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -459,6 +495,24 @@
 
         function closeRejectModal() {
             document.getElementById('reject-modal').classList.add('hidden');
+        }
+
+        function openRejectSeekerModal(seekerId, seekerName) {
+            const modal = document.getElementById('reject-seeker-modal');
+            const form = document.getElementById('reject-seeker-form');
+            const nameSpan = document.getElementById('reject-seeker-name');
+            const reasonInput = document.getElementById('seeker_rejection_reason');
+
+            nameSpan.innerText = seekerName;
+            reasonInput.value = '';
+            
+            // Set action URL dynamically
+            form.action = `/admin/reject-seeker/${seekerId}`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeRejectSeekerModal() {
+            document.getElementById('reject-seeker-modal').classList.add('hidden');
         }
 
         // Restore active tab on load

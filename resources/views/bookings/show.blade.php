@@ -102,6 +102,51 @@
         </div>
     </div>
 
+    {{-- Owner Approval Actions --}}
+    @if(auth()->id() === $property->user_id && $booking->status === 'Pending' && !$booking->is_approved)
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-primary/30 mb-6 bg-gradient-to-br from-white to-[#faf5ee]">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-primary text-2xl">gavel</span>
+            <h3 class="font-headline text-lg font-bold">Persetujuan Sewa (Request to Book)</h3>
+        </div>
+        <p class="text-sm text-secondary mb-6">Pencari kos telah mengajukan permohonan sewa untuk kamar ini. Harap setujui atau tolak pengajuan sewa.</p>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <form action="{{ route('booking.approve', $booking) }}" method="POST" class="flex-grow">
+                @csrf
+                <button type="submit" class="w-full bg-green-600 text-white py-3.5 rounded-xl font-label font-bold text-sm hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98]">
+                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                    Terima Pesanan
+                </button>
+            </form>
+            <form action="{{ route('booking.reject', $booking) }}" method="POST" class="flex-grow" onsubmit="return confirm('Apakah Anda yakin ingin menolak pesanan ini?')">
+                @csrf
+                <button type="submit" class="w-full bg-red-600 text-white py-3.5 rounded-xl font-label font-bold text-sm hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98]">
+                    <span class="material-symbols-outlined text-sm">cancel</span>
+                    Tolak Pesanan
+                </button>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    {{-- Seeker Warning Banner: Waiting for Owner Approval --}}
+    @if(auth()->id() === $booking->user_id && !$booking->is_approved && $booking->status === 'Pending')
+    <div class="bg-surface-container-lowest rounded-xl p-6 border border-yellow-300 mb-6 bg-gradient-to-br from-white to-[#fffbeb]">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="material-symbols-outlined text-amber-600 text-2xl animate-pulse">hourglass_empty</span>
+            <h3 class="font-headline text-lg font-bold text-amber-800">Menunggu Persetujuan Pemilik Kos</h3>
+        </div>
+        <p class="text-sm text-secondary mb-5">Anda akan dapat melakukan pembayaran setelah pemilik menerima pengajuan sewa ini.</p>
+        <form action="{{ route('booking.cancel', $booking) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pemesanan ini?')">
+            @csrf
+            <button type="submit" class="w-full sm:w-auto bg-white text-tertiary border border-tertiary px-6 py-3 rounded-xl font-label font-bold text-xs hover:bg-red-50 transition-all text-center flex items-center justify-center gap-1 active:scale-[0.98]">
+                <span class="material-symbols-outlined text-sm">cancel</span>
+                Batalkan Pengajuan
+            </button>
+        </form>
+    </div>
+    @endif
+
     {{-- Info Kos --}}
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 mb-6">
         <h3 class="font-headline text-lg font-bold mb-4">Informasi Kos</h3>
@@ -169,7 +214,7 @@
     </div>
 
     {{-- Pembayaran Midtrans (Otomatis) --}}
-    @if(auth()->id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending')
+    @if(auth()->id() === $booking->user_id && $booking->is_approved && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending')
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-primary/30 mb-6 bg-gradient-to-br from-white to-[#faf5ee]">
         <div class="flex items-center gap-3 mb-4">
             <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">credit_card</span>
@@ -204,14 +249,14 @@
     {{-- Bukti Pembayaran (Transfer Manual) --}}
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 mb-6">
         <h3 class="font-headline text-lg font-bold mb-2">
-            @if(auth()->id() === $booking->user_id && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending')
+            @if(auth()->id() === $booking->user_id && $booking->is_approved && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending')
                 Transfer Manual (Alternatif)
             @else
                 Bukti Pembayaran / Transfer Manual
             @endif
         </h3>
         
-        @if(auth()->id() === $booking->user_id && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending')
+        @if(auth()->id() === $booking->user_id && $booking->is_approved && $booking->payment_status === 'Unpaid' && $booking->status === 'Pending')
             <p class="text-xs text-secondary mb-4">Punya kendala dengan pembayaran otomatis? Anda dapat mentransfer langsung ke Pemilik Kos dan mengunggah buktinya di sini.</p>
         @endif
         
@@ -222,7 +267,7 @@
         @endif
 
         {{-- Seeker: Upload bukti pembayaran --}}
-        @if(auth()->id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']))
+        @if(auth()->id() === $booking->user_id && $booking->is_approved && in_array($booking->payment_status, ['Unpaid', 'Checking']))
         <form action="{{ route('booking.upload-proof', $booking) }}" method="POST" enctype="multipart/form-data" class="mt-4">
             @csrf
             <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">

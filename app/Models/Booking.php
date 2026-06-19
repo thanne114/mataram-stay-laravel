@@ -22,10 +22,12 @@ class Booking extends Model
         'payment_status',
         'payment_proof',
         'payment_token',
+        'is_approved',
     ];
 
     protected $casts = [
         'check_in_date' => 'date',
+        'is_approved' => 'boolean',
     ];
 
     // ============================

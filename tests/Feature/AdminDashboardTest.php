@@ -267,4 +267,82 @@ class AdminDashboardTest extends TestCase
         $response->assertSessionHasErrors('rejection_reason');
         $this->assertEquals('draft', $property->fresh()->status);
     }
+
+    public function test_admin_can_reject_seeker_and_sends_email(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $admin = User::create([
+            'name' => 'Admin Test',
+            'email' => 'admin@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
+        ]);
+        $seeker = User::create([
+            'name' => 'Seeker Test',
+            'email' => 'seeker@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'seeker',
+            'identity_type' => 'ktp',
+            'identity_photo' => 'identities/ktp_test.jpg',
+            'selfie_photo' => 'identities/selfie_test.jpg',
+            'is_verified' => false,
+        ]);
+
+        // Simpan file bohongan di disk local
+        \Illuminate\Support\Facades\Storage::disk('local')->put('identities/ktp_test.jpg', 'content');
+        \Illuminate\Support\Facades\Storage::disk('local')->put('identities/selfie_test.jpg', 'content');
+
+        $response = $this->actingAs($admin)->post(route('admin.reject-seeker', $seeker), [
+            'reason' => 'Foto KTP buram dan tidak terbaca.',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Identitas user Seeker Test berhasil ditolak.');
+
+        $seeker->refresh();
+        $this->assertNull($seeker->identity_type);
+        $this->assertNull($seeker->identity_photo);
+        $this->assertNull($seeker->selfie_photo);
+        $this->assertFalse($seeker->is_verified);
+
+        // Pastikan file dihapus
+        \Illuminate\Support\Facades\Storage::disk('local')->assertMissing('identities/ktp_test.jpg');
+        \Illuminate\Support\Facades\Storage::disk('local')->assertMissing('identities/selfie_test.jpg');
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\IdentityRejectedMail::class, function ($mail) use ($seeker) {
+            return $mail->hasTo($seeker->email) &&
+                   $mail->reason === 'Foto KTP buram dan tidak terbaca.' &&
+                   $mail->user->id === $seeker->id;
+        });
+    }
+
+    public function test_non_admin_cannot_reject_seeker(): void
+    {
+        $seeker1 = User::create([
+            'name' => 'Seeker 1',
+            'email' => 'seeker1@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'seeker',
+        ]);
+        $seeker2 = User::create([
+            'name' => 'Seeker 2',
+            'email' => 'seeker2@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'seeker',
+            'identity_type' => 'ktp',
+            'identity_photo' => 'identities/ktp_test2.jpg',
+            'selfie_photo' => 'identities/selfie_test2.jpg',
+            'is_verified' => false,
+        ]);
+
+        $response = $this->actingAs($seeker1)->post(route('admin.reject-seeker', $seeker2), [
+            'reason' => 'Bypass attempt.',
+        ]);
+
+        $response->assertStatus(403);
+        $seeker2->refresh();
+        $this->assertEquals('ktp', $seeker2->identity_type);
+    }
 }

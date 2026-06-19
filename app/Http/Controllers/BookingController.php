@@ -60,6 +60,7 @@ class BookingController extends Controller
             $data['total_price'] = $totalPrice;
             $data['status'] = 'Pending';
             $data['payment_status'] = 'Unpaid';
+            $data['is_approved'] = false;
 
             $booking = Booking::create($data);
 
@@ -91,8 +92,8 @@ class BookingController extends Controller
             abort(403);
         }
 
-        // Generate Midtrans Snap Token jika seeker dan belum bayar (Unpaid atau Checking)
-        if (Auth::id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending') {
+        // Generate Midtrans Snap Token jika seeker, disetujui, dan belum bayar (Unpaid atau Checking)
+        if ($booking->is_approved && Auth::id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending') {
             if ($booking->payment_token) {
                 try {
                     \Midtrans\Config::$serverKey = config('services.midtrans.server_key');
@@ -305,5 +306,73 @@ class BookingController extends Controller
         }
 
         return back()->with('success', 'Pemesanan Anda telah berhasil dibatalkan.');
+    }
+
+    /**
+     * Owner menyetujui pemesanan (POST /booking/{booking}/approve)
+     */
+    public function approve(Booking $booking)
+    {
+        $property = $booking->roomType->property;
+
+        // Hanya pemilik kos yang bisa menyetujui
+        if (Auth::id() !== $property->user_id) {
+            abort(403);
+        }
+
+        if ($booking->is_approved) {
+            return back()->with('error', 'Pemesanan ini sudah disetujui sebelumnya.');
+        }
+
+        $booking->update([
+            'is_approved' => true,
+        ]);
+
+        try {
+            Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'approved_seeker'));
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking approved email: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Pesanan berhasil disetujui! Seeker telah diberi tahu untuk melakukan pembayaran.');
+    }
+
+    /**
+     * Owner menolak pemesanan (POST /booking/{booking}/reject)
+     */
+    public function reject(Booking $booking)
+    {
+        $property = $booking->roomType->property;
+
+        // Hanya pemilik kos yang bisa menolak
+        if (Auth::id() !== $property->user_id) {
+            abort(403);
+        }
+
+        if ($booking->status === 'Cancelled') {
+            return back()->with('error', 'Pemesanan ini sudah dibatalkan sebelumnya.');
+        }
+
+        $oldStatus = $booking->status;
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($booking, $oldStatus) {
+            $booking->update([
+                'status' => 'Cancelled',
+            ]);
+
+            // Jika status sebelumnya adalah Active (kamar sudah terkurang), kembalikan ketersediaan kamar
+            if ($oldStatus === 'Active') {
+                $roomType = RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
+                $roomType->increment('available_rooms');
+            }
+
+            try {
+                Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'rejected_seeker'));
+            } catch (\Exception $e) {
+                Log::error('Failed to send booking rejected email: ' . $e->getMessage());
+            }
+
+            return back()->with('success', 'Pesanan berhasil ditolak.');
+        });
     }
 }

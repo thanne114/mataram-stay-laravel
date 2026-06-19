@@ -25,12 +25,22 @@
                             @if($type === 'created_seeker')
                                 <!-- Seeker: Booking Created -->
                                 <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>{{ $booking->user->name }}</strong>,</p>
-                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Pemesanan kos Anda berhasil dibuat! Harap selesaikan pembayaran sebelum batas waktu agar kamar pilihan Anda tidak dilepaskan.</p>
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Pemesanan kos Anda berhasil dibuat! Pengajuan sewa Anda saat ini sedang menunggu persetujuan dari Pemilik Kos. Anda dapat melakukan pembayaran setelah pemilik menyetujui pengajuan ini.</p>
                                 
                             @elseif($type === 'created_owner')
                                 <!-- Owner: Booking Created -->
                                 <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>{{ $booking->roomType->property->owner->name }}</strong>,</p>
-                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Ada pengajuan sewa kos baru untuk properti Anda. Saat ini pemesanan menunggu pembayaran oleh calon penyewa.</p>
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Ada pengajuan sewa kos baru untuk properti Anda. Silakan masuk ke portal pemilik untuk menyetujui atau menolak pengajuan sewa ini.</p>
+
+                            @elseif($type === 'approved_seeker')
+                                <!-- Seeker: Booking Approved by Owner -->
+                                <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>{{ $booking->user->name }}</strong>,</p>
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Kabar baik! Pesanan sewa kos Anda telah disetujui oleh Pemilik Kos. Silakan lanjutkan ke pembayaran agar sewa Anda menjadi aktif.</p>
+
+                            @elseif($type === 'rejected_seeker')
+                                <!-- Seeker: Booking Rejected by Owner -->
+                                <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #3a302a;">Halo, <strong>{{ $booking->user->name }}</strong>,</p>
+                                <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #3a302a;">Mohon maaf, pengajuan sewa kos Anda ditolak oleh pemilik kos.</p>
                                 
                             @elseif($type === 'proof_uploaded')
                                 <!-- Owner: Seeker Uploaded Proof -->
@@ -132,7 +142,7 @@
                             @endif
 
                             <!-- Call to Action Button -->
-                            @if(in_array($type, ['created_seeker', 'created_owner', 'proof_uploaded', 'payment_success_seeker', 'payment_success_owner']))
+                            @if(in_array($type, ['created_seeker', 'created_owner', 'proof_uploaded', 'payment_success_seeker', 'payment_success_owner', 'approved_seeker']))
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
                                 <tr>
                                     <td align="center">

@@ -38,6 +38,8 @@ class BookingNotificationMail extends Mailable
             'cancelled_seeker' => 'Pemesanan Kos Dibatalkan - Mataram Stay',
             'overbooked_seeker' => 'Pemberitahuan Refund Transaksi (Kamar Penuh) - Mataram Stay',
             'overbooked_admin' => '[PENTING] Transaksi Overbooked Terdeteksi - Mataram Stay',
+            'approved_seeker' => 'Pemesanan Kos Disetujui Pemilik - Mataram Stay',
+            'rejected_seeker' => 'Pemesanan Kos Ditolak Pemilik - Mataram Stay',
             default => 'Notifikasi Pemesanan - Mataram Stay',
         };
 

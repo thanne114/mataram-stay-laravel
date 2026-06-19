@@ -90,6 +90,8 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
     // Verifikasi & Update Status Booking
     Route::post('/booking/{booking}/verify', [BookingController::class, 'verify'])->name('booking.verify');
     Route::post('/booking/{booking}/update-status', [BookingController::class, 'updateStatus'])->name('booking.update-status');
+    Route::post('/booking/{booking}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+    Route::post('/booking/{booking}/reject', [BookingController::class, 'reject'])->name('booking.reject');
 });
 
 // ============================================
@@ -120,6 +122,7 @@ Route::middleware(['auth', 'role:seeker'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard-admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::post('/admin/verify-seeker/{user}', [DashboardController::class, 'verifySeeker'])->name('admin.verify-seeker');
+    Route::post('/admin/reject-seeker/{user}', [DashboardController::class, 'rejectSeeker'])->name('admin.reject-seeker');
     Route::post('/admin/approve-property/{property}', [DashboardController::class, 'approveProperty'])->name('admin.approve-property');
     Route::post('/admin/property/{property}/reject', [DashboardController::class, 'reject'])->name('admin.property.reject');
     Route::post('/admin/update-settings', [DashboardController::class, 'updateSettings'])->name('admin.update-settings');

@@ -194,6 +194,41 @@ class DashboardController extends Controller
     }
 
     /**
+     * Reject Seeker Identity
+     */
+    public function rejectSeeker(Request $request, User $user)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'reason' => 'required|string',
+        ]);
+
+        if ($user->identity_photo) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($user->identity_photo);
+        }
+        if ($user->selfie_photo) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($user->selfie_photo);
+        }
+
+        $user->identity_type = null;
+        $user->identity_photo = null;
+        $user->selfie_photo = null;
+        $user->is_verified = false;
+        $user->save();
+
+        try {
+            Mail::to($user->email)->send(new \App\Mail\IdentityRejectedMail($user, $request->reason));
+        } catch (\Exception $e) {
+            Log::error('Failed to send identity rejected email: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', "Identitas user {$user->name} berhasil ditolak.");
+    }
+
+    /**
      * Approve Property Listing (Draft -> Published)
      */
     public function approveProperty(Property $property)
