@@ -177,17 +177,22 @@
                             <div class="text-right">
                                 <div class="font-label font-bold text-2xl text-primary">Rp {{ number_format($roomType->price_per_month, 0, ',', '.') }}</div>
                                 <span class="text-xs text-secondary">/ bulan</span>
-                                @auth
+                                @if(auth()->check() && auth()->user()->is_verified)
                                     @if(auth()->user()->isSeeker() && $roomType->available_rooms > 0)
                                     <a href="{{ route('booking.create', ['room_type_id' => $roomType->id]) }}" class="mt-3 block bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label font-bold text-sm hover:bg-primary-container transition-all text-center">
                                         Pesan Sekarang
                                     </a>
                                     @endif
                                 @else
-                                    <a href="/login" class="mt-3 block bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label font-bold text-sm hover:bg-primary-container transition-all text-center">
-                                        Login untuk Pesan
+                                    @if($roomType->available_rooms > 0)
+                                    <a href="{{ route('profile.edit', ['tab' => 'view-verifikasi']) }}" class="mt-3 block bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-label font-bold text-sm transition-all text-center flex items-center justify-center gap-2">
+                                        <span>🔒</span> Verifikasi Identitas untuk Menyewa
                                     </a>
-                                @endauth
+                                    <p class="mt-2 text-xs text-gray-500 leading-normal">
+                                        Demi keamanan bersama, Mataram Stay mewajibkan penyewa melengkapi identitas resmi sebelum melakukan pengajuan sewa.
+                                    </p>
+                                    @endif
+                                @endif
                             </div>
                         </div>
                     </div>
