@@ -35,36 +35,22 @@
                 @endif
             @endguest
             @auth
-                @php
-                    $dashboardUrl = match(auth()->user()->role) {
-                        'owner' => route('dashboard.owner'),
-                        'seeker' => route('profile.edit'),
-                        'admin' => route('dashboard.admin'),
-                        default => '/',
-                    };
-                    $roleLabel = match(auth()->user()->role) {
-                        'owner' => 'Pemilik Kos',
-                        'seeker' => 'Pencari Kos',
-                        'admin' => 'Administrator',
-                        default => ucfirst(auth()->user()->role),
-                    };
-                    $portalLabel = match(auth()->user()->role) {
-                        'seeker' => 'Ruang Penyewa',
-                        'owner' => 'Mitra Properti',
-                        'admin' => 'Admin Portal',
-                        default => 'Portal',
-                    };
-                    $transactionUrl = match(auth()->user()->role) {
-                        'owner' => route('transactions.owner'),
-                        'seeker' => route('transactions.seeker'),
-                        default => '#',
-                    };
-                @endphp
-
-                <!-- Dropdown Container -->
-                <div x-data="{ open: false }" @click.outside="open = false" class="relative">
-                    <!-- Trigger -->
-                    <button @click="open = !open" class="flex items-center gap-3 cursor-pointer group focus:outline-none text-right">
+                <div class="flex items-center gap-4">
+                    @php
+                        $dashboardUrl = match(auth()->user()->role) {
+                            'owner' => route('dashboard.owner'),
+                            'seeker' => route('profile.edit'),
+                            'admin' => route('dashboard.admin'),
+                            default => '/',
+                        };
+                        $roleLabel = match(auth()->user()->role) {
+                            'owner' => 'Pemilik Kos',
+                            'seeker' => 'Pencari Kos',
+                            'admin' => 'Administrator',
+                            default => ucfirst(auth()->user()->role),
+                        };
+                    @endphp
+                    <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 cursor-pointer group">
                         <div class="flex flex-col items-end">
                             <span class="font-label text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{{ auth()->user()->name }}</span>
                             <span class="font-label text-[10px] text-secondary uppercase tracking-wider">
@@ -72,56 +58,19 @@
                             </span>
                         </div>
                         @if(auth()->user()->profile_photo)
-                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" class="w-10 h-10 rounded-full border border-outline-variant object-cover group-hover:border-primary transition-colors" alt="Profile">
+                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" class="w-10 h-10 rounded-full border border-outline-variant object-cover" alt="Profile">
                         @else
-                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-outline-variant font-bold text-primary group-hover:border-primary transition-colors">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-outline-variant font-bold text-primary">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                         @endif
-                    </button>
-
-                    <!-- Dropdown Menu -->
-                    <div x-show="open"
-                         x-transition:enter="transition ease-out duration-100"
-                         x-transition:enter-start="transform opacity-0 scale-95"
-                         x-transition:enter-end="transform opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-75"
-                         x-transition:leave-start="transform opacity-100 scale-100"
-                         x-transition:leave-end="transform opacity-0 scale-95"
-                         class="absolute right-0 mt-3 w-56 rounded-xl bg-white border border-outline-variant/60 shadow-lg py-2 z-50 text-left font-body text-sm"
-                         style="display: none;">
-                        
-                        <a href="{{ $dashboardUrl }}" class="flex items-center gap-2.5 px-4 py-2.5 text-on-surface hover:bg-surface-variant/45 hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined text-lg">dashboard</span>
-                            {{ $portalLabel }}
-                        </a>
-
-                        @if(auth()->user()->role !== 'admin')
-                            <a href="{{ $transactionUrl }}" class="flex items-center gap-2.5 px-4 py-2.5 text-on-surface hover:bg-surface-variant/45 hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-lg">receipt_long</span>
-                                Transaksi
-                            </a>
-
-                            <a href="{{ route('profile.edit', ['tab' => 'view-verifikasi']) }}" class="flex items-center gap-2.5 px-4 py-2.5 text-on-surface hover:bg-surface-variant/45 hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-lg">verified_user</span>
-                                Verifikasi Akun
-                            </a>
-                        @endif
-
-                        <hr class="border-t border-outline-variant/40 my-1.5">
-
-                        <form action="{{ route('logout') }}" method="POST" class="w-full">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-tertiary hover:bg-tertiary/5 transition-colors">
-                                <span class="material-symbols-outlined text-lg">logout</span>
-                                Keluar
-                            </button>
-                        </form>
-                    </div>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="ml-2">
+                        @csrf
+                        <button type="submit" class="text-secondary hover:text-tertiary font-label text-sm font-bold transition-colors">Logout</button>
+                    </form>
                 </div>
             @endauth
         </div>
     </div>
-    <!-- Load Alpine.js for Dropdown functionality -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </nav>
