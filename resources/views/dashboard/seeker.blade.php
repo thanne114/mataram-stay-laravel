@@ -168,6 +168,22 @@
 </div>
 @endif
 
+@if($hasPendingTransaction)
+<div class="relative z-20 max-w-5xl w-full mx-auto mt-6 px-4">
+    <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+        <div class="flex items-start gap-3">
+            <span class="text-xl shrink-0">⚠️</span>
+            <p class="font-body text-sm leading-relaxed">
+                Pengingat: Anda memiliki transaksi yang belum diselesaikan (Pending). Silakan cek detail pesanan dan segera lakukan pembayaran agar pengajuan sewa Anda tidak dibatalkan otomatis.
+            </p>
+        </div>
+        <a href="{{ route('profile.edit', ['tab' => 'view-transaksi']) }}" class="bg-primary text-on-primary text-xs font-bold px-4 py-2.5 rounded-lg transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-95 whitespace-nowrap self-end sm:self-center text-center">
+            Lihat Transaksi
+        </a>
+    </div>
+</div>
+@endif
+
 
 <section class="w-full max-w-7xl mx-auto px-6 md:px-8 py-24 flex flex-col gap-12">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
