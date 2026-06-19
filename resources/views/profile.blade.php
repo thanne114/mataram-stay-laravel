@@ -68,7 +68,7 @@
     </style>
 </head>
 @php
-    $hasPendingTransaction = $bookings->where('status', 'Pending')->isNotEmpty() || $bookings->where('payment_status', 'Unpaid')->isNotEmpty();
+    $hasPendingTransaction = $bookings->where('status', 'Pending')->isNotEmpty();
 @endphp
 
 <body class="bg-background text-on-surface selection:bg-primary/20 flex flex-col min-h-screen">

@@ -222,4 +222,44 @@ class BookingApprovalTest extends TestCase
         $this->assertFalse($booking->is_approved);
         $this->assertEquals('Pending', $booking->status);
     }
+
+    public function test_pending_transaction_indicator_excludes_cancelled_or_completed_bookings(): void
+    {
+        // 1. Create a Cancelled booking with Unpaid payment status
+        Booking::create([
+            'user_id' => $this->seeker->id,
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => now()->addDays(2),
+            'duration_months' => 1,
+            'total_price' => 1002500,
+            'status' => 'Cancelled',
+            'payment_status' => 'Unpaid',
+            'is_approved' => false,
+        ]);
+
+        // 2. Create a Completed booking with Paid payment status
+        Booking::create([
+            'user_id' => $this->seeker->id,
+            'room_type_id' => $this->roomType->id,
+            'check_in_date' => now()->addDays(2),
+            'duration_months' => 1,
+            'total_price' => 1002500,
+            'status' => 'Completed',
+            'payment_status' => 'Paid',
+            'is_approved' => true,
+        ]);
+
+        $this->actingAs($this->seeker);
+
+        // Seeker dashboard response
+        $responseDashboard = $this->get(route('dashboard.seeker'));
+        $responseDashboard->assertStatus(200);
+        
+        // Assert that the warning banner is not present
+        $responseDashboard->assertDontSee('Pengingat: Anda memiliki transaksi yang belum diselesaikan');
+        
+        // Assert view variables show hasPendingTransaction as false
+        $responseDashboard->assertViewHas('hasPendingTransaction', false);
+    }
 }
+

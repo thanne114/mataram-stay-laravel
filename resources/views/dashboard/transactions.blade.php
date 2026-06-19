@@ -61,10 +61,7 @@
 </head>
 @php
     $hasPendingTransaction = \App\Models\Booking::where('user_id', auth()->id())
-        ->where(function($q) {
-            $q->where('status', 'Pending')
-              ->orWhere('payment_status', 'Unpaid');
-        })
+        ->where('status', 'Pending')
         ->exists();
 @endphp
 <body class="text-on-surface antialiased flex min-h-screen">

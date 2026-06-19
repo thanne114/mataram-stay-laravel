@@ -36,12 +36,9 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
-        // Cek apakah ada transaksi pending/unpaid
+        // Cek apakah ada transaksi pending
         $hasPendingTransaction = Booking::where('user_id', $user->id)
-            ->where(function($q) {
-                $q->where('status', 'Pending')
-                  ->orWhere('payment_status', 'Unpaid');
-            })
+            ->where('status', 'Pending')
             ->exists();
 
         return view('dashboard.seeker', compact('activeBookings', 'popularProperties', 'hasPendingTransaction'));
