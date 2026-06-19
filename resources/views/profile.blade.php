@@ -98,6 +98,9 @@
             <a href="#" onclick="switchView('view-verifikasi', this)" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary">verified_user</span>
                 Verifikasi Akun
+                @if(!auth()->user()->is_verified)
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-1"></span>
+                @endif
             </a>
             <a href="#" onclick="switchView('view-settings', this)" class="nav-link flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 font-semibold font-body text-sm shadow-sm group">
                 <span class="material-symbols-outlined text-xl group-hover:text-on-primary-container">settings</span>
@@ -116,6 +119,20 @@
     </aside>
 
     <section class="flex-1 max-w-4xl">
+
+        @if(!auth()->user()->is_verified)
+            <div class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl shrink-0">⚠️</span>
+                    <p class="font-body text-sm leading-relaxed">
+                        Perhatian: Anda belum mengunggah Kartu Identitas (KTP). Harap segera lengkapi verifikasi identitas Anda untuk dapat melakukan pengajuan sewa kos.
+                    </p>
+                </div>
+                <button onclick="switchView('view-verifikasi', document.querySelector('a[onclick*=\'view-verifikasi\']'))" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-95 whitespace-nowrap self-end sm:self-center">
+                    Verifikasi Sekarang
+                </button>
+            </div>
+        @endif
 
         {{-- 1. VIEW SETTINGS --}}
         <div id="view-settings" class="view-section space-y-12 block">
@@ -737,7 +754,8 @@
     // Load active tab on page load
     document.addEventListener('DOMContentLoaded', () => {
         const sessionTab = "{{ session('active_tab') }}";
-        const activeTab = sessionTab || localStorage.getItem('active_seeker_tab') || 'view-settings';
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab') || sessionTab || localStorage.getItem('active_seeker_tab') || 'view-settings';
         const tabButton = document.querySelector(`a[onclick*="switchView('${activeTab}')"]`) || document.querySelector(`a[onclick*="switchView('${activeTab}'"]`) || document.querySelector('a[onclick*="switchView(\'view-settings\'"]');
         if (tabButton) {
             switchView(activeTab, tabButton);
