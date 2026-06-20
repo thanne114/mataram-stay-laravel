@@ -2,6 +2,7 @@
 <html class="light" lang="id" style="">
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Owner Portal | Mataram Stay</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -627,7 +628,17 @@
                                 $lastMsg = $conv->messages->first();
                                 $isOwner = auth()->id() === $conv->owner_id;
                             @endphp
-                            <button onclick="loadConversation({{ $conv->id }}, this)" class="conversation-item w-full text-left flex items-center gap-3 p-4 hover:bg-surface-container transition-colors duration-200" data-id="{{ $conv->id }}">
+                            <button onclick="loadConversation({{ $conv->id }}, this)" 
+                                    class="conversation-item w-full text-left flex items-center gap-3 p-4 hover:bg-surface-container transition-colors duration-200" 
+                                    data-id="{{ $conv->id }}"
+                                    data-partner-name="{{ $partner->name }}"
+                                    data-partner-initial="{{ strtoupper(substr($partner->name, 0, 1)) }}"
+                                    data-partner-role="{{ $isOwner ? 'Pemilik Kos' : 'Pencari Kos' }}"
+                                    data-property-name="{{ $conv->property ? $conv->property->name : '' }}"
+                                    data-property-area="{{ $conv->property ? $conv->property->area : '' }}"
+                                    data-property-price="{{ $conv->property ? number_format($conv->property->lowest_price, 0, ',', '.') : '' }}"
+                                    data-property-slug="{{ $conv->property ? $conv->property->slug : '' }}"
+                                    data-property-image="{{ $conv->property && $conv->property->main_image ? asset('storage/' . $conv->property->main_image) : '' }}">
                                 <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-headline font-bold text-primary text-base shrink-0">
                                     {{ strtoupper(substr($partner->name, 0, 1)) }}
                                 </div>
@@ -971,6 +982,7 @@
     }
 
     // AJAX CHAT SYSTEM INTEGRATION
+    const currentAuthId = {{ auth()->id() }};
     let activeConversationId = null;
     let chatPollingInterval = null;
 
@@ -984,23 +996,73 @@
             clearInterval(chatPollingInterval);
             chatPollingInterval = null;
         }
+
+        // Cari element di sidebar jika tidak di-pass
+        const targetElement = element || document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
         
         // Highlight sidebar item
         document.querySelectorAll('.conversation-item').forEach(item => {
             item.classList.remove('bg-surface-container-high/60', 'border-l-4', 'border-primary');
         });
-        if (element) {
-            element.classList.add('bg-surface-container-high/60', 'border-l-4', 'border-primary');
+        if (targetElement) {
+            targetElement.classList.add('bg-surface-container-high/60', 'border-l-4', 'border-primary');
             // Hide unread badge
-            const badge = element.querySelector('.unread-badge');
+            const badge = targetElement.querySelector('.unread-badge');
             if (badge) badge.remove();
+        }
+        
+        // Update header & property banner dynamically using sidebar dataset
+        if (targetElement) {
+            const emptyState = document.getElementById('chat-empty-state');
+            const activeArea = document.getElementById('chat-active-area');
+            if (emptyState) emptyState.classList.add('hidden');
+            if (activeArea) activeArea.classList.remove('hidden');
+
+            const headerName = document.getElementById('chat-header-name');
+            const headerAvatar = document.getElementById('chat-header-avatar');
+            const headerRole = document.getElementById('chat-header-role');
+            if (headerName) headerName.innerText = targetElement.dataset.partnerName || '';
+            if (headerAvatar) headerAvatar.innerText = targetElement.dataset.partnerInitial || '';
+            if (headerRole) headerRole.innerText = targetElement.dataset.partnerRole || '';
+
+            const banner = document.getElementById('chat-property-banner');
+            if (banner) {
+                if (targetElement.dataset.propertyName) {
+                    banner.classList.remove('hidden');
+                    const propName = document.getElementById('chat-property-name');
+                    const propDetails = document.getElementById('chat-property-details');
+                    const propLink = document.getElementById('chat-property-link');
+                    if (propName) propName.innerText = targetElement.dataset.propertyName;
+                    if (propDetails) {
+                        propDetails.innerText = `${targetElement.dataset.propertyArea} • Rp ${targetElement.dataset.propertyPrice}/bln`;
+                    }
+                    if (propLink) propLink.href = `/kos/${targetElement.dataset.propertySlug}`;
+
+                    const img = document.getElementById('chat-property-image');
+                    const placeholder = document.getElementById('chat-property-placeholder');
+                    if (img && placeholder) {
+                        if (targetElement.dataset.propertyImage) {
+                            img.src = targetElement.dataset.propertyImage;
+                            img.classList.remove('hidden');
+                            placeholder.classList.add('hidden');
+                        } else {
+                            img.classList.add('hidden');
+                            placeholder.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
         }
         
         try {
             const response = await fetch(`/chat/${conversationId}`, {
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             });
             if (!response.ok) throw new Error("Failed to load chat");
@@ -1078,8 +1140,10 @@
                 try {
                     const pollResponse = await fetch(`/chat/${conversationId}`, {
                         headers: {
+                            'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
                     if (!pollResponse.ok) return;
@@ -1106,13 +1170,22 @@
                                 const bodyText = sidebarItem.querySelector('.last-msg-body');
                                 const timeText = sidebarItem.querySelector('.last-msg-time');
                                 if (bodyText) {
-                                    if (lastMsg.sender_id === pollData.auth_id) {
+                                    if (lastMsg.sender_id === currentAuthId) {
                                         bodyText.innerHTML = `<span class="text-primary font-medium">Anda: </span>${lastMsg.body}`;
                                     } else {
                                         bodyText.innerText = lastMsg.body;
                                     }
                                 }
-                                if (timeText) timeText.innerText = lastMsg.time;
+                                if (timeText) {
+                                    let lastMsgTime = '';
+                                    if (lastMsg.created_at) {
+                                        const date = new Date(lastMsg.created_at);
+                                        const hours = String(date.getHours()).padStart(2, '0');
+                                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                                        lastMsgTime = `${hours}:${minutes}`;
+                                    }
+                                    timeText.innerText = lastMsgTime || 'Barusan';
+                                }
                                 
                                 const parent = document.getElementById('owner-chat-sidebar-list');
                                 if (parent) parent.insertBefore(sidebarItem, parent.firstChild);
@@ -1130,7 +1203,7 @@
     }
 
     function createMessageBubble(msg) {
-        const isSelf = msg.is_self;
+        const isSelf = msg.is_self !== undefined ? msg.is_self : (msg.sender_id === currentAuthId);
         const outerDiv = document.createElement('div');
         outerDiv.className = `flex ${isSelf ? 'justify-end' : 'justify-start'}`;
         
@@ -1149,7 +1222,14 @@
         meta.className = `flex items-center gap-1 text-[8px] text-secondary mt-0.5 ${isSelf ? 'justify-end' : 'justify-start'}`;
         
         const timeSpan = document.createElement('span');
-        timeSpan.innerText = msg.time;
+        let timeStr = msg.time;
+        if (!timeStr && msg.created_at) {
+            const date = new Date(msg.created_at);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            timeStr = `${hours}:${minutes}`;
+        }
+        timeSpan.innerText = timeStr || '';
         meta.appendChild(timeSpan);
         
         if (isSelf) {
@@ -1171,15 +1251,13 @@
         const text = input.value.trim();
         if (!text || !activeConversationId) return;
         
-        const token = document.querySelector('input[name="_token"]').value;
-        
         try {
             const response = await fetch(`/chat/${activeConversationId}/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token,
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ body: text })

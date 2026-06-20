@@ -51,33 +51,7 @@ class ChatController extends Controller
         $messages = $conversation->messages()->with('sender')->oldest()->get();
 
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'auth_id' => Auth::id(),
-                'conversation' => [
-                    'id' => $conversation->id,
-                    'partner_name' => $conversation->partner->name,
-                    'partner_initial' => strtoupper(substr($conversation->partner->name, 0, 1)),
-                    'partner_role' => Auth::id() === $conversation->owner_id ? 'Pencari Kos' : 'Pemilik Kos',
-                    'partner_whatsapp' => $conversation->partner->no_whatsapp,
-                    'property' => $conversation->property ? [
-                        'name' => $conversation->property->name,
-                        'slug' => $conversation->property->slug,
-                        'area' => $conversation->property->area,
-                        'lowest_price' => number_format($conversation->property->lowest_price, 0, ',', '.'),
-                        'main_image' => $conversation->property->main_image ? asset('storage/' . $conversation->property->main_image) : null,
-                    ] : null,
-                ],
-                'messages' => $messages->map(function ($msg) {
-                    return [
-                        'id' => $msg->id,
-                        'body' => $msg->body,
-                        'sender_id' => $msg->sender_id,
-                        'is_self' => $msg->sender_id === Auth::id(),
-                        'time' => $msg->created_at->format('H:i'),
-                        'is_read' => $msg->is_read,
-                    ];
-                }),
-            ]);
+            return response()->json(['messages' => $conversation->messages()->with(['sender'])->get()]);
         }
 
         // Muat daftar percakapan untuk sidebar
