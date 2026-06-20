@@ -119,21 +119,21 @@ Penyelesaian poin-poin dalam audit ini akan meningkatkan stabilitas, performa be
 Berikut adalah checklist langkah perbaikan terstruktur berdasarkan skala prioritas:
 
 ### Tahap 1: Keamanan & Integritas Data (High Priority)
-- [ ] Nonaktifkan rute `POST /login` dan `POST /register` manual untuk menutup celah akses langsung di backend.
-- [ ] Ubah pemanggilan JS library Midtrans Snap agar dinamis mendeteksi environment (Sandbox vs Production).
-- [ ] Refaktor tabel pivot `facility_property` dengan primary key komposit `(property_id, facility_id)` untuk mencegah redundansi fasilitas.
-- [ ] Tambahkan database indeks untuk kolom foreign key yang sering dipanggil dalam kueri relational (`properties.user_id`, `room_types.property_id`, `bookings.room_type_id`, `reviews.property_id`).
+- [x] Nonaktifkan rute `POST /login` dan `POST /register` manual untuk menutup celah akses langsung di backend.
+- [x] Ubah pemanggilan JS library Midtrans Snap agar dinamis mendeteksi environment (Sandbox vs Production).
+- [x] Refaktor tabel pivot `facility_property` dengan primary key komposit `(property_id, facility_id)` untuk mencegah redundansi fasilitas.
+- [x] Tambahkan database indeks untuk kolom foreign key yang sering dipanggil dalam kueri relational (`properties.user_id`, `room_types.property_id`, `bookings.room_type_id`, `reviews.property_id`).
 
 ### Tahap 2: Pembersihan Struktur & Optimasi Query (Medium Priority)
-- [ ] Hapus file controller reset kata sandi (`ForgotPasswordController`, `ResetPasswordController`) beserta rute dan view terkait.
-- [ ] Hilangkan query database langsung di dalam berkas Blade `transactions.blade.php` dan pindahkan logikanya ke Controller.
-- [ ] Optimalkan kueri data pesan di `DashboardController@owner` dengan membatasi eager load hanya untuk pesan terbaru saja.
-- [ ] Gunakan kueri agregasi SQL `sum()` langsung di database untuk menghitung total pendapatan platform di `DashboardController@admin`.
-- [ ] Bersihkan redundansi kolom sosial pengguna (`social_id` dan `auth_provider` digabung dengan `google_id` dan `avatar`).
+- [x] Hapus file controller reset kata sandi (`ForgotPasswordController`, `ResetPasswordController`) beserta rute dan view terkait.
+- [x] Hilangkan query database langsung di dalam berkas Blade `transactions.blade.php` dan pindahkan logikanya ke Controller.
+- [x] Optimalkan kueri data pesan di `DashboardController@owner` dengan membatasi eager load hanya untuk pesan terbaru saja.
+- [x] Gunakan kueri agregasi SQL `sum()` langsung di database untuk menghitung total pendapatan platform di `DashboardController@admin`.
+- [x] Bersihkan redundansi kolom sosial pengguna (`social_id` dan `auth_provider` digabung dengan `google_id` dan `avatar`).
 
 ### Tahap 3: Restrukturisasi Antarmuka & UX (Low/Cosmetic Priority)
-- [ ] Refaktor `login.blade.php`, `register.blade.php`, dan `transactions.blade.php` agar menggunakan layout global `<x-layout>`.
-- [ ] Buat alur perantara (*onboarding step*) bagi pengguna baru Google SSO untuk memilih peran (seeker vs owner) jika mendaftar langsung dari halaman login.
-- [ ] Terapkan middleware pengisian data wajib profil (WhatsApp) setelah user berhasil terdaftar via SSO sebelum bisa booking.
-- [ ] Modularisasi berkas monolitik `profile.blade.php` dan `owner_portal.blade.php` menjadi file-file Blade partials yang teratur.
-- [ ] Tingkatkan filter harga kos di halaman pencarian menggunakan visual Range Slider interaktif bergaya OTA modern.
+- [x] Refaktor `login.blade.php`, `register.blade.php`, dan `transactions.blade.php` agar menggunakan layout global `<x-layout>`.
+- [x] Buat alur perantara (*onboarding step*) bagi pengguna baru Google SSO untuk memilih peran (seeker vs owner) jika mendaftar langsung dari halaman login.
+- [x] Terapkan middleware pengisian data wajib profil (WhatsApp) setelah user berhasil terdaftar via SSO sebelum bisa booking.
+- [x] Modularisasi berkas monolitik `profile.blade.php` dan `owner_portal.blade.php` menjadi file-file Blade partials yang teratur.
+- [x] Tingkatkan filter harga kos di halaman pencarian menggunakan visual Range Slider interaktif bergaya OTA modern.
