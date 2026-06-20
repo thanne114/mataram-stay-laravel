@@ -30,7 +30,7 @@ class GoogleSSOTest extends TestCase
         $response = $this->get('/auth/google/redirect?role=owner');
 
         $response->assertRedirect('https://accounts.google.com/o/oauth2/v2/auth');
-        $this->assertEquals('owner', session('google_register_role'));
+        $this->assertEquals('owner', session('google_sso_role'));
     }
 
     /**
@@ -52,7 +52,7 @@ class GoogleSSOTest extends TestCase
             ->andReturn($provider);
 
         // Set target role in session
-        session(['google_register_role' => 'seeker']);
+        session(['google_sso_role' => 'seeker']);
 
         $response = $this->get('/auth/google/callback');
 

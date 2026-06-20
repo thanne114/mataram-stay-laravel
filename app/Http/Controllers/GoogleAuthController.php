@@ -22,7 +22,7 @@ class GoogleAuthController extends Controller
             $role = 'seeker';
         }
 
-        session(['google_register_role' => $role]);
+        session(['google_sso_role' => $role]);
 
         return Socialite::driver('google')->redirect();
     }
@@ -52,7 +52,7 @@ class GoogleAuthController extends Controller
             ]);
         } else {
             // Register a new user
-            $role = session('google_register_role', 'seeker');
+            $role = session('google_sso_role', 'seeker');
             
             // Clean/Generate unique username
             $baseUsername = Str::slug($googleUser->getName() ?: 'user', '');
@@ -76,7 +76,7 @@ class GoogleAuthController extends Controller
         }
 
         // Clean up session role
-        session()->forget('google_register_role');
+        session()->forget('google_sso_role');
 
         // Authenticate the user
         Auth::login($user);
