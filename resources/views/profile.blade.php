@@ -864,9 +864,18 @@
                 </div>
 
                 <!-- Right Pane: Active Chat Room -->
+                @php
+                    $activeConversationId = request('conversation_id');
+                    $activeConversation = null;
+                    if ($activeConversationId) {
+                        $activeConversation = $conversations->firstWhere('id', $activeConversationId);
+                    }
+                    $activeMessages = $activeConversation ? $activeConversation->messages()->with('sender')->oldest()->get() : collect();
+                    $hasProperty = $activeConversation && $activeConversation->property;
+                @endphp
                 <div class="flex flex-col flex-grow bg-surface-container-low" id="chat-room-container">
                     <!-- Initial Empty State -->
-                    <div class="flex flex-col flex-grow items-center justify-center p-8 text-center" id="chat-empty-state">
+                    <div class="flex flex-col flex-grow items-center justify-center p-8 text-center {{ $activeConversation ? 'hidden' : '' }}" id="chat-empty-state">
                         <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 border border-outline-variant/30">
                             <span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">chat_bubble_outline</span>
                         </div>
@@ -876,38 +885,45 @@
                         </p>
                     </div>
 
-                    <!-- Dynamic Chat Area (hidden initially) -->
-                    <div class="hidden flex flex-col h-full" id="chat-active-area">
+                    <!-- Dynamic Chat Area -->
+                    <div class="{{ $activeConversation ? '' : 'hidden' }} flex flex-col h-full" id="chat-active-area">
                         <!-- Header -->
                         <div class="p-4 border-b border-outline-variant/30 bg-surface-container-lowest flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center font-headline font-bold text-primary text-sm shrink-0" id="chat-header-avatar">
-                                    A
+                                    {{ $activeConversation ? strtoupper(substr($activeConversation->partner->name, 0, 1)) : 'A' }}
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="font-bold text-sm text-on-surface truncate" id="chat-header-name">Andi Owner</h4>
+                                    <h4 class="font-bold text-sm text-on-surface truncate" id="chat-header-name">{{ $activeConversation ? $activeConversation->partner->name : 'Andi Owner' }}</h4>
                                     <div class="flex items-center gap-1.5 mt-0.5">
-                                        <span class="px-1.5 py-0.5 bg-primary-fixed text-on-primary-fixed text-[8px] font-bold rounded-full uppercase tracking-wider" id="chat-header-role">Pemilik Kos</span>
+                                        <span class="px-1.5 py-0.5 bg-primary-fixed text-on-primary-fixed text-[8px] font-bold rounded-full uppercase tracking-wider" id="chat-header-role">{{ $activeConversation ? (auth()->id() === $activeConversation->owner_id ? 'Pemilik Kos' : 'Pencari Kos') : 'Pemilik Kos' }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Property Banner -->
-                        <div class="px-4 py-2 bg-surface-container border-b border-outline-variant/30 flex items-center justify-between gap-4 hidden" id="chat-property-banner">
+                        <div class="px-4 py-2 bg-surface-container border-b border-outline-variant/30 flex items-center justify-between gap-4 {{ $hasProperty ? '' : 'hidden' }}" id="chat-property-banner">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-surface-container-high border border-outline-variant/20">
-                                    <img src="" class="w-full h-full object-cover hidden" id="chat-property-image">
-                                    <div class="w-full h-full flex items-center justify-center bg-surface-container" id="chat-property-placeholder">
-                                        <span class="material-symbols-outlined text-base text-outline">apartment</span>
-                                    </div>
+                                    @if($hasProperty && $activeConversation->property->main_image)
+                                        <img src="{{ asset('storage/' . $activeConversation->property->main_image) }}" class="w-full h-full object-cover" id="chat-property-image">
+                                        <div class="w-full h-full flex items-center justify-center bg-surface-container hidden" id="chat-property-placeholder">
+                                            <span class="material-symbols-outlined text-base text-outline">apartment</span>
+                                        </div>
+                                    @else
+                                        <img src="" class="w-full h-full object-cover hidden" id="chat-property-image">
+                                        <div class="w-full h-full flex items-center justify-center bg-surface-container" id="chat-property-placeholder">
+                                            <span class="material-symbols-outlined text-base text-outline">apartment</span>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="min-w-0 text-left">
-                                    <p class="text-xs font-bold truncate text-on-surface" id="chat-property-name">Nama Kos</p>
-                                    <p class="text-[9px] text-secondary" id="chat-property-details">Area • Rp 0/bln</p>
+                                    <p class="text-xs font-bold truncate text-on-surface" id="chat-property-name">{{ $hasProperty ? $activeConversation->property->name : 'Nama Kos' }}</p>
+                                    <p class="text-[9px] text-secondary" id="chat-property-details">{{ $hasProperty ? $activeConversation->property->area . ' • Rp ' . number_format($activeConversation->property->lowest_price, 0, ',', '.') . '/bln' : 'Area • Rp 0/bln' }}</p>
                                 </div>
                             </div>
-                            <a href="" class="text-xs font-bold text-primary hover:text-primary-container shrink-0 flex items-center gap-0.5 transition-colors" id="chat-property-link">
+                            <a href="{{ $hasProperty ? route('property.show', $activeConversation->property->slug) : '' }}" class="text-xs font-bold text-primary hover:text-primary-container shrink-0 flex items-center gap-0.5 transition-colors" id="chat-property-link">
                                 <span>Detail Kos</span>
                                 <span class="material-symbols-outlined text-xs">arrow_forward</span>
                             </a>
@@ -915,14 +931,44 @@
 
                         <!-- Messages Stream -->
                         <div id="tab-message-container" class="flex-grow overflow-y-auto p-4 space-y-4">
-                            <!-- Messages appended here -->
+                            @if($activeConversation)
+                                @forelse($activeMessages as $msg)
+                                    @php
+                                        $isSelf = $msg->sender_id === auth()->id();
+                                    @endphp
+                                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
+                                        <div class="flex flex-col max-w-[75%] md:max-w-[65%] gap-1">
+                                            <!-- Bubble -->
+                                            <div class="p-3.5 rounded-2xl shadow-sm leading-relaxed text-sm {{ $isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20' }}">
+                                                <p class="whitespace-pre-wrap break-words">{{ $msg->body }}</p>
+                                            </div>
+                                            <!-- Timestamp and status -->
+                                            <div class="flex items-center gap-1 text-[9px] text-secondary mt-0.5 {{ $isSelf ? 'justify-end' : 'justify-start' }}">
+                                                <span>{{ $msg->created_at->format('H:i') }}</span>
+                                                @if($isSelf)
+                                                    @if($msg->is_read)
+                                                        <span class="material-symbols-outlined text-xs text-primary font-bold">done_all</span>
+                                                    @else
+                                                        <span class="material-symbols-outlined text-xs text-secondary/60">done</span>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="flex items-center justify-center h-full py-12 text-secondary flex-col">
+                                        <span class="material-symbols-outlined text-3xl mb-1 text-outline-variant">forum</span>
+                                        <p class="text-xs font-bold">Mulai obrolan Anda</p>
+                                    </div>
+                                @endforelse
+                            @endif
                         </div>
 
                         <!-- Form -->
                         <div class="p-4 border-t border-outline-variant/30 bg-surface-container-lowest">
                             <form id="chat-msg-form" onsubmit="sendMessage(event)" class="flex gap-3 items-end">
                                 @csrf
-                                <input type="hidden" id="active-conversation-id" value="">
+                                <input type="hidden" id="active-conversation-id" value="{{ $activeConversation ? $activeConversation->id : '' }}">
                                 <div class="flex-grow">
                                     <textarea 
                                         id="chat-msg-input"
@@ -1391,50 +1437,8 @@
             if (!response.ok) throw new Error("Failed to load chat");
             
             const data = await response.json();
-            
-            // Show active area, hide empty state
-            const emptyState = document.getElementById('chat-empty-state');
-            const activeArea = document.getElementById('chat-active-area');
-            if (emptyState) emptyState.classList.add('hidden');
-            if (activeArea) activeArea.classList.remove('hidden');
-            
-            // Update Header
-            const headerName = document.getElementById('chat-header-name');
-            const headerAvatar = document.getElementById('chat-header-avatar');
-            const headerRole = document.getElementById('chat-header-role');
-            if (headerName) headerName.innerText = data.conversation.partner_name;
-            if (headerAvatar) headerAvatar.innerText = data.conversation.partner_initial;
-            if (headerRole) headerRole.innerText = data.conversation.partner_role;
-            
-            // Update Property Banner
-            const banner = document.getElementById('chat-property-banner');
-            if (banner) {
-                if (data.conversation.property) {
-                    banner.classList.remove('hidden');
-                    const propName = document.getElementById('chat-property-name');
-                    const propDetails = document.getElementById('chat-property-details');
-                    const propLink = document.getElementById('chat-property-link');
-                    if (propName) propName.innerText = data.conversation.property.name;
-                    if (propDetails) propDetails.innerText = `${data.conversation.property.area} • Rp ${data.conversation.property.lowest_price}/bln`;
-                    if (propLink) propLink.href = `/kos/${data.conversation.property.slug}`;
-                    
-                    const img = document.getElementById('chat-property-image');
-                    const placeholder = document.getElementById('chat-property-placeholder');
-                    if (img && placeholder) {
-                        if (data.conversation.property.main_image) {
-                            img.src = data.conversation.property.main_image;
-                            img.classList.remove('hidden');
-                            placeholder.classList.add('hidden');
-                        } else {
-                            img.classList.add('hidden');
-                            placeholder.classList.remove('hidden');
-                        }
-                    }
-                } else {
-                    banner.classList.add('hidden');
-                }
-            }
-            
+            console.log('Chat Data:', data);
+
             // Render Messages
             const msgContainer = document.getElementById('tab-message-container');
             if (msgContainer) {
@@ -1471,6 +1475,7 @@
                     });
                     if (!pollResponse.ok) return;
                     const pollData = await pollResponse.json();
+                    console.log('Poll Chat Data:', pollData);
                     
                     const pollMsgContainer = document.getElementById('tab-message-container');
                     if (pollMsgContainer && activeConversationId === conversationId) {
@@ -1621,6 +1626,12 @@
 
     // Auto-open chat if conversation_id query parameter exists
     document.addEventListener('DOMContentLoaded', () => {
+        // Scroll fallback messages to bottom
+        const msgContainer = document.getElementById('tab-message-container');
+        if (msgContainer) {
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+        
         const urlParams = new URLSearchParams(window.location.search);
         const conversationId = urlParams.get('conversation_id');
         if (conversationId) {
