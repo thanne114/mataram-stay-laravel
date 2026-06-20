@@ -21,9 +21,9 @@ return new class extends Migration
 
         // Tabel Pivot/Penghubung (Kos A punya fasilitas apa saja)
         Schema::create('facility_property', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->foreignId('facility_id')->constrained('facilities')->onDelete('cascade');
+            $table->primary(['property_id', 'facility_id']);
         });
     }
 

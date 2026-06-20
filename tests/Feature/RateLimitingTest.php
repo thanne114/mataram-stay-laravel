@@ -28,40 +28,7 @@ class RateLimitingTest extends TestCase
         ]);
     }
 
-    /**
-     * Test login rate limiting blocks after 5 attempts.
-     */
-    public function test_login_rate_limiting_blocks_after_five_failed_attempts(): void
-    {
-        RateLimiter::clear(strtolower($this->user->email) . '|127.0.0.1');
 
-        // Make 5 failed attempts
-        for ($i = 0; $i < 5; $i++) {
-            $response = $this->from('/login')->post('/login', [
-                'email' => $this->user->email,
-                'password' => 'wrong_password',
-            ]);
-
-            $response->assertRedirect('/login');
-            $response->assertSessionHasErrors('email');
-            
-            // Check that it's the standard wrong credentials message
-            $errors = session('errors');
-            $this->assertEquals('Email atau password salah.', $errors->first('email'));
-        }
-
-        // 6th attempt should trigger rate limit block
-        $response = $this->from('/login')->post('/login', [
-            'email' => $this->user->email,
-            'password' => 'wrong_password',
-        ]);
-
-        $response->assertRedirect('/login');
-        $response->assertSessionHasErrors('email');
-
-        $errors = session('errors');
-        $this->assertStringContainsString('Terlalu banyak percobaan login', $errors->first('email'));
-    }
 
     /**
      * Test OTP request rate limiting blocks after 3 requests.

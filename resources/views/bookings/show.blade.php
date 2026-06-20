@@ -438,7 +438,11 @@
 </script>
 
 @if(auth()->id() === $booking->user_id && in_array($booking->payment_status, ['Unpaid', 'Checking']) && $booking->status === 'Pending' && $booking->payment_token)
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    @if(config('services.midtrans.is_production'))
+        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    @else
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    @endif
     <script>
         document.getElementById('pay-button').onclick = function(){
             snap.pay('{{ $booking->payment_token }}', {
