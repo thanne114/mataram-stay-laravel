@@ -14,7 +14,7 @@ class GoogleAuthController extends Controller
     /**
      * Redirect the user to the Google authentication page.
      */
-    public function redirectToGoogle(Request $request)
+    public function redirect(Request $request)
     {
         // Store the target role (seeker / owner) in the session
         $role = $request->query('role', 'seeker');
@@ -30,7 +30,7 @@ class GoogleAuthController extends Controller
     /**
      * Obtain the user information from Google.
      */
-    public function handleGoogleCallback()
+    public function callback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
@@ -43,13 +43,13 @@ class GoogleAuthController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if ($user) {
-            // If user exists but is not linked to Google, link them
-            if (empty($user->social_id)) {
-                $user->update([
-                    'social_id' => $googleUser->getId(),
-                    'auth_provider' => 'google',
-                ]);
-            }
+            // Update google_id and avatar
+            $user->update([
+                'google_id' => $googleUser->getId(),
+                'avatar' => $googleUser->getAvatar(),
+                'social_id' => $googleUser->getId(),
+                'auth_provider' => 'google',
+            ]);
         } else {
             // Register a new user
             $role = session('google_register_role', 'seeker');
@@ -65,10 +65,13 @@ class GoogleAuthController extends Controller
                 'name' => $googleUser->getName() ?: 'Google User',
                 'email' => $googleUser->getEmail(),
                 'username' => $username,
+                'google_id' => $googleUser->getId(),
+                'avatar' => $googleUser->getAvatar(),
                 'social_id' => $googleUser->getId(),
                 'auth_provider' => 'google',
                 'role' => $role,
                 'email_verified_at' => now(), // Mark email as verified since it is authenticated by Google
+                'password' => null, // Left empty
             ]);
         }
 

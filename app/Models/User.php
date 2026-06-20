@@ -29,6 +29,8 @@ class User extends Authenticatable
         'phone_verified_at',
         'social_id',
         'auth_provider',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [
