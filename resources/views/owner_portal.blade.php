@@ -78,6 +78,11 @@
                 <span class="material-symbols-outlined text-xl group-hover:text-primary" data-icon="receipt_long">receipt_long</span>
                 Transaksi
             </button>
+
+            <a href="{{ route('chat.index') }}" class="nav-item flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group w-full text-left">
+                <span class="material-symbols-outlined text-xl group-hover:text-primary" data-icon="forum">forum</span>
+                Pesan
+            </a>
             
             <button onclick="switchTab('settings', this)" class="nav-item flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group w-full text-left">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary" data-icon="settings">settings</span>

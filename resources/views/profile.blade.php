@@ -90,6 +90,10 @@
                     <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-1"></span>
                 @endif
             </a>
+            <a href="{{ route('chat.index') }}" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
+                <span class="material-symbols-outlined text-xl group-hover:text-primary">forum</span>
+                Pesan
+            </a>
             <a href="#" onclick="switchView('view-kossaya', this)" class="nav-link flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary">apartment</span>
                 Kos Saya
