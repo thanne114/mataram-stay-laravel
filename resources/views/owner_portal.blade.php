@@ -79,10 +79,10 @@
                 Transaksi
             </button>
 
-            <a href="{{ route('chat.index') }}" class="nav-item flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group w-full text-left">
+            <button onclick="switchTab('pesan', this)" class="nav-item flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group w-full text-left">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary" data-icon="forum">forum</span>
                 Pesan
-            </a>
+            </button>
             
             <button onclick="switchTab('settings', this)" class="nav-item flex items-center gap-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all font-body text-sm font-medium group w-full text-left">
                 <span class="material-symbols-outlined text-xl group-hover:text-primary" data-icon="settings">settings</span>
@@ -602,7 +602,151 @@
                         <h4 class="font-headline text-xl text-tertiary">Nonaktifkan Akun</h4>
                         <p class="text-sm text-secondary font-body">Tindakan ini tidak dapat dibatalkan. Semua data properti dan riwayat sewa Anda akan dihapus permanen.</p>
                     </div>
-                    <button class="bg-tertiary text-white px-8 py-3 rounded-lg font-body text-sm font-bold shadow-md hover:bg-tertiary-container transition-all active:scale-95 shrink-0">Deactivate Account</button>
+        </section>
+
+        <!-- Tab Obrolan (Pesan) -->
+        <section id="pesan" class="tab-content hidden animate-in fade-in duration-500">
+            <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-soft flex min-h-[550px] h-[600px]">
+                
+                <!-- Left Pane: Conversation List -->
+                <div class="w-full md:w-80 lg:w-96 border-r border-outline-variant/30 flex flex-col bg-surface-container-lowest shrink-0">
+                    <div class="p-4 border-b border-outline-variant/30">
+                        <h3 class="font-headline text-xl font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">forum</span>
+                            <span>Pesan Saya</span>
+                        </h3>
+                    </div>
+                    <div class="flex-grow overflow-y-auto divide-y divide-outline-variant/20" id="owner-chat-sidebar-list">
+                        @forelse($conversations as $conv)
+                            @php
+                                $partner = $conv->partner;
+                                $lastMsg = $conv->messages->first();
+                                $isOwner = auth()->id() === $conv->owner_id;
+                            @endphp
+                            <button onclick="loadConversation({{ $conv->id }}, this)" class="conversation-item w-full text-left flex items-center gap-3 p-4 hover:bg-surface-container transition-colors duration-200" data-id="{{ $conv->id }}">
+                                <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-headline font-bold text-primary text-base shrink-0">
+                                    {{ strtoupper(substr($partner->name, 0, 1)) }}
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-baseline mb-1">
+                                        <h4 class="font-bold text-xs text-on-surface truncate pr-2">{{ $partner->name }}</h4>
+                                        <span class="text-[9px] text-secondary shrink-0 last-msg-time">
+                                            {{ $lastMsg ? $lastMsg->created_at->diffForHumans(null, true) : $conv->created_at->diffForHumans(null, true) }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-1 mb-0.5">
+                                        @if($isOwner)
+                                            <span class="px-1.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[8px] font-bold rounded-full uppercase tracking-wider scale-90 origin-left">Pencari</span>
+                                        @else
+                                            <span class="px-1.5 py-0.5 bg-primary-fixed text-on-primary-fixed text-[8px] font-bold rounded-full uppercase tracking-wider scale-90 origin-left">Pemilik</span>
+                                        @endif
+                                        @if($conv->property)
+                                            <span class="text-[9px] text-primary truncate max-w-[100px] font-medium">{{ $conv->property->name }}</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[11px] text-secondary truncate last-msg-body">
+                                        @if($lastMsg)
+                                            @if($lastMsg->sender_id === auth()->id())
+                                                <span class="text-primary font-medium">Anda: </span>
+                                            @endif
+                                            {{ $lastMsg->body }}
+                                        @else
+                                            <span class="italic text-secondary/70">Mulai percakapan...</span>
+                                        @endif
+                                    </p>
+                                </div>
+                                @if($conv->unread_messages_count > 0)
+                                    <div class="w-4 h-4 rounded-full bg-primary text-on-primary flex items-center justify-center text-[9px] font-bold shrink-0 unread-badge">
+                                        {{ $conv->unread_messages_count }}
+                                    </div>
+                                @endif
+                            </button>
+                        @empty
+                            <div class="p-8 text-center text-secondary">
+                                <span class="material-symbols-outlined text-3xl mb-1 text-outline-variant">mail_outline</span>
+                                <p class="text-xs font-medium">Belum ada obrolan</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Right Pane: Active Chat Room -->
+                <div class="flex flex-col flex-grow bg-surface-container-low" id="chat-room-container">
+                    <!-- Initial Empty State -->
+                    <div class="flex flex-col flex-grow items-center justify-center p-8 text-center" id="chat-empty-state">
+                        <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 border border-outline-variant/30">
+                            <span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">chat_bubble_outline</span>
+                        </div>
+                        <h3 class="font-headline text-xl font-bold text-on-surface mb-1">Mulai Obrolan</h3>
+                        <p class="text-xs text-secondary max-w-xs leading-relaxed">
+                            Pilih obrolan di sebelah kiri untuk berkirim pesan dengan pemilik atau pencari kos.
+                        </p>
+                    </div>
+
+                    <!-- Dynamic Chat Area (hidden initially) -->
+                    <div class="hidden flex flex-col h-full" id="chat-active-area">
+                        <!-- Header -->
+                        <div class="p-4 border-b border-outline-variant/30 bg-surface-container-lowest flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center font-headline font-bold text-primary text-sm shrink-0" id="chat-header-avatar">
+                                    A
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-on-surface truncate" id="chat-header-name">Andi Owner</h4>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="px-1.5 py-0.5 bg-primary-fixed text-on-primary-fixed text-[8px] font-bold rounded-full uppercase tracking-wider" id="chat-header-role">Pemilik Kos</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Property Banner -->
+                        <div class="px-4 py-2 bg-surface-container border-b border-outline-variant/30 flex items-center justify-between gap-4 hidden" id="chat-property-banner">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-surface-container-high border border-outline-variant/20">
+                                    <img src="" class="w-full h-full object-cover hidden" id="chat-property-image">
+                                    <div class="w-full h-full flex items-center justify-center bg-surface-container" id="chat-property-placeholder">
+                                        <span class="material-symbols-outlined text-base text-outline">apartment</span>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 text-left">
+                                    <p class="text-xs font-bold truncate text-on-surface" id="chat-property-name">Nama Kos</p>
+                                    <p class="text-[9px] text-secondary" id="chat-property-details">Area • Rp 0/bln</p>
+                                </div>
+                            </div>
+                            <a href="" class="text-xs font-bold text-primary hover:text-primary-container shrink-0 flex items-center gap-0.5 transition-colors" id="chat-property-link">
+                                <span>Detail Kos</span>
+                                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                            </a>
+                        </div>
+
+                        <!-- Messages Stream -->
+                        <div id="tab-message-container" class="flex-grow overflow-y-auto p-4 space-y-4">
+                            <!-- Messages appended here -->
+                        </div>
+
+                        <!-- Form -->
+                        <div class="p-4 border-t border-outline-variant/30 bg-surface-container-lowest">
+                            <form id="chat-msg-form" onsubmit="sendMessage(event)" class="flex gap-3 items-end">
+                                @csrf
+                                <input type="hidden" id="active-conversation-id" value="">
+                                <div class="flex-grow">
+                                    <textarea 
+                                        id="chat-msg-input"
+                                        name="body" 
+                                        rows="1" 
+                                        placeholder="Tulis pesan..." 
+                                        required
+                                        class="w-full bg-surface-container border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary rounded-2xl px-4 py-2 text-xs resize-none max-h-24 min-h-[38px] outline-none text-on-surface font-body"
+                                        oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';"
+                                    ></textarea>
+                                </div>
+                                <button type="submit" class="bg-primary text-on-primary hover:bg-primary-container p-2.5 rounded-2xl font-bold flex items-center justify-center shrink-0 shadow-md transition-all active:scale-95">
+                                    <span class="material-symbols-outlined text-sm">send</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -813,6 +957,195 @@
         });
         document.getElementById('compiled-email-otp').value = compiled;
     }
+
+    // AJAX CHAT SYSTEM INTEGRATION
+    let activeConversationId = null;
+
+    window.loadConversation = async function(conversationId, element) {
+        activeConversationId = conversationId;
+        document.getElementById('active-conversation-id').value = conversationId;
+        
+        // Highlight sidebar item
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.classList.remove('bg-surface-container-high/60', 'border-l-4', 'border-primary');
+        });
+        if (element) {
+            element.classList.add('bg-surface-container-high/60', 'border-l-4', 'border-primary');
+            // Hide unread badge
+            const badge = element.querySelector('.unread-badge');
+            if (badge) badge.remove();
+        }
+        
+        try {
+            const response = await fetch(`/chat/${conversationId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (!response.ok) throw new Error("Failed to load chat");
+            
+            const data = await response.json();
+            
+            // Show active area, hide empty state
+            document.getElementById('chat-empty-state').classList.add('hidden');
+            document.getElementById('chat-active-area').classList.remove('hidden');
+            
+            // Update Header
+            document.getElementById('chat-header-name').innerText = data.conversation.partner_name;
+            document.getElementById('chat-header-avatar').innerText = data.conversation.partner_initial;
+            document.getElementById('chat-header-role').innerText = data.conversation.partner_role;
+            
+            // Update Property Banner
+            const banner = document.getElementById('chat-property-banner');
+            if (data.conversation.property) {
+                banner.classList.remove('hidden');
+                document.getElementById('chat-property-name').innerText = data.conversation.property.name;
+                document.getElementById('chat-property-details').innerText = `${data.conversation.property.area} • Rp ${data.conversation.property.lowest_price}/bln`;
+                document.getElementById('chat-property-link').href = `/kos/${data.conversation.property.slug}`;
+                
+                const img = document.getElementById('chat-property-image');
+                const placeholder = document.getElementById('chat-property-placeholder');
+                if (data.conversation.property.main_image) {
+                    img.src = data.conversation.property.main_image;
+                    img.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                } else {
+                    img.classList.add('hidden');
+                    placeholder.classList.remove('hidden');
+                }
+            } else {
+                banner.classList.add('hidden');
+            }
+            
+            // Render Messages
+            const msgContainer = document.getElementById('tab-message-container');
+            msgContainer.innerHTML = '';
+            
+            if (data.messages.length === 0) {
+                msgContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full py-12 text-secondary flex-col">
+                        <span class="material-symbols-outlined text-3xl mb-1 text-outline-variant">forum</span>
+                        <p class="text-xs font-bold">Mulai obrolan Anda</p>
+                    </div>
+                `;
+            } else {
+                data.messages.forEach(msg => {
+                    const bubble = createMessageBubble(msg);
+                    msgContainer.appendChild(bubble);
+                });
+            }
+            
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+            
+        } catch (err) {
+            console.error("Error loading chat:", err);
+        }
+    }
+
+    function createMessageBubble(msg) {
+        const isSelf = msg.is_self;
+        const outerDiv = document.createElement('div');
+        outerDiv.className = `flex ${isSelf ? 'justify-end' : 'justify-start'}`;
+        
+        const innerDiv = document.createElement('div');
+        innerDiv.className = `flex flex-col max-w-[75%] md:max-w-[65%] gap-0.5`;
+        
+        const bubble = document.createElement('div');
+        bubble.className = `p-3 rounded-2xl shadow-sm leading-relaxed text-xs ${isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20'}`;
+        
+        const p = document.createElement('p');
+        p.className = 'whitespace-pre-wrap break-words';
+        p.innerText = msg.body;
+        bubble.appendChild(p);
+        
+        const meta = document.createElement('div');
+        meta.className = `flex items-center gap-1 text-[8px] text-secondary mt-0.5 ${isSelf ? 'justify-end' : 'justify-start'}`;
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.innerText = msg.time;
+        meta.appendChild(timeSpan);
+        
+        if (isSelf) {
+            const checkIcon = document.createElement('span');
+            checkIcon.className = 'material-symbols-outlined text-[10px] text-primary font-bold';
+            checkIcon.innerText = msg.is_read ? 'done_all' : 'done';
+            meta.appendChild(checkIcon);
+        }
+        
+        innerDiv.appendChild(bubble);
+        innerDiv.appendChild(meta);
+        outerDiv.appendChild(innerDiv);
+        return outerDiv;
+    }
+
+    window.sendMessage = async function(event) {
+        event.preventDefault();
+        const input = document.getElementById('chat-msg-input');
+        const text = input.value.trim();
+        if (!text || !activeConversationId) return;
+        
+        const token = document.querySelector('input[name="_token"]').value;
+        
+        try {
+            const response = await fetch(`/chat/${activeConversationId}/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ body: text })
+            });
+            
+            if (!response.ok) throw new Error("Failed to send message");
+            
+            const data = await response.json();
+            if (data.success) {
+                input.value = '';
+                input.style.height = 'auto';
+                
+                const msgContainer = document.getElementById('tab-message-container');
+                if (msgContainer.querySelector('.py-12')) {
+                    msgContainer.innerHTML = '';
+                }
+                
+                const bubble = createMessageBubble(data.message);
+                msgContainer.appendChild(bubble);
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+                
+                // Update last message in sidebar list
+                const sidebarItem = document.querySelector(`.conversation-item[data-id="${activeConversationId}"]`);
+                if (sidebarItem) {
+                    const bodyText = sidebarItem.querySelector('.last-msg-body');
+                    const timeText = sidebarItem.querySelector('.last-msg-time');
+                    if (bodyText) bodyText.innerHTML = `<span class="text-primary font-medium">Anda: </span>${text}`;
+                    if (timeText) timeText.innerText = 'Barusan';
+                    
+                    const parent = document.getElementById('owner-chat-sidebar-list');
+                    parent.insertBefore(sidebarItem, parent.firstChild);
+                }
+            }
+        } catch (err) {
+            console.error("Error sending message:", err);
+        }
+    }
+
+    // Auto-open chat if conversation_id query parameter exists
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const conversationId = urlParams.get('conversation_id');
+        if (conversationId) {
+            const sidebarItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+            if (sidebarItem) {
+                // Wait slightly for tabs to initialize
+                setTimeout(() => {
+                    loadConversation(conversationId, sidebarItem);
+                }, 100);
+            }
+        }
+    });
 </script>
 
 <!-- CSS Animation Keyframe for spin -->

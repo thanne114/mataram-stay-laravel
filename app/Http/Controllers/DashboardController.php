@@ -99,6 +99,16 @@ class DashboardController extends Controller
                 ->paginate(15);
         }
 
+        $conversations = \App\Models\Conversation::where('seeker_id', $user->id)
+            ->orWhere('owner_id', $user->id)
+            ->with(['seeker', 'owner', 'property', 'messages' => function ($q) {
+                $q->latest();
+            }])
+            ->get()
+            ->sortByDesc(function ($conv) {
+                return $conv->messages->first()?->created_at ?? $conv->created_at;
+            });
+
         return view('owner_portal', [
             'properties'      => $properties,
             'totalProperties' => $totalProperties,
@@ -108,6 +118,7 @@ class DashboardController extends Controller
             'successCount'    => $successCount,
             'pendingCount'    => $pendingCount,
             'role'            => 'owner',
+            'conversations'   => $conversations,
         ]);
     }
 

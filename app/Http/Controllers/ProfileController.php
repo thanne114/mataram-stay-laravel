@@ -41,7 +41,17 @@ class ProfileController extends Controller
         // Pending Bookings for Riwayat Pengajuan Sewa
         $pendingBookings = $bookings->where('status', 'Pending');
 
-        return view('profile', compact('bookings', 'activeBooking', 'completedBookings', 'pendingBookings'));
+        $conversations = \App\Models\Conversation::where('seeker_id', $user->id)
+            ->orWhere('owner_id', $user->id)
+            ->with(['seeker', 'owner', 'property', 'messages' => function ($q) {
+                $q->latest();
+            }])
+            ->get()
+            ->sortByDesc(function ($conv) {
+                return $conv->messages->first()?->created_at ?? $conv->created_at;
+            });
+
+        return view('profile', compact('bookings', 'activeBooking', 'completedBookings', 'pendingBookings', 'conversations'));
     }
 
     // Memproses update data profil

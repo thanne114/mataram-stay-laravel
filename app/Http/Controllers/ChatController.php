@@ -29,12 +29,15 @@ class ChatController extends Controller
     }
 
     /**
-     * Tampilkan isi percakapan tertentu
+     * Tampilkan isi percakapan tertentu (Dukung AJAX & Non-AJAX)
      */
-    public function show(Conversation $conversation)
+    public function show(Request $request, Conversation $conversation)
     {
         // Pastikan user adalah bagian dari percakapan ini
         if (Auth::id() !== $conversation->seeker_id && Auth::id() !== $conversation->owner_id) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
             abort(403, 'Unauthorized action.');
         }
 
@@ -46,6 +49,36 @@ class ChatController extends Controller
 
         // Muat semua pesan
         $messages = $conversation->messages()->with('sender')->oldest()->get();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'auth_id' => Auth::id(),
+                'conversation' => [
+                    'id' => $conversation->id,
+                    'partner_name' => $conversation->partner->name,
+                    'partner_initial' => strtoupper(substr($conversation->partner->name, 0, 1)),
+                    'partner_role' => Auth::id() === $conversation->owner_id ? 'Pencari Kos' : 'Pemilik Kos',
+                    'partner_whatsapp' => $conversation->partner->no_whatsapp,
+                    'property' => $conversation->property ? [
+                        'name' => $conversation->property->name,
+                        'slug' => $conversation->property->slug,
+                        'area' => $conversation->property->area,
+                        'lowest_price' => number_format($conversation->property->lowest_price, 0, ',', '.'),
+                        'main_image' => $conversation->property->main_image ? asset('storage/' . $conversation->property->main_image) : null,
+                    ] : null,
+                ],
+                'messages' => $messages->map(function ($msg) {
+                    return [
+                        'id' => $msg->id,
+                        'body' => $msg->body,
+                        'sender_id' => $msg->sender_id,
+                        'is_self' => $msg->sender_id === Auth::id(),
+                        'time' => $msg->created_at->format('H:i'),
+                        'is_read' => $msg->is_read,
+                    ];
+                }),
+            ]);
+        }
 
         // Muat daftar percakapan untuk sidebar
         $conversations = Conversation::where('seeker_id', Auth::id())
@@ -62,12 +95,15 @@ class ChatController extends Controller
     }
 
     /**
-     * Kirim pesan baru dalam percakapan
+     * Kirim pesan baru dalam percakapan (Dukung AJAX & Non-AJAX)
      */
     public function store(Request $request, Conversation $conversation)
     {
         // Pastikan user adalah bagian dari percakapan ini
         if (Auth::id() !== $conversation->seeker_id && Auth::id() !== $conversation->owner_id) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
             abort(403, 'Unauthorized action.');
         }
 
@@ -75,12 +111,26 @@ class ChatController extends Controller
             'body' => 'required|string|max:1000',
         ]);
 
-        Message::create([
+        $message = Message::create([
             'conversation_id' => $conversation->id,
             'sender_id' => Auth::id(),
             'body' => $request->body,
             'is_read' => false,
         ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => [
+                    'id' => $message->id,
+                    'body' => $message->body,
+                    'sender_id' => $message->sender_id,
+                    'is_self' => true,
+                    'time' => $message->created_at->format('H:i'),
+                    'is_read' => false,
+                ]
+            ]);
+        }
 
         return redirect()->route('chat.show', $conversation);
     }
@@ -105,6 +155,7 @@ class ChatController extends Controller
             'property_id' => $property->id,
         ]);
 
-        return redirect()->route('chat.show', $conversation);
+        // Dialihkan kembali ke dasbor profile dengan tab pesan & conversation_id terbuka otomatis
+        return redirect()->route('profile.edit', ['tab' => 'view-pesan', 'conversation_id' => $conversation->id]);
     }
 }
