@@ -41,6 +41,7 @@ class MidtransWebhookTest extends TestCase
             'email' => 'seeker.joe@test.com',
             'password' => bcrypt('password'),
             'role' => 'seeker',
+            'is_verified' => true,
         ]);
 
         $this->property = Property::create([

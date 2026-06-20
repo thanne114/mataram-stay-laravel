@@ -104,9 +104,14 @@ class SendRentExtensionRemindersTest extends TestCase
                 ->where('room_type_id', $this->roomType->id)
                 ->whereDate('check_in_date', $expectedCheckoutDate)
                 ->where('duration_months', 1)
-                ->where('total_price', 1000000)
+                ->where('room_subtotal', 1000000)
+                ->where('admin_fee', 2500)
+                ->where('commission_fee', 50000)
+                ->where('net_owner_amount', 950000)
+                ->where('total_price', 1002500)
                 ->where('status', 'Pending')
                 ->where('payment_status', 'Unpaid')
+                ->where('is_approved', false)
                 ->exists()
         );
 
