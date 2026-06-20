@@ -58,6 +58,11 @@ class ProfileController extends Controller
             'no_whatsapp' => ['required', 'string', 'max:20'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             
+            // Validasi Rekening Bank (Bila diisi)
+            'bank_name' => ['nullable', 'string', 'max:255'],
+            'bank_account_name' => ['nullable', 'string', 'max:255'],
+            'bank_account_number' => ['nullable', 'string', 'max:50'],
+            
             // Validasi Password (Hanya diwajibkan jika user ingin mengganti password)
             'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'min:8', 'confirmed'],
@@ -68,6 +73,9 @@ class ProfileController extends Controller
         $user->username = $request->username; // <-- BARIS INI SUDAH DIAKTIFKAN
         $user->email = $request->email;
         $user->no_whatsapp = $request->no_whatsapp;
+        $user->bank_name = $request->bank_name;
+        $user->bank_account_name = $request->bank_account_name;
+        $user->bank_account_number = $request->bank_account_number;
 
         // 3. Update password (Hanya jika kolom password baru diisi)
         if ($request->filled('password')) {

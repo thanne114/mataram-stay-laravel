@@ -321,6 +321,20 @@
     </div>
     @endif
 
+    {{-- Admin: Refund Dispute --}}
+    @if(auth()->user()->isAdmin() && $booking->status === 'Cancelled' && $booking->payment_status === 'Paid' && $booking->escrow_status !== 'refunded')
+    <div class="bg-red-50 rounded-xl p-6 border border-red-200 mb-6">
+        <h3 class="font-headline text-lg font-bold text-red-800 mb-2">Pusat Dispute Admin: Refund Dana</h3>
+        <p class="text-xs text-red-700 font-body mb-4">Pesanan ini telah dibatalkan tetapi berstatus lunas. Sebagai administrator, Anda dapat menandai pesanan ini telah di-refund.</p>
+        <form action="{{ route('admin.booking.refund', $booking) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memproses refund dana untuk pesanan ini?')">
+            @csrf
+            <button type="submit" class="w-full bg-red-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-red-700 transition-all">
+                Proses Pengembalian Dana (Refund)
+            </button>
+        </form>
+    </div>
+    @endif
+
     {{-- Review (Seeker, setelah Completed) --}}
     @if(auth()->id() === $booking->user_id && $booking->status === 'Completed' && !$booking->review)
     <div id="review-section" class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">

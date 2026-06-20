@@ -287,7 +287,40 @@
                             </div>
                         </div>
                     </div>
+                @if(auth()->user()->isOwner())
+                {{-- Accordion: Informasi Rekening Pencairan --}}
+                <div class="space-y-4 accordion-item mt-6">
+                    <button type="button" class="w-full flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline/5 sahara-shadow group transition-all hover:bg-surface-container-high" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">account_balance</span>
+                            <h3 class="text-2xl font-headline">Informasi Rekening Pencairan</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-secondary transition-transform duration-300 chevron">expand_more</span>
+                    </button>
+                    
+                    <div class="hidden bg-surface-container-low rounded-xl p-8 sahara-shadow border border-outline/5 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nama Bank</label>
+                            <select name="bank_name" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm">
+                                <option value="">Pilih Bank</option>
+                                <option value="BCA" {{ old('bank_name', auth()->user()->bank_name) == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                <option value="Mandiri" {{ old('bank_name', auth()->user()->bank_name) == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                <option value="BNI" {{ old('bank_name', auth()->user()->bank_name) == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                <option value="BRI" {{ old('bank_name', auth()->user()->bank_name) == 'BRI' ? 'selected' : '' }}>BRI</option>
+                                <option value="BSI" {{ old('bank_name', auth()->user()->bank_name) == 'BSI' ? 'selected' : '' }}>BSI</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nomor Rekening</label>
+                            <input name="bank_account_number" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm" type="text" placeholder="Contoh: 1234567890" value="{{ old('bank_account_number', auth()->user()->bank_account_number) }}">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nama Pemilik Rekening</label>
+                            <input name="bank_account_name" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm" type="text" placeholder="Nama sesuai buku tabungan" value="{{ old('bank_account_name', auth()->user()->bank_account_name) }}">
+                        </div>
+                    </div>
                 </div>
+                @endif
 
                 {{-- Accordion 2: Keamanan & Password --}}
                 <div class="space-y-4 accordion-item">

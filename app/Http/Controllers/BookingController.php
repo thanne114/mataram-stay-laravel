@@ -269,6 +269,18 @@ class BookingController extends Controller
                 $roomType->increment('available_rooms');
             }
 
+            if ($request->status === 'Completed' && $booking->payment_status === 'Paid') {
+                $payoutReference = \App\Services\MidtransPayoutService::sendPayout($booking);
+                if ($payoutReference) {
+                    $booking->escrow_status = 'released';
+                    $booking->payout_status = 'success';
+                    $booking->payout_reference = $payoutReference;
+                } else {
+                    $booking->payout_status = 'failed';
+                }
+                $booking->save();
+            }
+
             if ($request->status === 'Cancelled') {
                 try {
                     Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));

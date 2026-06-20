@@ -295,4 +295,23 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Pengaturan monetisasi berhasil diperbarui!');
     }
+
+    /**
+     * Dispute Refund Booking oleh Admin
+     */
+    public function refundBooking(Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($booking->status === 'Cancelled' && $booking->payment_status === 'Paid') {
+            $booking->update([
+                'escrow_status' => 'refunded'
+            ]);
+            return redirect()->back()->with('success', 'Dana booking #' . $booking->id . ' berhasil di-refund.');
+        }
+
+        return redirect()->back()->with('error', 'Booking tidak memenuhi syarat untuk refund.');
+    }
 }

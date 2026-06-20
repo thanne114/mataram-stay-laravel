@@ -126,6 +126,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/approve-property/{property}', [DashboardController::class, 'approveProperty'])->name('admin.approve-property');
     Route::post('/admin/property/{property}/reject', [DashboardController::class, 'reject'])->name('admin.property.reject');
     Route::post('/admin/update-settings', [DashboardController::class, 'updateSettings'])->name('admin.update-settings');
+    Route::post('/admin/booking/{booking}/refund', [DashboardController::class, 'refundBooking'])->name('admin.booking.refund');
 });
 
 // ============================================

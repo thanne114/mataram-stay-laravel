@@ -307,8 +307,14 @@
                                     <td class="px-8 py-6 text-center">
                                         <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $booking->status }}</span>
                                     </td>
-                                    <td class="px-8 py-6">
-                                        <a href="{{ route('booking.show', $booking) }}" class="text-primary hover:underline text-xs font-bold uppercase">Detail</a>
+                                    <td class="px-8 py-6 flex items-center gap-2">
+                                         <a href="{{ route('booking.show', $booking) }}" class="text-primary hover:underline text-xs font-bold uppercase">Detail</a>
+                                         @if(auth()->user()->isAdmin() && $booking->status === 'Cancelled' && $booking->payment_status === 'Paid' && $booking->escrow_status !== 'refunded')
+                                             <form action="{{ route('admin.booking.refund', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin memproses refund untuk pesanan ini?')">
+                                                 @csrf
+                                                 <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors uppercase">Refund</button>
+                                             </form>
+                                         @endif
                                     </td>
                                 </tr>
                             @empty
@@ -465,6 +471,37 @@
                             <div class="md:col-span-2 flex justify-end mt-4">
                                 <button type="submit" class="bg-primary text-white px-8 py-3 rounded-xl font-body text-sm font-bold shadow-md hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95">Simpan Perubahan</button>
                             </div>
+                        </div>
+                    </div>
+                {{-- Accordion: Informasi Rekening Pencairan --}}
+                <div class="space-y-4 accordion-item mt-6">
+                    <button type="button" class="w-full flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline/5 sahara-shadow group transition-all hover:bg-surface-container-high" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">account_balance</span>
+                            <h3 class="text-2xl font-headline">Informasi Rekening Pencairan</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-secondary transition-transform duration-300 chevron">expand_more</span>
+                    </button>
+                    
+                    <div class="hidden bg-surface-container-low rounded-xl p-8 sahara-shadow border border-outline/5 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nama Bank</label>
+                            <select name="bank_name" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm">
+                                <option value="">Pilih Bank</option>
+                                <option value="BCA" {{ old('bank_name', auth()->user()->bank_name) == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                <option value="Mandiri" {{ old('bank_name', auth()->user()->bank_name) == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                <option value="BNI" {{ old('bank_name', auth()->user()->bank_name) == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                <option value="BRI" {{ old('bank_name', auth()->user()->bank_name) == 'BRI' ? 'selected' : '' }}>BRI</option>
+                                <option value="BSI" {{ old('bank_name', auth()->user()->bank_name) == 'BSI' ? 'selected' : '' }}>BSI</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nomor Rekening</label>
+                            <input name="bank_account_number" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm" type="text" placeholder="Contoh: 1234567890" value="{{ old('bank_account_number', auth()->user()->bank_account_number) }}">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-secondary">Nama Pemilik Rekening</label>
+                            <input name="bank_account_name" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-body text-sm" type="text" placeholder="Nama sesuai buku tabungan" value="{{ old('bank_account_name', auth()->user()->bank_account_name) }}">
                         </div>
                     </div>
                 </div>

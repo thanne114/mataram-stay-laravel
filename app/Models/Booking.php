@@ -23,6 +23,9 @@ class Booking extends Model
         'payment_proof',
         'payment_token',
         'is_approved',
+        'escrow_status',
+        'payout_status',
+        'payout_reference',
     ];
 
     protected $casts = [
