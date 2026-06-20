@@ -293,6 +293,23 @@
                 </a>
                 @endif
 
+                @if(auth()->check())
+                    @if(auth()->id() !== $property->user_id)
+                    <form action="{{ route('chat.start', $property) }}" method="POST" class="mt-3">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-label font-bold text-sm transition-all">
+                            <span class="material-symbols-outlined text-lg">forum</span>
+                            Tanya Pemilik Kos
+                        </button>
+                    </form>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="w-full mt-3 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-label font-bold text-sm transition-all">
+                        <span class="material-symbols-outlined text-lg">forum</span>
+                        Tanya Pemilik Kos
+                    </a>
+                @endif
+
                 @if($property->roomTypes->count() > 0)
                 <div class="mt-4 pt-4 border-t border-outline-variant/30">
                     <div class="text-xs text-secondary uppercase tracking-wider mb-1">Mulai dari</div>

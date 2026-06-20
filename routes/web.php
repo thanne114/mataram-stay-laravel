@@ -68,6 +68,12 @@ Route::middleware('auth')->group(function () {
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Chat Internal
+    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{conversation}/send', [\App\Http\Controllers\ChatController::class, 'store'])->name('chat.send');
+    Route::post('/chat/start/{property}', [\App\Http\Controllers\ChatController::class, 'start'])->name('chat.start');
 });
 
 // ============================================
