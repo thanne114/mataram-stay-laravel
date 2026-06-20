@@ -59,8 +59,7 @@ class GoogleSSOTest extends TestCase
         $response->assertRedirect('/dashboard-seeker');
         $this->assertDatabaseHas('users', [
             'email' => 'seeker.google@example.com',
-            'social_id' => 'google-id-12345',
-            'auth_provider' => 'google',
+            'google_id' => 'google-id-12345',
             'role' => 'seeker',
         ]);
         
@@ -100,8 +99,7 @@ class GoogleSSOTest extends TestCase
         // Assert user has been linked in database
         $this->assertDatabaseHas('users', [
             'email' => 'existing.seeker@example.com',
-            'social_id' => 'google-id-existing',
-            'auth_provider' => 'google',
+            'google_id' => 'google-id-existing',
         ]);
         
         $this->assertAuthenticatedAs($user);

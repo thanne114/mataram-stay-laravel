@@ -25,9 +25,14 @@ class TransactionController extends Controller
             ->latest()
             ->paginate(15);
 
+        $hasPendingTransaction = Booking::where('user_id', Auth::id())
+            ->where('status', 'Pending')
+            ->exists();
+
         return view('dashboard.transactions', [
             'bookings' => $bookings,
             'role'     => 'seeker',
+            'hasPendingTransaction' => $hasPendingTransaction,
         ]);
     }
 }

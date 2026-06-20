@@ -47,8 +47,6 @@ class GoogleAuthController extends Controller
             $user->update([
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
-                'social_id' => $googleUser->getId(),
-                'auth_provider' => 'google',
             ]);
         } else {
             // Register a new user
@@ -67,8 +65,6 @@ class GoogleAuthController extends Controller
                 'username' => $username,
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
-                'social_id' => $googleUser->getId(),
-                'auth_provider' => 'google',
                 'role' => $role,
                 'email_verified_at' => now(), // Mark email as verified since it is authenticated by Google
                 'password' => null, // Left empty

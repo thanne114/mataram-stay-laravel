@@ -27,8 +27,6 @@ class User extends Authenticatable
         'bank_account_number',
         'is_verified',
         'phone_verified_at',
-        'social_id',
-        'auth_provider',
         'google_id',
         'avatar',
     ];

@@ -59,11 +59,6 @@
         ::-webkit-scrollbar-thumb { background: #d8d0c8; border-radius: 10px; }
     </style>
 </head>
-@php
-    $hasPendingTransaction = \App\Models\Booking::where('user_id', auth()->id())
-        ->where('status', 'Pending')
-        ->exists();
-@endphp
 <body class="text-on-surface antialiased flex min-h-screen">
 
 <!-- SideNavBar (Desktop Only) -->
@@ -89,7 +84,7 @@
     <a class="group flex items-center px-4 py-3 text-primary font-bold border-r-4 border-primary bg-primary-container/10 transition-all rounded-l-lg -mr-4 mb-2" href="{{ route('transactions.seeker') }}">
         <span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
         <span class="text-label-lg">Transaksi</span>
-        @if($hasPendingTransaction)
+        @if($hasPendingTransaction ?? false)
             <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse ml-1"></span>
         @endif
     </a>
@@ -305,7 +300,7 @@
     <a class="flex flex-col items-center justify-center text-primary relative" href="{{ route('transactions.seeker') }}">
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
         <span class="font-body text-[10px] uppercase tracking-wider mt-1 font-bold">Transaksi</span>
-        @if($hasPendingTransaction)
+        @if($hasPendingTransaction ?? false)
             <span class="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
         @endif
     </a>

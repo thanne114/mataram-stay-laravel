@@ -41,14 +41,25 @@ class ProfileController extends Controller
         // Pending Bookings for Riwayat Pengajuan Sewa
         $pendingBookings = $bookings->where('status', 'Pending');
 
-        $conversations = \App\Models\Conversation::where('seeker_id', $user->id)
-            ->orWhere('owner_id', $user->id)
-            ->with(['seeker', 'owner', 'property', 'messages' => function ($q) {
-                $q->latest();
-            }])
+        $conversations = \App\Models\Conversation::where(function ($query) use ($user) {
+                $query->where('seeker_id', $user->id)
+                      ->orWhere('owner_id', $user->id);
+            })
+            ->with([
+                'seeker',
+                'owner',
+                'property',
+                'latestMessage'
+            ])
+            ->withCount([
+                'messages as unread_messages_count' => function ($q) {
+                    $q->where('sender_id', '!=', auth()->id())
+                      ->where('is_read', false);
+                }
+            ])
             ->get()
             ->sortByDesc(function ($conv) {
-                return $conv->messages->first()?->created_at ?? $conv->created_at;
+                return $conv->latestMessage?->created_at ?? $conv->created_at;
             });
 
         return view('profile', compact('bookings', 'activeBooking', 'completedBookings', 'pendingBookings', 'conversations'));

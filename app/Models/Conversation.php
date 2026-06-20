@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Conversation extends Model
 {
@@ -38,6 +39,12 @@ class Conversation extends Model
         return $this->hasMany(Message::class);
     }
 
+    /** Pesan terakhir dalam obrolan ini */
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(Message::class)->latestOfMany();
+    }
+
     /** Mendapatkan partner chat (selain pengguna yang login) */
     public function getPartnerAttribute(): User
     {
@@ -50,6 +57,10 @@ class Conversation extends Model
     /** Mendapatkan jumlah pesan yang belum dibaca */
     public function getUnreadMessagesCountAttribute(): int
     {
+        if (array_key_exists('unread_messages_count', $this->attributes)) {
+            return (int) $this->attributes['unread_messages_count'];
+        }
+
         return $this->messages()
             ->where('sender_id', '!=', auth()->id())
             ->where('is_read', false)
