@@ -8,7 +8,7 @@ class StoreBookingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->isSeeker();
+        return $this->user()->isSeeker() && $this->user()->isIdentityVerified();
     }
 
     public function rules(): array

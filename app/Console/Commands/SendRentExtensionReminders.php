@@ -78,14 +78,27 @@ class SendRentExtensionReminders extends Command
                 $this->info("Unpaid renewal booking ID {$renewalBooking->id} already exists for User ID {$booking->user_id}. Sending reminder.");
             } else {
                 // Create a new renewal booking for the next month
+                // Calculate pricing breakdown (same logic as BookingController@store)
+                $roomSubtotal = $booking->roomType->price_per_month * 1; // 1 month renewal
+                $adminFee = (int) \App\Models\Setting::getValue('admin_fee', 2500);
+                $commissionRate = (float) \App\Models\Setting::getValue('commission_rate', 5);
+                $commissionFee = (int) round($roomSubtotal * ($commissionRate / 100));
+                $netOwnerAmount = $roomSubtotal - $commissionFee;
+                $totalPrice = $roomSubtotal + $adminFee;
+
                 $renewalBooking = Booking::create([
                     'user_id' => $booking->user_id,
                     'room_type_id' => $booking->room_type_id,
                     'check_in_date' => $checkoutDate,
                     'duration_months' => 1,
-                    'total_price' => $booking->roomType->price_per_month,
+                    'room_subtotal' => $roomSubtotal,
+                    'admin_fee' => $adminFee,
+                    'commission_fee' => $commissionFee,
+                    'net_owner_amount' => $netOwnerAmount,
+                    'total_price' => $totalPrice,
                     'status' => 'Pending',
                     'payment_status' => 'Unpaid',
+                    'is_approved' => false,
                 ]);
                 $this->info("Created new renewal booking ID {$renewalBooking->id} for User ID {$booking->user_id} starting on {$checkoutDate}.");
             }
