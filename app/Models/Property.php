@@ -132,7 +132,7 @@ class Property extends Model
         return (($this->id * 7) + now()->dayOfYear) % 28 + 8;
     }
 
-    /** Closest campus to the property */
+    /** Closest campus to the property (or specifically selected campus from request) */
     public function getClosestCampusAttribute(): array
     {
         $campuses = [
@@ -160,20 +160,33 @@ class Property extends Model
 
         $closest = null;
         $minDist = 999999;
-
-        foreach ($campuses as $key => $campus) {
+        
+        $selectedCampus = request('kampus');
+        if ($selectedCampus && array_key_exists($selectedCampus, $campuses)) {
+            $closest = $campuses[$selectedCampus];
             $earthRadius = 6371; // km
-            $dLat = deg2rad($campus['lat'] - $propLat);
-            $dLng = deg2rad($campus['lng'] - $propLng);
+            $dLat = deg2rad($closest['lat'] - $propLat);
+            $dLng = deg2rad($closest['lng'] - $propLng);
             $a = sin($dLat/2) * sin($dLat/2) +
-                 cos(deg2rad($propLat)) * cos(deg2rad($campus['lat'])) *
+                 cos(deg2rad($propLat)) * cos(deg2rad($closest['lat'])) *
                  sin($dLng/2) * sin($dLng/2);
             $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-            $dist = $earthRadius * $c;
+            $minDist = $earthRadius * $c;
+        } else {
+            foreach ($campuses as $key => $campus) {
+                $earthRadius = 6371; // km
+                $dLat = deg2rad($campus['lat'] - $propLat);
+                $dLng = deg2rad($campus['lng'] - $propLng);
+                $a = sin($dLat/2) * sin($dLat/2) +
+                     cos(deg2rad($propLat)) * cos(deg2rad($campus['lat'])) *
+                     sin($dLng/2) * sin($dLng/2);
+                $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                $dist = $earthRadius * $c;
 
-            if ($dist < $minDist) {
-                $minDist = $dist;
-                $closest = $campus;
+                if ($dist < $minDist) {
+                    $minDist = $dist;
+                    $closest = $campus;
+                }
             }
         }
 
@@ -189,12 +202,81 @@ class Property extends Model
             }
             return [
                 'name' => $closest['name'],
+                'lat' => $closest['lat'],
+                'lng' => $closest['lng'],
                 'distance' => round($minDist, 2),
                 'label' => $label,
             ];
         }
 
         return [];
+    }
+
+    /** Nearby campuses to the property (within 3 km radius) */
+    public function getNearbyCampusesAttribute(): array
+    {
+        $campuses = [
+            'UNRAM' => ['name' => 'Universitas Mataram (UNRAM)', 'lat' => -8.587063, 'lng' => 116.092185],
+            'UIN_MATARAM' => ['name' => 'UIN Mataram Kampus 2', 'lat' => -8.610029404934442, 'lng' => 116.10061365572658],
+            'UIN_MATARAM_1' => ['name' => 'UIN Mataram Kampus 1', 'lat' => -8.582297, 'lng' => 116.094629],
+            'UIN_MATARAM_2' => ['name' => 'UIN Mataram Kampus 2', 'lat' => -8.610029404934442, 'lng' => 116.10061365572658],
+            'UMMAT' => ['name' => 'Universitas Muhammadiyah Mataram (UMMAT)', 'lat' => -8.603922736822168, 'lng' => 116.10314990009388],
+            'POLTEKKES_KEMENKES_MATARAM' => ['name' => 'Poltekkes Kemenkes Mataram', 'lat' => -8.60697944667692, 'lng' => 116.13034004303186],
+            'UT_MATARAM' => ['name' => 'Universitas Terbuka Mataram (UT)', 'lat' => -8.615985997292142, 'lng' => 116.0837822198231],
+            'UTM' => ['name' => 'Universitas Teknologi Mataram (UTM)', 'lat' => -8.592227544759059, 'lng' => 116.09210315753597],
+            'UNBIM' => ['name' => 'Universitas Bhakti Mataram (UNBIM)', 'lat' => -8.6050, 'lng' => 116.0850],
+            'IAHN_GDE_PUDJA' => ['name' => 'IAHN Gde Pudja', 'lat' => -8.585315823591262, 'lng' => 116.10274343138725],
+            'STIKES_YARSI' => ['name' => 'INKES Yarsi Mataram', 'lat' => -8.616198152336244, 'lng' => 116.1037731163117],
+            'STIKES_MATARAM' => ['name' => 'STIKES Mataram', 'lat' => -8.589637018133999, 'lng' => 116.08274860194847],
+            'UNMAS' => ['name' => 'Universitas Mahasaraswati Mataram', 'lat' => -8.5925, 'lng' => 116.1105],
+        ];
+
+        $propLat = (float) $this->latitude;
+        $propLng = (float) $this->longitude;
+
+        if (!$propLat || !$propLng) {
+            return [];
+        }
+
+        $nearby = [];
+
+        foreach ($campuses as $key => $campus) {
+            $earthRadius = 6371; // km
+            $dLat = deg2rad($campus['lat'] - $propLat);
+            $dLng = deg2rad($campus['lng'] - $propLng);
+            $a = sin($dLat/2) * sin($dLat/2) +
+                 cos(deg2rad($propLat)) * cos(deg2rad($campus['lat'])) *
+                 sin($dLng/2) * sin($dLng/2);
+            $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+            $dist = $earthRadius * $c;
+
+            if ($dist <= 3.0) {
+                if ($dist < 1.0) {
+                    $time = round($dist * 12);
+                    $time = $time < 1 ? 1 : $time;
+                    $label = "🚶 {$time} Menit jalan kaki";
+                } else {
+                    $time = round($dist * 2);
+                    $time = $time < 1 ? 1 : $time;
+                    $label = "🚗 {$time} Menit berkendara";
+                }
+
+                $nearby[] = [
+                    'key' => $key,
+                    'name' => $campus['name'],
+                    'lat' => $campus['lat'],
+                    'lng' => $campus['lng'],
+                    'distance' => round($dist, 2),
+                    'label' => $label,
+                ];
+            }
+        }
+
+        usort($nearby, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        return $nearby;
     }
 
     // ============================

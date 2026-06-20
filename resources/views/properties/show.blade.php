@@ -205,7 +205,7 @@
             <section>
                 <h2 class="font-headline text-2xl font-bold text-on-surface mb-4">Lokasi</h2>
                 <div id="map-detail" class="w-full h-[350px] rounded-xl border border-outline-variant/40"></div>
-                <div class="mt-4">
+                <div class="mt-4 flex flex-wrap gap-3">
                     <a href="https://www.google.com/maps/dir/?api=1&destination={{ $property->latitude }},{{ $property->longitude }}" 
                        target="_blank" 
                        rel="noopener noreferrer" 
@@ -214,6 +214,23 @@
                         Dapatkan Rute di Google Maps
                     </a>
                 </div>
+
+                @if(count($property->nearby_campuses) > 0)
+                <div class="mt-6 bg-surface-container-low rounded-xl p-5 border border-outline-variant/30">
+                    <h3 class="font-headline text-lg font-bold text-on-surface mb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">school</span>
+                        Akses Kampus Hub Terdekat (Radius 3 KM)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @foreach($property->nearby_campuses as $nc)
+                        <div class="flex items-center justify-between text-sm p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 hover:border-primary/40 transition-colors">
+                            <span class="font-semibold text-on-surface-variant text-xs truncate max-w-[200px]" title="{{ $nc['name'] }}">{{ $nc['name'] }}</span>
+                            <span class="text-[10px] font-bold text-primary bg-primary-fixed/40 px-2 py-1 rounded-full whitespace-nowrap">{{ $nc['label'] }} ({{ $nc['distance'] }} km)</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </section>
             @endif
 
@@ -320,13 +337,51 @@
 
 @if($property->latitude && $property->longitude)
 <script>
-    var map = L.map('map-detail').setView([{{ $property->latitude }}, {{ $property->longitude }}], 16);
+    var propertyLat = {{ $property->latitude }};
+    var propertyLng = {{ $property->longitude }};
+    var map = L.map('map-detail').setView([propertyLat, propertyLng], 15);
+    
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-    L.marker([{{ $property->latitude }}, {{ $property->longitude }}]).addTo(map)
-        .bindPopup('<b>{{ $property->name }}</b><br>{{ $property->address }}<br><a href="https://www.google.com/maps/dir/?api=1&destination={{ $property->latitude }},{{ $property->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-bold text-primary hover:underline" style="color: #c2652a; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px;">Buka di Google Maps ↗</a>').openPopup();
+
+    var propertyType = "{{ $property->type }}";
+    var markerIconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png';
+    if (propertyType === 'Putra') {
+        markerIconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
+    } else if (propertyType === 'Putri') {
+        markerIconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png';
+    }
+
+    var propIcon = L.icon({
+        iconUrl: markerIconUrl,
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    L.marker([propertyLat, propertyLng], { icon: propIcon }).addTo(map)
+        .bindPopup('<b>🏠 {{ $property->name }}</b><br>{{ $property->address }}<br><a href="https://www.google.com/maps/dir/?api=1&destination={{ $property->latitude }},{{ $property->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-bold text-primary hover:underline" style="color: #c2652a; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px;">Buka di Google Maps ↗</a>').openPopup();
+
+    var campusIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [20, 33],
+        iconAnchor: [10, 33],
+        popupAnchor: [1, -30],
+        shadowSize: [33, 33]
+    });
+
+    var nearbyCampuses = {!! json_encode($property->nearby_campuses) !!};
+    nearbyCampuses.forEach(function (c) {
+        if (c.lat && c.lng) {
+            L.marker([c.lat, c.lng], { icon: campusIcon }).addTo(map)
+                .bindPopup('<b>🏫 ' + c.name + '</b><br>' + c.label + ' (' + c.distance + ' km)');
+        }
+    });
 </script>
 @endif
 </body></html>
