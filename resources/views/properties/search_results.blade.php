@@ -7,6 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
     tailwind.config = {
@@ -34,6 +36,36 @@
 <style>
     .font-headline { font-family: 'EB Garamond', serif; }
     #map-search { z-index: 10; }
+
+    /* noUiSlider Custom Styling */
+    #price-slider {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        height: 6px;
+        border: none;
+        background: #ece6dc;
+        box-shadow: none;
+        border-radius: 9999px;
+    }
+    #price-slider .noUi-connect {
+        background: #c2652a;
+        border-radius: 9999px;
+    }
+    #price-slider .noUi-handle {
+        border: 2px solid #c2652a;
+        background: #ffffff;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        width: 18px;
+        height: 18px;
+        right: -9px;
+        top: -6px;
+    }
+    #price-slider .noUi-handle:before,
+    #price-slider .noUi-handle:after {
+        display: none;
+    }
 </style>
 </head>
 <body class="bg-background text-on-surface font-body antialiased min-h-screen flex flex-col">
@@ -83,29 +115,11 @@
                 <label class="text-[10px] uppercase tracking-widest font-bold text-secondary mb-1 block">
                     Rentang Harga
                 </label>
-                <div class="flex items-center gap-2">
-                    <div class="relative flex-1">
-                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-secondary font-medium">Rp</span>
-                        <input type="text" 
-                               x-model="harga_minimal_display" 
-                               @input="harga_minimal_display = formatRupiah($event.target.value); harga_minimal = $event.target.value.replace(/[^0-9]/g, '')"
-                               @input.debounce.500ms="applyFilters()"
-                               @blur="applyFilters()"
-                               @keyup.enter="applyFilters()"
-                               class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-7 pr-2 py-2.5 text-xs focus:border-primary focus:ring-1 focus:ring-primary font-body text-on-surface" 
-                               placeholder="0">
-                    </div>
-                    <span class="text-secondary font-bold">—</span>
-                    <div class="relative flex-1">
-                        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-secondary font-medium">Rp</span>
-                        <input type="text" 
-                               x-model="harga_maksimal_display" 
-                               @input="harga_maksimal_display = formatRupiah($event.target.value); harga_maksimal = $event.target.value.replace(/[^0-9]/g, '')"
-                               @input.debounce.500ms="applyFilters()"
-                               @blur="applyFilters()"
-                               @keyup.enter="applyFilters()"
-                               class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-7 pr-2 py-2.5 text-xs focus:border-primary focus:ring-1 focus:ring-primary font-body text-on-surface" 
-                               placeholder="15.000.000">
+                <div class="px-1 pt-1">
+                    <div id="price-slider"></div>
+                    <div class="mt-2 text-[11px] text-on-surface-variant font-semibold flex justify-between">
+                        <span>Min: <span class="text-primary" x-text="harga_minimal_display ? 'Rp ' + harga_minimal_display : 'Rp 0'"></span></span>
+                        <span>Max: <span class="text-primary" x-text="harga_maksimal_display ? 'Rp ' + harga_maksimal_display : 'Rp 15.000.000'"></span></span>
                     </div>
                 </div>
             </div>
@@ -392,6 +406,38 @@
                 if (this.harga_maksimal) {
                     this.harga_maksimal = this.harga_maksimal.toString().replace(/[^0-9]/g, '');
                     this.harga_maksimal_display = this.formatRupiah(this.harga_maksimal);
+                }
+
+                // Initialize JSDelivr noUiSlider
+                let slider = document.getElementById('price-slider');
+                if (slider) {
+                    let minVal = parseInt(this.harga_minimal) || 0;
+                    let maxVal = parseInt(this.harga_maksimal) || 15000000;
+                    
+                    noUiSlider.create(slider, {
+                        start: [minVal, maxVal],
+                        connect: true,
+                        step: 100000,
+                        range: {
+                            'min': 0,
+                            'max': 15000000
+                        }
+                    });
+
+                    slider.noUiSlider.on('update', (values, handle) => {
+                        let val = Math.round(parseFloat(values[handle]));
+                        if (handle === 0) {
+                            this.harga_minimal = val;
+                            this.harga_minimal_display = this.formatRupiah(val);
+                        } else {
+                            this.harga_maksimal = val;
+                            this.harga_maksimal_display = this.formatRupiah(val);
+                        }
+                    });
+
+                    slider.noUiSlider.on('change', () => {
+                        this.applyFilters();
+                    });
                 }
 
                 // Watchers to trigger filtering on change

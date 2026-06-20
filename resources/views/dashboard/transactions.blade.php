@@ -1,68 +1,13 @@
-<!DOCTYPE html><html class="light" lang="id" style=""><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Riwayat Transaksi - Mataram Stay</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-container": "#f2ece4",
-                        "on-tertiary-fixed-variant": "#6e3030",
-                        "on-surface-variant": "#605850",
-                        "surface-dim": "#dcd6cc",
-                        "surface-container-high": "#ece6dc",
-                        "surface-bright": "#faf5ee",
-                        "on-secondary": "#ffffff",
-                        "on-secondary-container": "#605850",
-                        "secondary-container": "#eae2da",
-                        "primary": "#c2652a",
-                        "on-primary-fixed-variant": "#8a4518",
-                        "surface-container-low": "#f6f0e8",
-                        "on-primary": "#ffffff",
-                        "on-background": "#3a302a",
-                        "inverse-surface": "#3a302a",
-                        "surface-container-highest": "#e6e0d6",
-                        "on-surface": "#3a302a",
-                        "surface": "#faf5ee",
-                        "outline": "#9a9088",
-                        "outline-variant": "#d8d0c8",
-                        "background": "#faf5ee",
-                        "surface-tint": "#c2652a",
-                        "secondary": "#78706a",
-                        "primary-container": "#e08850",
-                        "on-primary-container": "#fbe8d8"
-                    },
-                    "fontFamily": {
-                        "headline": ["EB Garamond", "serif"],
-                        "display": ["EB Garamond", "serif"],
-                        "body": ["Manrope", "sans-serif"],
-                        "label": ["Manrope", "sans-serif"]
-                    }
-                }
-            }
-        }
-    </script>
-<style>
-        body { font-family: 'Manrope', sans-serif; background-color: #faf5ee; }
-        .font-headline { font-family: 'EB Garamond', serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+<x-layout title="Riwayat Transaksi - Mataram Stay">
+    <style>
         .shadow-soft { box-shadow: 0 2px 16px rgba(58, 48, 42, 0.04); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #faf5ee; }
         ::-webkit-scrollbar-thumb { background: #d8d0c8; border-radius: 10px; }
     </style>
-</head>
-<body class="text-on-surface antialiased flex min-h-screen">
 
 <!-- SideNavBar (Desktop Only) -->
-<aside class="fixed inset-y-0 left-0 z-50 bg-surface-container-low border-r border-outline-variant/20 w-64 flex flex-col py-8 px-4 h-screen hidden md:flex">
+<aside class="fixed top-16 bottom-0 left-0 z-40 bg-surface-container-low border-r border-outline-variant/20 w-64 flex flex-col py-8 px-4 hidden md:flex">
 <!-- Brand Header -->
 <div class="px-4 mb-10"><a href="/"><h1 class="font-headline text-2xl font-semibold text-primary mb-1">Mataram Stay</h1></a></div>
 <!-- Navigation Tabs -->
@@ -107,7 +52,7 @@
 </aside>
 
 <!-- Main Content Canvas -->
-<main class="flex-1 md:ml-64 min-h-screen bg-background flex flex-col">
+<main class="flex-grow md:ml-64 min-h-[calc(100vh-4rem)] bg-background flex flex-col">
 <div class="p-6 lg:p-12 flex-1">
     
 <!-- TopAppBar Contextual (Profile Header) -->
@@ -267,8 +212,6 @@
 </div>
 </div> <!-- End of Padding Container -->
 
-<!-- Empty Space / Atmospheric Detail -->
-<x-footer />
     <!-- Spasi tambahan untuk layar mobile agar konten tidak tertutup navigasi bawah -->
     <div class="h-20 md:hidden w-full"></div>
 </main>
@@ -310,5 +253,4 @@
         <span class="font-body text-[10px] uppercase tracking-wider mt-1">Profile</span>
     </a>
 </nav>
-
-</body></html>
+</x-layout>

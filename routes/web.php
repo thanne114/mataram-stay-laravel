@@ -46,6 +46,10 @@ Route::middleware('guest')->group(function () {
     // Google OAuth Routes
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+
+    // Google SSO Onboarding Role Selection
+    Route::get('/auth/google/choose-role', [GoogleAuthController::class, 'showChooseRole'])->name('auth.google.choose-role');
+    Route::post('/auth/google/choose-role', [GoogleAuthController::class, 'saveChooseRole'])->name('auth.google.choose-role.save');
 });
 
 // ============================================
@@ -97,9 +101,11 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 Route::middleware(['auth', 'role:seeker'])->group(function () {
     Route::get('/dashboard-seeker', [DashboardController::class, 'seeker'])->name('dashboard.seeker');
 
-    // Booking
-    Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
-    Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+    // Booking (Protected by WhatsApp check)
+    Route::middleware('ensure.whatsapp')->group(function () {
+        Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
+        Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+    });
 
     // Upload Bukti Pembayaran
     Route::post('/booking/{booking}/upload-proof', [BookingController::class, 'uploadProof'])->name('booking.upload-proof');

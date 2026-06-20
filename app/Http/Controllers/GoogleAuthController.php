@@ -17,12 +17,12 @@ class GoogleAuthController extends Controller
     public function redirect(Request $request)
     {
         // Store the target role (seeker / owner) in the session
-        $role = $request->query('role', 'seeker');
-        if (!in_array($role, ['seeker', 'owner'])) {
-            $role = 'seeker';
+        $role = $request->query('role');
+        if ($role && in_array($role, ['seeker', 'owner'])) {
+            session(['google_sso_role' => $role]);
+        } else {
+            session()->forget('google_sso_role');
         }
-
-        session(['google_sso_role' => $role]);
 
         return Socialite::driver('google')->redirect();
     }
@@ -50,7 +50,22 @@ class GoogleAuthController extends Controller
             ]);
         } else {
             // Register a new user
-            $role = session('google_sso_role', 'seeker');
+            $role = session('google_sso_role');
+            
+            if (!$role) {
+                // No role predefined (user registered via login page)
+                // Store Google user information in session and redirect to choose role
+                session([
+                    'google_sso_user' => [
+                        'name' => $googleUser->getName() ?: 'Google User',
+                        'email' => $googleUser->getEmail(),
+                        'google_id' => $googleUser->getId(),
+                        'avatar' => $googleUser->getAvatar(),
+                    ]
+                ]);
+
+                return redirect()->route('auth.google.choose-role');
+            }
             
             // Clean/Generate unique username
             $baseUsername = Str::slug($googleUser->getName() ?: 'user', '');
@@ -79,6 +94,63 @@ class GoogleAuthController extends Controller
 
         // Redirect based on role
         if ($user->role === 'owner' || $user->role === 'admin') {
+            return redirect()->route('dashboard.owner')->with('success', 'Selamat datang!');
+        }
+
+        return redirect()->route('dashboard.seeker')->with('success', 'Selamat datang, Pencari Kos!');
+    }
+
+    /**
+     * Show the role selection page.
+     */
+    public function showChooseRole()
+    {
+        $googleUser = session('google_sso_user');
+        if (!$googleUser) {
+            return redirect()->route('login')->with('error', 'Sesi pendaftaran Google Anda telah kedaluwarsa. Silakan coba lagi.');
+        }
+
+        return view('auth.choose_role', compact('googleUser'));
+    }
+
+    /**
+     * Save the chosen role and complete registration.
+     */
+    public function saveChooseRole(Request $request)
+    {
+        $googleUser = session('google_sso_user');
+        if (!$googleUser) {
+            return redirect()->route('login')->with('error', 'Sesi pendaftaran Google Anda telah kedaluwarsa. Silakan coba lagi.');
+        }
+
+        $request->validate([
+            'role' => 'required|string|in:seeker,owner',
+        ]);
+
+        // Clean/Generate unique username
+        $baseUsername = Str::slug($googleUser['name'] ?: 'user', '');
+        $username = $baseUsername . rand(100, 999);
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . rand(100, 999);
+        }
+
+        $user = User::create([
+            'name' => $googleUser['name'],
+            'email' => $googleUser['email'],
+            'username' => $username,
+            'google_id' => $googleUser['google_id'],
+            'avatar' => $googleUser['avatar'],
+            'role' => $request->role,
+            'email_verified_at' => now(),
+            'password' => null,
+        ]);
+
+        // Clean up session
+        session()->forget(['google_sso_user', 'google_sso_role']);
+
+        Auth::login($user);
+
+        if ($user->role === 'owner') {
             return redirect()->route('dashboard.owner')->with('success', 'Selamat datang!');
         }
 

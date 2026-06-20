@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'ensure.whatsapp' => \App\Http\Middleware\EnsureWhatsappIsConfigured::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

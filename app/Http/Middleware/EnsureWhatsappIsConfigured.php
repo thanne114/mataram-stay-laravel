@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class EnsureWhatsappIsConfigured
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = Auth::user();
+        
+        if ($user && empty($user->no_whatsapp)) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => 'Silakan lengkapi nomor WhatsApp Anda terlebih dahulu di halaman profil.'
+                ], 403);
+            }
+            
+            return redirect()->route('profile.edit', ['tab' => 'view-settings'])
+                ->with('error', 'Silakan lengkapi nomor WhatsApp Anda terlebih dahulu sebelum melakukan booking.');
+        }
+
+        return $next($request);
+    }
+}
