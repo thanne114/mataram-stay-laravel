@@ -35,21 +35,31 @@
                 @endif
             @endguest
             @auth
+                @php
+                    $unreadMessagesCount = \App\Models\Message::where('is_read', false)
+                        ->where('sender_id', '!=', auth()->id())
+                        ->whereHas('conversation', function ($query) {
+                            $query->where('seeker_id', auth()->id())
+                                ->orWhere('owner_id', auth()->id());
+                        })
+                        ->count();
+
+                    $hasNotification = (auth()->user()->role === 'seeker' && !auth()->user()->is_verified) || ($unreadMessagesCount > 0);
+
+                    $dashboardUrl = match(auth()->user()->role) {
+                        'owner' => route('dashboard.owner'),
+                        'seeker' => route('profile.edit'),
+                        'admin' => route('dashboard.admin'),
+                        default => '/',
+                    };
+                    $roleLabel = match(auth()->user()->role) {
+                        'owner' => 'Pemilik Kos',
+                        'seeker' => 'Pencari Kos',
+                        'admin' => 'Administrator',
+                        default => ucfirst(auth()->user()->role),
+                    };
+                @endphp
                 <div class="flex items-center gap-4">
-                    @php
-                        $dashboardUrl = match(auth()->user()->role) {
-                            'owner' => route('dashboard.owner'),
-                            'seeker' => route('profile.edit'),
-                            'admin' => route('dashboard.admin'),
-                            default => '/',
-                        };
-                        $roleLabel = match(auth()->user()->role) {
-                            'owner' => 'Pemilik Kos',
-                            'seeker' => 'Pencari Kos',
-                            'admin' => 'Administrator',
-                            default => ucfirst(auth()->user()->role),
-                        };
-                    @endphp
                     <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 cursor-pointer group">
                         <div class="flex flex-col items-end">
                             <span class="font-label text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{{ auth()->user()->name }}</span>
@@ -57,13 +67,18 @@
                                 {{ $roleLabel }}
                             </span>
                         </div>
-                        @if(auth()->user()->profile_photo)
-                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" class="w-10 h-10 rounded-full border border-outline-variant object-cover" alt="Profile">
-                        @else
-                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-outline-variant font-bold text-primary">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </div>
-                        @endif
+                        <div class="relative">
+                            @if(auth()->user()->profile_photo)
+                                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" class="w-10 h-10 rounded-full border border-outline-variant object-cover" alt="Profile">
+                            @else
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-outline-variant font-bold text-primary">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            @if($hasNotification)
+                                <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                            @endif
+                        </div>
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="ml-2">
                         @csrf
