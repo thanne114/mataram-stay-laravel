@@ -103,24 +103,9 @@
                                 @else
                                     <span class="px-2 py-0.5 bg-primary-fixed text-on-primary-fixed text-[9px] font-bold rounded-full uppercase tracking-wider">Pemilik Kos</span>
                                 @endif
-                                @if($conversation->partner->no_whatsapp)
-                                    <span class="text-[10px] text-green-600 flex items-center gap-0.5">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
-                                        Tersedia WA
-                                    </span>
-                                @endif
                             </div>
                         </div>
                     </div>
-
-                    <!-- Direct WA shortcut -->
-                    @if($conversation->partner->no_whatsapp)
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $conversation->partner->no_whatsapp) }}" target="_blank" 
-                           class="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-label font-bold transition-all shadow-sm">
-                            <span class="material-symbols-outlined text-sm">chat</span>
-                            <span class="hidden sm:inline">WhatsApp</span>
-                        </a>
-                    @endif
                 </div>
 
                 <!-- Contextual Property Banner -->
