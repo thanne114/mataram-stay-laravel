@@ -478,6 +478,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 {{-- Accordion: Informasi Rekening Pencairan --}}
                 <div class="space-y-4 accordion-item mt-6">
                     <button type="button" class="w-full flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline/5 sahara-shadow group transition-all hover:bg-surface-container-high" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')">
@@ -602,6 +603,9 @@
                         <h4 class="font-headline text-xl text-tertiary">Nonaktifkan Akun</h4>
                         <p class="text-sm text-secondary font-body">Tindakan ini tidak dapat dibatalkan. Semua data properti dan riwayat sewa Anda akan dihapus permanen.</p>
                     </div>
+                    <button class="bg-tertiary text-white px-8 py-3 rounded-lg font-body text-sm font-bold shadow-md hover:bg-tertiary-container transition-all active:scale-95 shrink-0">Deactivate Account</button>
+                </div>
+            </div>
         </section>
 
         <!-- Tab Obrolan (Pesan) -->
@@ -801,7 +805,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const sessionTab = "{{ session('active_tab') }}";
         const activeTab = sessionTab || localStorage.getItem('active_owner_tab') || 'dashboard';
-        const tabButton = document.querySelector(`button[onclick*="switchTab('${activeTab}')"]`) || document.querySelector(`button[onclick*="switchTab('${activeTab}'"]`) || document.querySelector('button[onclick*="switchTab(\'dashboard\'"]');
+        const tabButton = document.querySelector(`button[onclick*="${activeTab}"]`) || document.querySelector(`button[onclick*="dashboard"]`);
         if (tabButton) {
             switchTab(activeTab, tabButton);
         }
@@ -963,7 +967,8 @@
 
     window.loadConversation = async function(conversationId, element) {
         activeConversationId = conversationId;
-        document.getElementById('active-conversation-id').value = conversationId;
+        const activeConvInput = document.getElementById('active-conversation-id');
+        if (activeConvInput) activeConvInput.value = conversationId;
         
         // Highlight sidebar item
         document.querySelectorAll('.conversation-item').forEach(item => {
@@ -988,55 +993,69 @@
             const data = await response.json();
             
             // Show active area, hide empty state
-            document.getElementById('chat-empty-state').classList.add('hidden');
-            document.getElementById('chat-active-area').classList.remove('hidden');
+            const emptyState = document.getElementById('chat-empty-state');
+            const activeArea = document.getElementById('chat-active-area');
+            if (emptyState) emptyState.classList.add('hidden');
+            if (activeArea) activeArea.classList.remove('hidden');
             
             // Update Header
-            document.getElementById('chat-header-name').innerText = data.conversation.partner_name;
-            document.getElementById('chat-header-avatar').innerText = data.conversation.partner_initial;
-            document.getElementById('chat-header-role').innerText = data.conversation.partner_role;
+            const headerName = document.getElementById('chat-header-name');
+            const headerAvatar = document.getElementById('chat-header-avatar');
+            const headerRole = document.getElementById('chat-header-role');
+            if (headerName) headerName.innerText = data.conversation.partner_name;
+            if (headerAvatar) headerAvatar.innerText = data.conversation.partner_initial;
+            if (headerRole) headerRole.innerText = data.conversation.partner_role;
             
             // Update Property Banner
             const banner = document.getElementById('chat-property-banner');
-            if (data.conversation.property) {
-                banner.classList.remove('hidden');
-                document.getElementById('chat-property-name').innerText = data.conversation.property.name;
-                document.getElementById('chat-property-details').innerText = `${data.conversation.property.area} • Rp ${data.conversation.property.lowest_price}/bln`;
-                document.getElementById('chat-property-link').href = `/kos/${data.conversation.property.slug}`;
-                
-                const img = document.getElementById('chat-property-image');
-                const placeholder = document.getElementById('chat-property-placeholder');
-                if (data.conversation.property.main_image) {
-                    img.src = data.conversation.property.main_image;
-                    img.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+            if (banner) {
+                if (data.conversation.property) {
+                    banner.classList.remove('hidden');
+                    const propName = document.getElementById('chat-property-name');
+                    const propDetails = document.getElementById('chat-property-details');
+                    const propLink = document.getElementById('chat-property-link');
+                    if (propName) propName.innerText = data.conversation.property.name;
+                    if (propDetails) propDetails.innerText = `${data.conversation.property.area} • Rp ${data.conversation.property.lowest_price}/bln`;
+                    if (propLink) propLink.href = `/kos/${data.conversation.property.slug}`;
+                    
+                    const img = document.getElementById('chat-property-image');
+                    const placeholder = document.getElementById('chat-property-placeholder');
+                    if (img && placeholder) {
+                        if (data.conversation.property.main_image) {
+                            img.src = data.conversation.property.main_image;
+                            img.classList.remove('hidden');
+                            placeholder.classList.add('hidden');
+                        } else {
+                            img.classList.add('hidden');
+                            placeholder.classList.remove('hidden');
+                        }
+                    }
                 } else {
-                    img.classList.add('hidden');
-                    placeholder.classList.remove('hidden');
+                    banner.classList.add('hidden');
                 }
-            } else {
-                banner.classList.add('hidden');
             }
             
             // Render Messages
             const msgContainer = document.getElementById('tab-message-container');
-            msgContainer.innerHTML = '';
-            
-            if (data.messages.length === 0) {
-                msgContainer.innerHTML = `
-                    <div class="flex items-center justify-center h-full py-12 text-secondary flex-col">
-                        <span class="material-symbols-outlined text-3xl mb-1 text-outline-variant">forum</span>
-                        <p class="text-xs font-bold">Mulai obrolan Anda</p>
-                    </div>
-                `;
-            } else {
-                data.messages.forEach(msg => {
-                    const bubble = createMessageBubble(msg);
-                    msgContainer.appendChild(bubble);
-                });
+            if (msgContainer) {
+                msgContainer.innerHTML = '';
+                
+                if (data.messages.length === 0) {
+                    msgContainer.innerHTML = `
+                        <div class="flex items-center justify-center h-full py-12 text-secondary flex-col">
+                            <span class="material-symbols-outlined text-3xl mb-1 text-outline-variant">forum</span>
+                            <p class="text-xs font-bold">Mulai obrolan Anda</p>
+                        </div>
+                    `;
+                } else {
+                    data.messages.forEach(msg => {
+                        const bubble = createMessageBubble(msg);
+                        msgContainer.appendChild(bubble);
+                    });
+                }
+                
+                msgContainer.scrollTop = msgContainer.scrollHeight;
             }
-            
-            msgContainer.scrollTop = msgContainer.scrollHeight;
             
         } catch (err) {
             console.error("Error loading chat:", err);
