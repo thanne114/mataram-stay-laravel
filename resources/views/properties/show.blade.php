@@ -285,13 +285,7 @@
                         <p class="text-xs text-secondary">Pemilik Kos</p>
                     </div>
                 </div>
-                @if($property->owner->no_whatsapp)
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $property->owner->no_whatsapp) }}" target="_blank" 
-                   class="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-3 rounded-lg font-label font-bold text-sm hover:bg-green-700 transition-all">
-                    <span class="material-symbols-outlined text-lg">chat</span>
-                    Hubungi via WhatsApp
-                </a>
-                @endif
+
 
                 @if(auth()->check())
                     @if(auth()->id() !== $property->user_id)
