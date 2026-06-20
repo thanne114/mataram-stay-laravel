@@ -81,26 +81,49 @@ class Property extends Model
     /** Harga termurah dari semua tipe kamar */
     public function getLowestPriceAttribute(): ?int
     {
-        return $this->roomTypes->min('price_per_month');
+        if (array_key_exists('room_types_min_price_per_month', $this->attributes)) {
+            return $this->attributes['room_types_min_price_per_month'] !== null
+                ? (int) $this->attributes['room_types_min_price_per_month']
+                : null;
+        }
+        return $this->relationLoaded('roomTypes')
+            ? $this->roomTypes->min('price_per_month')
+            : $this->roomTypes()->min('price_per_month');
     }
 
     /** Total kamar tersedia di semua tipe */
     public function getAvailableRoomsAttribute(): int
     {
-        return $this->roomTypes->sum('available_rooms');
+        if (array_key_exists('room_types_sum_available_rooms', $this->attributes)) {
+            return (int) $this->attributes['room_types_sum_available_rooms'];
+        }
+        return $this->relationLoaded('roomTypes')
+            ? (int) $this->roomTypes->sum('available_rooms')
+            : (int) $this->roomTypes()->sum('available_rooms');
     }
 
     /** Total semua kamar di semua tipe */
     public function getTotalRoomsAttribute(): int
     {
-        return $this->roomTypes->sum('total_rooms');
+        if (array_key_exists('room_types_sum_total_rooms', $this->attributes)) {
+            return (int) $this->attributes['room_types_sum_total_rooms'];
+        }
+        return $this->relationLoaded('roomTypes')
+            ? (int) $this->roomTypes->sum('total_rooms')
+            : (int) $this->roomTypes()->sum('total_rooms');
     }
 
     /** Rating rata-rata dari ulasan */
     public function getAverageRatingAttribute(): ?float
     {
-        $avg = $this->reviews->avg('rating');
-        return $avg ? round($avg, 1) : null;
+        if (array_key_exists('reviews_avg_rating', $this->attributes)) {
+            $avg = $this->attributes['reviews_avg_rating'];
+        } else {
+            $avg = $this->relationLoaded('reviews')
+                ? $this->reviews->avg('rating')
+                : $this->reviews()->avg('rating');
+        }
+        return $avg ? round((float) $avg, 1) : null;
     }
 
     /** Pseudo-random views count based on ID and current day */

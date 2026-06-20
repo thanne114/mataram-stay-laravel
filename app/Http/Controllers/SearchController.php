@@ -43,7 +43,8 @@ class SearchController extends Controller
         $query = Property::where('status', 'published')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->with(['roomTypes']);
+            ->with(['roomTypes'])
+            ->limit(500);
 
         $this->applySearchFilters($query, $request);
 
