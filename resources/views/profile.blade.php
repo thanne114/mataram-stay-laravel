@@ -943,6 +943,14 @@
         // Simpan tab aktif di localStorage untuk persistence
         localStorage.setItem('active_seeker_tab', viewId);
 
+        // Hentikan polling chat jika pindah dari tab chat
+        if (viewId !== 'view-pesan') {
+            if (chatPollingInterval) {
+                clearInterval(chatPollingInterval);
+                chatPollingInterval = null;
+            }
+        }
+
         // Sembunyikan semua section view
         const views = document.querySelectorAll('.view-section');
         views.forEach(view => {
@@ -1287,11 +1295,18 @@
 
     // AJAX CHAT SYSTEM INTEGRATION
     let activeConversationId = null;
+    let chatPollingInterval = null;
 
     window.loadConversation = async function(conversationId, element) {
         activeConversationId = conversationId;
         const activeConvInput = document.getElementById('active-conversation-id');
         if (activeConvInput) activeConvInput.value = conversationId;
+        
+        // Hentikan polling lama jika ada
+        if (chatPollingInterval) {
+            clearInterval(chatPollingInterval);
+            chatPollingInterval = null;
+        }
         
         // Highlight sidebar item
         document.querySelectorAll('.conversation-item').forEach(item => {
@@ -1379,6 +1394,58 @@
                 
                 msgContainer.scrollTop = msgContainer.scrollHeight;
             }
+            
+            // Mulai polling berkala setiap 5 detik
+            chatPollingInterval = setInterval(async () => {
+                if (activeConversationId !== conversationId) return;
+                try {
+                    const pollResponse = await fetch(`/chat/${conversationId}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    if (!pollResponse.ok) return;
+                    const pollData = await pollResponse.json();
+                    
+                    const pollMsgContainer = document.getElementById('tab-message-container');
+                    if (pollMsgContainer && activeConversationId === conversationId) {
+                        const currentBubbles = pollMsgContainer.querySelectorAll('.flex.justify-start, .flex.justify-end').length;
+                        const hasPlaceholder = pollMsgContainer.querySelector('.py-12') !== null;
+                        const currentCount = hasPlaceholder ? 0 : currentBubbles;
+                        
+                        if (pollData.messages.length > currentCount) {
+                            pollMsgContainer.innerHTML = '';
+                            pollData.messages.forEach(msg => {
+                                const bubble = createMessageBubble(msg);
+                                pollMsgContainer.appendChild(bubble);
+                            });
+                            pollMsgContainer.scrollTop = pollMsgContainer.scrollHeight;
+                            
+                            // Update sidebar preview
+                            const sidebarItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+                            if (sidebarItem && pollData.messages.length > 0) {
+                                const lastMsg = pollData.messages[pollData.messages.length - 1];
+                                const bodyText = sidebarItem.querySelector('.last-msg-body');
+                                const timeText = sidebarItem.querySelector('.last-msg-time');
+                                if (bodyText) {
+                                    if (lastMsg.sender_id === pollData.auth_id) {
+                                        bodyText.innerHTML = `<span class="text-primary font-medium">Anda: </span>${lastMsg.body}`;
+                                    } else {
+                                        bodyText.innerText = lastMsg.body;
+                                    }
+                                }
+                                if (timeText) timeText.innerText = lastMsg.time;
+                                
+                                const parent = document.getElementById('seeker-chat-sidebar-list');
+                                if (parent) parent.insertBefore(sidebarItem, parent.firstChild);
+                            }
+                        }
+                    }
+                } catch (pollErr) {
+                    console.error("Polling error:", pollErr);
+                }
+            }, 5000);
             
         } catch (err) {
             console.error("Error loading chat:", err);
