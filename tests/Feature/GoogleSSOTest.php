@@ -104,4 +104,35 @@ class GoogleSSOTest extends TestCase
         
         $this->assertAuthenticatedAs($user);
     }
+
+    /**
+     * Test Google callback redirects user with role admin to admin dashboard.
+     */
+    public function test_google_callback_redirects_admin_to_dashboard_admin(): void
+    {
+        // Pre-create user with email and admin role
+        $admin = User::create([
+            'name' => 'Admin Google',
+            'email' => 'mataramstay@gmail.com',
+            'role' => 'admin',
+        ]);
+
+        // Setup mock user from Google
+        $googleUser = $this->createMock(SocialiteUser::class);
+        $googleUser->method('getId')->willReturn('google-id-admin');
+        $googleUser->method('getName')->willReturn('Admin Google');
+        $googleUser->method('getEmail')->willReturn('mataramstay@gmail.com');
+
+        $provider = $this->createMock(\Laravel\Socialite\Two\GoogleProvider::class);
+        $provider->method('user')->willReturn($googleUser);
+
+        Socialite::shouldReceive('driver')
+            ->with('google')
+            ->andReturn($provider);
+
+        $response = $this->get('/auth/google/callback');
+
+        $response->assertRedirect('/dashboard-admin');
+        $this->assertAuthenticatedAs($admin);
+    }
 }

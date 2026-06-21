@@ -34,27 +34,15 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Seed Admin Default
-        User::firstOrCreate(
-            ['email' => 'admin@mataramstay.com'],
+        // Seed Admin Produksi Google SSO
+        User::updateOrCreate(
+            ['email' => 'mataramstay@gmail.com'],
             [
                 'name' => 'Admin Mataram Stay',
-                'username' => 'admin_stay',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'no_whatsapp' => '081234567892',
-            ]
-        );
-
-        // Seed Admin Produksi
-        User::firstOrCreate(
-            ['email' => 'admin@mataramstay.my.id'],
-            [
-                'name' => 'Admin Mataram Stay Live',
-                'username' => 'admin_stay_live',
-                'password' => Hash::make('!KamiFfLrp26'),
+                'username' => 'mataram_admin',
                 'role' => 'admin',
                 'no_whatsapp' => '081234567895',
+                'email_verified_at' => now(),
             ]
         );
     }

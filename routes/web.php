@@ -43,9 +43,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::get('/register', [AuthController::class, 'register'])->name('register');
 
-    // Admin Secret Portal Login
-    Route::get('/admin-panel-login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');
-    Route::post('/admin-panel-login', [AuthController::class, 'adminLogin'])->name('admin.login.submit');
+
 
     // Google OAuth Routes
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google');
