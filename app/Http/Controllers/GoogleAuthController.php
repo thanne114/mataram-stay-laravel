@@ -93,7 +93,9 @@ class GoogleAuthController extends Controller
         Auth::login($user);
 
         // Redirect based on role
-        if ($user->role === 'owner' || $user->role === 'admin') {
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard.admin')->with('success', 'Selamat datang, Admin!');
+        } elseif ($user->role === 'owner') {
             return redirect()->route('dashboard.owner')->with('success', 'Selamat datang!');
         }
 
