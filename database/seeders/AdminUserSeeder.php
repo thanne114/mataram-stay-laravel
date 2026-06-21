@@ -34,7 +34,7 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Seed Admin
+        // Seed Admin Default
         User::firstOrCreate(
             ['email' => 'admin@mataramstay.com'],
             [
@@ -43,6 +43,18 @@ class AdminUserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'no_whatsapp' => '081234567892',
+            ]
+        );
+
+        // Seed Admin Produksi
+        User::firstOrCreate(
+            ['email' => 'admin@mataramstay.my.id'],
+            [
+                'name' => 'Admin Mataram Stay Live',
+                'username' => 'admin_stay_live',
+                'password' => Hash::make('!KamiFfLrp26'),
+                'role' => 'admin',
+                'no_whatsapp' => '081234567895',
             ]
         );
     }
