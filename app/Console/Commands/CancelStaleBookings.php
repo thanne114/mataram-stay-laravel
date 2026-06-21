@@ -15,22 +15,22 @@ class CancelStaleBookings extends Command
      *
      * @var string
      */
-    protected $signature = 'bookings:cancel-stale {--days=7 : Number of days before auto-cancellation}';
+    protected $signature = 'bookings:cancel-stale {--minutes=30 : Number of minutes before auto-cancellation}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Automatically cancel Pending bookings that have not been paid after the specified number of days.';
+    protected $description = 'Automatically cancel Pending bookings that have not been paid after the specified number of minutes.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $days = (int) $this->option('days');
-        $cutoffDate = now()->subDays($days);
+        $minutes = (int) $this->option('minutes');
+        $cutoffDate = now()->subMinutes($minutes);
 
         $this->info("Scanning for stale Pending bookings created before: {$cutoffDate->toDateTimeString()}");
 
@@ -61,7 +61,7 @@ class CancelStaleBookings extends Command
             }
 
             $cancelledCount++;
-            $this->info("Cancelled stale Booking ID {$booking->id} (created: {$booking->created_at->toDateString()}, User: {$booking->user->name}).");
+            $this->info("Cancelled stale Booking ID {$booking->id} (created: {$booking->created_at->toDateTimeString()}, User: {$booking->user->name}).");
         }
 
         $this->info("Finished. Total stale bookings cancelled: {$cancelledCount}");
