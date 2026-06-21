@@ -121,6 +121,8 @@ class ChatController extends Controller
             'is_read' => false,
         ]);
 
+        broadcast(new \App\Events\MessageSent($message))->toOthers();
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,

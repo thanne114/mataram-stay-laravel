@@ -6,6 +6,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Owner Portal | Mataram Stay</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Pusher & Echo via CDN -->
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.0/dist/echo.iife.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script id="tailwind-config">
@@ -328,22 +331,109 @@
         document.getElementById('compiled-email-otp').value = compiled;
     }
 
-    // AJAX CHAT SYSTEM INTEGRATION
+    // REAL-TIME CHAT INTEGRATION VIA PUSHER WEBSOCKETS & LARAVEL ECHO
     const currentAuthId = {{ auth()->id() }};
     let activeConversationId = null;
-    let chatPollingInterval = null;
+    const subscribedChannels = new Set();
+
+    // Echo configuration
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: '{{ config('broadcasting.connections.pusher.key') }}',
+        cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}',
+        forceTLS: true,
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        }
+    });
+
+    // Subscribe to all sidebar conversations on load
+    function subscribeToAllConversations() {
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            const convId = item.dataset.id;
+            subscribeToConversation(convId);
+        });
+    }
+
+    function subscribeToConversation(convId) {
+        if (!convId || subscribedChannels.has(convId)) return;
+        subscribedChannels.add(convId);
+        window.Echo.private('conversation.' + convId)
+            .listen('MessageSent', (e) => {
+                handleIncomingMessage(e);
+            });
+    }
+
+    function handleIncomingMessage(e) {
+        console.log('Real-time message received:', e);
+        
+        const msgContainer = document.getElementById('tab-message-container');
+        
+        // If the message is for the currently active conversation, render it
+        if (parseInt(activeConversationId) === parseInt(e.conversation_id)) {
+            // Prevent duplicate bubble if we already rendered it
+            const existingMsg = document.getElementById('msg-' + e.id);
+            if (!existingMsg && msgContainer) {
+                // Remove placeholder empty state if present
+                const placeholder = msgContainer.querySelector('.py-12');
+                if (placeholder) {
+                    msgContainer.innerHTML = '';
+                }
+                
+                const bubble = createMessageBubble(e);
+                bubble.id = 'msg-' + e.id;
+                msgContainer.appendChild(bubble);
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            }
+        } else if (parseInt(e.sender_id) !== parseInt(currentAuthId)) {
+            // Show unread badge if message is from the other participant and conversation is not active
+            const sidebarItem = document.querySelector(`.conversation-item[data-id="${e.conversation_id}"]`);
+            if (sidebarItem) {
+                let badge = sidebarItem.querySelector('.unread-badge');
+                if (badge) {
+                    let count = parseInt(badge.innerText.trim()) || 0;
+                    badge.innerText = count + 1;
+                } else {
+                    badge = document.createElement('div');
+                    badge.className = 'w-4 h-4 rounded-full bg-primary text-on-primary flex items-center justify-center text-[9px] font-bold shrink-0 unread-badge';
+                    badge.innerText = '1';
+                    sidebarItem.appendChild(badge);
+                }
+            }
+        }
+        
+        // Update sidebar item text preview and timestamp, then move it to the top
+        const sidebarItem = document.querySelector(`.conversation-item[data-id="${e.conversation_id}"]`);
+        if (sidebarItem) {
+            const bodyText = sidebarItem.querySelector('.last-msg-body');
+            const timeText = sidebarItem.querySelector('.last-msg-time');
+            if (bodyText) {
+                if (parseInt(e.sender_id) === parseInt(currentAuthId)) {
+                    bodyText.innerHTML = `<span class="text-primary font-medium">Anda: </span>${e.body}`;
+                } else {
+                    bodyText.innerText = e.body;
+                }
+            }
+            if (timeText) {
+                timeText.innerText = e.time || 'Barusan';
+            }
+            
+            const parent = document.getElementById('owner-chat-sidebar-list');
+            if (parent) {
+                parent.insertBefore(sidebarItem, parent.firstChild);
+            }
+        }
+    }
 
     window.loadConversation = async function(conversationId, element) {
         activeConversationId = conversationId;
         const activeConvInput = document.getElementById('active-conversation-id');
         if (activeConvInput) activeConvInput.value = conversationId;
         
-        // Hentikan polling lama jika ada
-        if (chatPollingInterval) {
-            clearInterval(chatPollingInterval);
-            chatPollingInterval = null;
-        }
-
         // Cari element di sidebar jika tidak di-pass
         const targetElement = element || document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
         
@@ -415,9 +505,8 @@
             if (!response.ok) throw new Error("Failed to load chat");
             
             const data = await response.json();
-            
             console.log('Chat Data:', data);
-            
+
             // Render Messages
             const msgContainer = document.getElementById('tab-message-container');
             if (msgContainer) {
@@ -433,76 +522,16 @@
                 } else {
                     data.messages.forEach(msg => {
                         const bubble = createMessageBubble(msg);
+                        bubble.id = 'msg-' + msg.id;
                         msgContainer.appendChild(bubble);
                     });
                 }
                 
                 msgContainer.scrollTop = msgContainer.scrollHeight;
             }
-            
-            // Mulai polling berkala setiap 5 detik
-            chatPollingInterval = setInterval(async () => {
-                if (activeConversationId !== conversationId) return;
-                try {
-                    const pollResponse = await fetch(`/chat/${conversationId}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
-                    });
-                    if (!pollResponse.ok) return;
-                    const pollData = await pollResponse.json();
-                    console.log('Poll Chat Data:', pollData);
-                    
-                    const pollMsgContainer = document.getElementById('tab-message-container');
-                    if (pollMsgContainer && activeConversationId === conversationId) {
-                        const currentBubbles = pollMsgContainer.querySelectorAll('.flex.justify-start, .flex.justify-end').length;
-                        const hasPlaceholder = pollMsgContainer.querySelector('.py-12') !== null;
-                        const currentCount = hasPlaceholder ? 0 : currentBubbles;
-                        
-                        if (pollData.messages.length > currentCount) {
-                            pollMsgContainer.innerHTML = '';
-                            pollData.messages.forEach(msg => {
-                                const bubble = createMessageBubble(msg);
-                                pollMsgContainer.appendChild(bubble);
-                            });
-                            pollMsgContainer.scrollTop = pollMsgContainer.scrollHeight;
-                            
-                            // Update sidebar preview
-                            const sidebarItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
-                            if (sidebarItem && pollData.messages.length > 0) {
-                                const lastMsg = pollData.messages[pollData.messages.length - 1];
-                                const bodyText = sidebarItem.querySelector('.last-msg-body');
-                                const timeText = sidebarItem.querySelector('.last-msg-time');
-                                if (bodyText) {
-                                    if (lastMsg.sender_id === currentAuthId) {
-                                        bodyText.innerHTML = `<span class="text-primary font-medium">Anda: </span>${lastMsg.body}`;
-                                    } else {
-                                        bodyText.innerText = lastMsg.body;
-                                    }
-                                }
-                                if (timeText) {
-                                    let lastMsgTime = '';
-                                    if (lastMsg.created_at) {
-                                        const date = new Date(lastMsg.created_at);
-                                        const hours = String(date.getHours()).padStart(2, '0');
-                                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                                        lastMsgTime = `${hours}:${minutes}`;
-                                    }
-                                    timeText.innerText = lastMsgTime || 'Barusan';
-                                }
-                                
-                                const parent = document.getElementById('owner-chat-sidebar-list');
-                                if (parent) parent.insertBefore(sidebarItem, parent.firstChild);
-                            }
-                        }
-                    }
-                } catch (pollErr) {
-                    console.error("Polling error:", pollErr);
-                }
-            }, 5000);
+
+            // Ensure subscribed to this conversation channel
+            subscribeToConversation(conversationId);
             
         } catch (err) {
             console.error("Error loading chat:", err);
@@ -510,15 +539,15 @@
     }
 
     function createMessageBubble(msg) {
-        const isSelf = msg.is_self !== undefined ? msg.is_self : (msg.sender_id === currentAuthId);
+        const isSelf = msg.is_self !== undefined ? msg.is_self : (parseInt(msg.sender_id) === parseInt(currentAuthId));
         const outerDiv = document.createElement('div');
         outerDiv.className = `flex ${isSelf ? 'justify-end' : 'justify-start'}`;
         
         const innerDiv = document.createElement('div');
-        innerDiv.className = `flex flex-col max-w-[75%] md:max-w-[65%] gap-0.5`;
+        innerDiv.className = `flex flex-col max-w-[75%] md:max-w-[65%] gap-1`;
         
         const bubble = document.createElement('div');
-        bubble.className = `p-3 rounded-2xl shadow-sm leading-relaxed text-xs ${isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20'}`;
+        bubble.className = `p-3.5 rounded-2xl shadow-sm leading-relaxed text-sm ${isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20'}`;
         
         const p = document.createElement('p');
         p.className = 'whitespace-pre-wrap break-words';
@@ -526,7 +555,7 @@
         bubble.appendChild(p);
         
         const meta = document.createElement('div');
-        meta.className = `flex items-center gap-1 text-[8px] text-secondary mt-0.5 ${isSelf ? 'justify-end' : 'justify-start'}`;
+        meta.className = `flex items-center gap-1 text-[9px] text-secondary mt-0.5 ${isSelf ? 'justify-end' : 'justify-start'}`;
         
         const timeSpan = document.createElement('span');
         let timeStr = msg.time;
@@ -541,7 +570,7 @@
         
         if (isSelf) {
             const checkIcon = document.createElement('span');
-            checkIcon.className = 'material-symbols-outlined text-[10px] text-primary font-bold';
+            checkIcon.className = 'material-symbols-outlined text-xs text-primary font-bold';
             checkIcon.innerText = msg.is_read ? 'done_all' : 'done';
             meta.appendChild(checkIcon);
         }
@@ -583,6 +612,7 @@
                 }
                 
                 const bubble = createMessageBubble(data.message);
+                bubble.id = 'msg-' + data.message.id;
                 msgContainer.appendChild(bubble);
                 msgContainer.scrollTop = msgContainer.scrollHeight;
                 
@@ -595,7 +625,9 @@
                     if (timeText) timeText.innerText = 'Barusan';
                     
                     const parent = document.getElementById('owner-chat-sidebar-list');
-                    parent.insertBefore(sidebarItem, parent.firstChild);
+                    if (parent) {
+                        parent.insertBefore(sidebarItem, parent.firstChild);
+                    }
                 }
             }
         } catch (err) {
@@ -605,6 +637,9 @@
 
     // Auto-open chat if conversation_id query parameter exists
     document.addEventListener('DOMContentLoaded', () => {
+        // Subscribe to initial channels
+        subscribeToAllConversations();
+        
         // Scroll fallback messages to bottom
         const msgContainer = document.getElementById('tab-message-container');
         if (msgContainer) {
