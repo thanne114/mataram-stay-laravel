@@ -382,4 +382,21 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Email Anda berhasil diverifikasi!');
     }
+
+    // Menonaktifkan akun secara permanen (deactive/delete account)
+    public function deactivate(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Proses logout dan hapus user
+        Auth::logout();
+        
+        // Invalidasi session saat ini
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        $user->delete();
+
+        return redirect()->route('home')->with('success', 'Akun Anda telah berhasil dinonaktifkan secara permanen.');
+    }
 }

@@ -144,4 +144,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/verify-email', [ProfileController::class, 'verifyEmail'])->name('profile.verify-email');
     Route::get('/profile/identity-photo/{filename}', [ProfileController::class, 'showIdentityPhoto'])->name('profile.identity-photo');
     Route::get('/booking/payment-proof/{filename}', [BookingController::class, 'showPaymentProof'])->name('booking.payment-proof');
+    Route::delete('/profile/deactivate', [ProfileController::class, 'deactivate'])->name('profile.deactivate');
 });

@@ -265,7 +265,11 @@
                         <h4 class="font-headline text-xl text-tertiary">Nonaktifkan Akun</h4>
                         <p class="text-sm text-secondary font-body">Tindakan ini tidak dapat dibatalkan. Semua data properti dan riwayat sewa Anda akan dihapus permanen.</p>
                     </div>
-                    <button class="bg-tertiary text-white px-8 py-3 rounded-lg font-body text-sm font-bold shadow-md hover:bg-tertiary-container transition-all active:scale-95 shrink-0">Deactivate Account</button>
+                    <form action="{{ route('profile.deactivate') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan akun secara permanen? Semua data Anda (properti, transaksi, chat) akan dihapus secara permanen dari sistem.');" class="shrink-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-tertiary text-white px-8 py-3 rounded-lg font-body text-sm font-bold shadow-md hover:bg-tertiary-container transition-all active:scale-95">Deactivate Account</button>
+                    </form>
                 </div>
             </div>
         </div>
