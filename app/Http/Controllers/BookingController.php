@@ -178,7 +178,8 @@ class BookingController extends Controller
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+        // Simpan ke disk local untuk alasan keamanan
+        $path = $request->file('payment_proof')->store('payment_proofs', 'local');
 
         $booking->update([
             'payment_proof'  => $path,
@@ -198,8 +199,33 @@ class BookingController extends Controller
     }
 
     /**
-     * Owner verifikasi pembayaran (POST /booking/{booking}/verify)
+     * Tampilkan bukti pembayaran secara aman (Secure Route)
      */
+    public function showPaymentProof($filename)
+    {
+        $user = Auth::user();
+        
+        $booking = Booking::where('payment_proof', 'payment_proofs/' . $filename)->firstOrFail();
+
+        // Otorisasi: Hanya seeker pemilik booking, owner kos terkait, atau admin yang boleh melihat
+        $property = $booking->roomType?->property;
+        if ($user->id !== $booking->user_id && (!$property || $user->id !== $property->user_id) && !$user->isAdmin()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk melihat dokumen ini.');
+        }
+
+        $path = 'payment_proofs/' . $filename;
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            abort(404, 'File fisik tidak ditemukan.');
+        }
+
+        $fileContent = \Illuminate\Support\Facades\Storage::disk('local')->get($path);
+        $mimeType = \Illuminate\Support\Facades\Storage::disk('local')->mimeType($path);
+
+        return response($fileContent)
+            ->header('Content-Type', $mimeType)
+            ->header('Cache-Control', 'private, max-age=86400');
+    }
+
     public function verify(Booking $booking)
     {
         $property = $booking->roomType->property;
@@ -213,13 +239,17 @@ class BookingController extends Controller
             return back()->with('error', 'Pemesanan ini sudah diverifikasi sebelumnya.');
         }
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($booking) {
+        $verified = false;
+        $errorMessage = null;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($booking, &$verified, &$errorMessage) {
             // Lock room type row in database for update to prevent race conditions
             $roomType = RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
 
             // Double check availability before confirming payment
             if ($roomType->available_rooms <= 0) {
-                return back()->with('error', 'Maaf, kamar untuk tipe ini sudah penuh. Verifikasi tidak dapat dilanjutkan.');
+                $errorMessage = 'Maaf, kamar untuk tipe ini sudah penuh. Verifikasi tidak dapat dilanjutkan.';
+                return;
             }
 
             $booking->update([
@@ -229,7 +259,14 @@ class BookingController extends Controller
 
             // Kurangi kamar tersedia
             $roomType->decrement('available_rooms');
+            $verified = true;
+        });
 
+        if ($errorMessage) {
+            return back()->with('error', $errorMessage);
+        }
+
+        if ($verified) {
             try {
                 Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'payment_success_seeker'));
                 if ($booking->roomType->property->owner) {
@@ -240,7 +277,9 @@ class BookingController extends Controller
             }
 
             return back()->with('success', 'Pembayaran berhasil diverifikasi. Booking sekarang aktif.');
-        });
+        }
+
+        return back()->with('error', 'Terjadi kesalahan saat memverifikasi pembayaran.');
     }
 
     /**
@@ -259,8 +298,9 @@ class BookingController extends Controller
         ]);
 
         $oldStatus = $booking->status;
+        $statusUpdated = false;
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $booking, $oldStatus) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $booking, $oldStatus, &$statusUpdated) {
             $booking->update(['status' => $request->status]);
 
             // Jika dibatalkan atau selesai, tambah kamar tersedia kembali
@@ -268,19 +308,27 @@ class BookingController extends Controller
                 $roomType = RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
                 $roomType->increment('available_rooms');
             }
+            $statusUpdated = true;
+        });
 
+        if ($statusUpdated) {
+            // Payout logic outside transaction
             if ($request->status === 'Completed' && $booking->payment_status === 'Paid') {
                 $payoutReference = \App\Services\MidtransPayoutService::sendPayout($booking);
                 if ($payoutReference) {
-                    $booking->escrow_status = 'released';
-                    $booking->payout_status = 'success';
-                    $booking->payout_reference = $payoutReference;
+                    $booking->update([
+                        'escrow_status' => 'released',
+                        'payout_status' => 'success',
+                        'payout_reference' => $payoutReference,
+                    ]);
                 } else {
-                    $booking->payout_status = 'failed';
+                    $booking->update([
+                        'payout_status' => 'failed',
+                    ]);
                 }
-                $booking->save();
             }
 
+            // Email logic outside transaction
             if ($request->status === 'Cancelled') {
                 try {
                     Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
@@ -290,7 +338,9 @@ class BookingController extends Controller
             }
 
             return back()->with('success', 'Status booking berhasil diperbarui menjadi ' . $request->status . '.');
-        });
+        }
+
+        return back()->with('error', 'Gagal memperbarui status booking.');
     }
 
     /**

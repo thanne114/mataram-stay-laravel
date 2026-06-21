@@ -262,7 +262,7 @@
         
         @if($booking->payment_proof)
             <div class="rounded-lg overflow-hidden border border-outline-variant/30 mb-4">
-                <img src="{{ asset('storage/' . $booking->payment_proof) }}" alt="Bukti Pembayaran" class="w-full max-h-96 object-contain bg-surface-container-high">
+                <img src="{{ route('booking.payment-proof', basename($booking->payment_proof)) }}" alt="Bukti Pembayaran" class="w-full max-h-96 object-contain bg-surface-container-high">
             </div>
         @endif
 

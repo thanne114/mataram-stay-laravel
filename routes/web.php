@@ -138,8 +138,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/booking/{booking}', [BookingController::class, 'show'])->name('booking.show');
     Route::post('/profile/verify-identity', [ProfileController::class, 'verifyIdentity'])->name('profile.verify-identity');
+    Route::post('/profile/send-phone-otp', [ProfileController::class, 'sendPhoneOtp'])->name('profile.send-phone-otp');
     Route::post('/profile/verify-phone', [ProfileController::class, 'verifyPhone'])->name('profile.verify-phone');
     Route::post('/profile/send-email-otp', [ProfileController::class, 'sendEmailOtp'])->name('profile.send-email-otp');
     Route::post('/profile/verify-email', [ProfileController::class, 'verifyEmail'])->name('profile.verify-email');
     Route::get('/profile/identity-photo/{filename}', [ProfileController::class, 'showIdentityPhoto'])->name('profile.identity-photo');
+    Route::get('/booking/payment-proof/{filename}', [BookingController::class, 'showPaymentProof'])->name('booking.payment-proof');
 });

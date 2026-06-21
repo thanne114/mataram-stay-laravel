@@ -457,6 +457,42 @@
         document.getElementById('compiled-otp').value = compiled;
     }
 
+    // OTP Phone Modal Logic
+    window.sendPhoneOtpAndOpenModal = function() {
+        const verifyBtn = document.querySelector('button[onclick="sendPhoneOtpAndOpenModal()"]');
+        if (verifyBtn) {
+            verifyBtn.setAttribute('disabled', 'true');
+            verifyBtn.innerHTML = '<span class="material-symbols-outlined text-xs animate-spin" style="display: inline-block; animation: spin 1s linear infinite;">sync</span> Mengirim...';
+        }
+
+        // Send AJAX request
+        fetch("{{ route('profile.send-phone-otp') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                openOtpModal();
+            } else {
+                alert('Gagal mengirim OTP: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Terjadi kesalahan saat mengirim kode OTP.');
+        })
+        .finally(() => {
+            if (verifyBtn) {
+                verifyBtn.removeAttribute('disabled');
+                verifyBtn.innerHTML = 'Verifikasi';
+            }
+        });
+    }
+
     // OTP Email Modal Logic
     window.sendEmailOtpAndOpenModal = function() {
         const emailField = document.getElementById('profile_email_field');

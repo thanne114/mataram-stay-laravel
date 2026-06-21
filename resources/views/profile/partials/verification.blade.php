@@ -31,7 +31,7 @@
                             <span class="material-symbols-outlined text-sm">verified</span> Terverifikasi
                         </span>
                     @else
-                        <button type="button" onclick="openOtpModal()" class="bg-primary text-white px-6 py-2 rounded-md font-medium text-sm hover:bg-primary-container transition">Verifikasi</button>
+                        <button type="button" onclick="sendPhoneOtpAndOpenModal()" class="bg-primary text-white px-6 py-2 rounded-md font-medium text-sm hover:bg-primary-container transition">Verifikasi</button>
                     @endif
                 </div>
             </div>

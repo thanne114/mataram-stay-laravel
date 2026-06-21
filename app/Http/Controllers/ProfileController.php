@@ -233,6 +233,50 @@ class ProfileController extends Controller
             ->header('Cache-Control', 'private, max-age=86400');
     }
 
+    // Mengirimkan kode OTP handphone (WhatsApp)
+    public function sendPhoneOtp(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (empty($user->no_whatsapp)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Silakan lengkapi nomor WhatsApp Anda terlebih dahulu.'
+            ], 400);
+        }
+
+        $throttleKey = 'send-phone-otp:' . $user->id . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+            return response()->json([
+                'status' => 'error',
+                'message' => "Terlalu banyak permintaan OTP. Silakan coba lagi dalam {$minutes} menit."
+            ], 429);
+        }
+
+        // Generate 4 digit OTP
+        $otp = (string) rand(1000, 9999);
+        
+        // Simpan OTP ke session dengan waktu kedaluwarsa 10 menit
+        session([
+            'phone_otp' => $otp,
+            'phone_otp_expires_at' => now()->addMinutes(10),
+            'phone_otp_target' => $user->no_whatsapp
+        ]);
+        
+        // Simulasi pengiriman WhatsApp dengan mencatatnya ke log file
+        \Illuminate\Support\Facades\Log::info("WhatsApp OTP sent to {$user->no_whatsapp}: {$otp}");
+        
+        RateLimiter::hit($throttleKey, 900); // 15 minutes decay
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kode OTP verifikasi nomor handphone berhasil dikirim ke nomor WhatsApp ' . $user->no_whatsapp
+        ]);
+    }
+
     // Memproses verifikasi nomor handphone (OTP)
     public function verifyPhone(Request $request)
     {
@@ -241,6 +285,22 @@ class ProfileController extends Controller
         $request->validate([
             'otp' => ['required', 'string', 'size:4'],
         ]);
+
+        // Verifikasi terhadap OTP asli yang tersimpan di session
+        $sessionOtp = session('phone_otp');
+        $expiresAt = session('phone_otp_expires_at');
+        $targetPhone = session('phone_otp_target');
+
+        if (!$sessionOtp || !$expiresAt || now()->greaterThan($expiresAt) || $targetPhone !== $user->no_whatsapp) {
+            return back()->withErrors(['otp' => 'Kode OTP verifikasi nomor handphone sudah kedaluwarsa atau tidak valid. Silakan kirim ulang OTP.']);
+        }
+
+        if ($request->otp !== $sessionOtp) {
+            return back()->withErrors(['otp' => 'Kode OTP verifikasi nomor handphone salah.']);
+        }
+
+        // Bersihkan session OTP setelah sukses
+        session()->forget(['phone_otp', 'phone_otp_expires_at', 'phone_otp_target']);
 
         $user->phone_verified_at = now();
         $user->save();

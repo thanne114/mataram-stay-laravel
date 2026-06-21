@@ -64,9 +64,13 @@ class PaymentController extends Controller
         $emailToSend = null;
 
         if ($transactionStatus === 'settlement' || $transactionStatus === 'capture') {
-            if ($booking->payment_status !== 'Paid') {
-                \Illuminate\Support\Facades\DB::transaction(function () use ($booking, &$emailToSend) {
-                    // Lock the room type row for update to prevent race conditions during settlement
+            $emailToSend = null;
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($orderId, &$emailToSend) {
+                // Lock the booking row for update to prevent race conditions during settlement
+                $booking = Booking::lockForUpdate()->findOrFail($orderId);
+
+                if ($booking->payment_status !== 'Paid') {
                     $roomType = \App\Models\RoomType::lockForUpdate()->findOrFail($booking->room_type_id);
 
                     if ($booking->status === 'Cancelled') {
@@ -93,7 +97,12 @@ class PaymentController extends Controller
                         $emailToSend = 'success';
                         Log::info("Booking ID {$booking->id} marked as Paid and Active. Room type {$roomType->name} decremented.");
                     }
-                });
+                }
+            });
+
+            if ($emailToSend) {
+                // Refresh booking to obtain latest status
+                $booking->refresh();
 
                 // Send email notifications after transaction commits
                 try {
@@ -114,10 +123,14 @@ class PaymentController extends Controller
                 }
             }
         } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
-            $oldStatus = $booking->status;
-            
-            if ($oldStatus !== 'Completed') {
-                \Illuminate\Support\Facades\DB::transaction(function () use ($booking, $oldStatus) {
+            $emailToSend = null;
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($orderId, &$emailToSend) {
+                // Lock the booking row for update to prevent race conditions during cancellation
+                $booking = Booking::lockForUpdate()->findOrFail($orderId);
+                $oldStatus = $booking->status;
+
+                if ($oldStatus !== 'Completed' && $booking->status !== 'Cancelled') {
                     $booking->update([
                         'payment_status' => 'Unpaid',
                         'status'         => 'Cancelled',
@@ -129,18 +142,21 @@ class PaymentController extends Controller
                         $roomType->increment('available_rooms');
                         Log::info("Room type {$roomType->name} incremented because Active booking was cancelled.");
                     }
-                });
 
+                    $emailToSend = 'cancelled';
+                }
+            });
+
+            if ($emailToSend === 'cancelled') {
                 // Send cancellation email to Seeker
                 try {
+                    $booking->refresh();
                     Mail::to($booking->user->email)->send(new BookingNotificationMail($booking, 'cancelled_seeker'));
                 } catch (\Exception $e) {
                     Log::error('Failed to send Midtrans payment failure/cancelled email: ' . $e->getMessage());
                 }
 
                 Log::info("Booking ID {$booking->id} marked as Cancelled due to status: {$transactionStatus}");
-            } else {
-                Log::info("Booking ID {$booking->id} is already Completed. Ignoring expiration webhook status change.");
             }
         } elseif ($transactionStatus === 'pending') {
             $booking->update([

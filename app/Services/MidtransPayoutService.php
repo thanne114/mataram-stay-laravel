@@ -14,9 +14,9 @@ class MidtransPayoutService
      */
     public static function sendPayout(Booking $booking)
     {
-        $apiKey = env('MIDTRANS_IRIS_API_KEY');
+        $apiKey = config('services.midtrans.iris_api_key');
         if (empty($apiKey)) {
-            Log::error('Midtrans Iris Payout: MIDTRANS_IRIS_API_KEY is not configured in .env');
+            Log::error('Midtrans Iris Payout: MIDTRANS_IRIS_API_KEY is not configured in config/services.php');
             return false;
         }
 

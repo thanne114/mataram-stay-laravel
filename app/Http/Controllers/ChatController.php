@@ -52,17 +52,24 @@ class ChatController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // Tandai semua pesan masuk sebagai dibaca
-        $conversation->messages()
+        // Tandai semua pesan masuk sebagai dibaca jika ada yang belum dibaca (mencegah write query berulang)
+        $hasUnread = $conversation->messages()
             ->where('sender_id', '!=', Auth::id())
             ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ->exists();
 
-        // Muat semua pesan
+        if ($hasUnread) {
+            $conversation->messages()
+                ->where('sender_id', '!=', Auth::id())
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        }
+
+        // Muat semua pesan (cukup query satu kali)
         $messages = $conversation->messages()->with('sender')->oldest()->get();
 
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['messages' => $conversation->messages()->with(['sender'])->get()]);
+            return response()->json(['messages' => $messages]);
         }
 
         // Muat daftar percakapan untuk sidebar
