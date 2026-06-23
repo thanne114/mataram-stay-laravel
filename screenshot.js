@@ -11,8 +11,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function run() {
     console.log('Launching browser...');
+    let executablePath = undefined;
+    if (fs.existsSync('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe')) {
+        executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    }
     const browser = await puppeteer.launch({
         headless: true,
+        executablePath,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         defaultViewport: { width: 1440, height: 900 }
     });
@@ -40,6 +45,7 @@ async function run() {
         { url: 'http://127.0.0.1:8000/seeker/transactions', name: 'seeker_transactions.png' },
         { url: 'http://127.0.0.1:8000/booking/1', name: 'seeker_booking_detail_pending.png' },
         { url: 'http://127.0.0.1:8000/booking/3', name: 'seeker_booking_detail_active.png' },
+        { url: 'http://127.0.0.1:8000/booking/create?room_type_id=1', name: 'seeker_booking_create.png' },
         { url: 'http://127.0.0.1:8000/chat', name: 'seeker_chat.png' },
         { url: 'http://127.0.0.1:8000/profile', name: 'seeker_profile.png' },
 
@@ -47,10 +53,13 @@ async function run() {
         { url: 'http://127.0.0.1:8000/auth/bypass/owner', name: 'owner_dashboard.png' },
         { url: 'http://127.0.0.1:8000/owner/transactions', name: 'owner_transactions.png' },
         { url: 'http://127.0.0.1:8000/property/create', name: 'owner_property_create.png' },
+        { url: 'http://127.0.0.1:8000/property/1/edit', name: 'owner_property_edit.png' },
         { url: 'http://127.0.0.1:8000/chat', name: 'owner_chat.png' },
+        { url: 'http://127.0.0.1:8000/profile', name: 'owner_profile.png' },
 
         // 5. Admin Views
-        { url: 'http://127.0.0.1:8000/auth/bypass/admin', name: 'admin_dashboard.png' }
+        { url: 'http://127.0.0.1:8000/auth/bypass/admin', name: 'admin_dashboard.png' },
+        { url: 'http://127.0.0.1:8000/profile', name: 'admin_profile.png' }
     ];
 
     for (const t of tasks) {
