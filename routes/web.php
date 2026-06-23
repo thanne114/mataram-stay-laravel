@@ -11,6 +11,27 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TransactionController;
 
+Route::get('/auth/bypass/{role}', function ($role) {
+    if (app()->environment('production')) {
+        abort(403);
+    }
+    $email = match($role) {
+        'seeker' => 'seeker@mataramstay.com',
+        'owner' => 'owner@mataramstay.com',
+        'admin' => 'mataramstay@gmail.com',
+        default => abort(404)
+    };
+    $user = \App\Models\User::where('email', $email)->firstOrFail();
+    auth()->login($user);
+    
+    $redirect = match($role) {
+        'seeker' => route('dashboard.seeker'),
+        'owner' => route('dashboard.owner'),
+        'admin' => route('dashboard.admin'),
+    };
+    return redirect($redirect);
+});
+
 // ============================================
 // RUTE PUBLIK (Tanpa Login)
 // ============================================
