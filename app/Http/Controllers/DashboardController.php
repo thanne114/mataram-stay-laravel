@@ -99,22 +99,7 @@ class DashboardController extends Controller
                 ->paginate(15);
         }
 
-        $conversations = \App\Models\Conversation::where(function ($query) use ($user) {
-                $query->where('seeker_id', $user->id)
-                      ->orWhere('owner_id', $user->id);
-            })
-            ->with([
-                'seeker',
-                'owner',
-                'property',
-                'latestMessage'
-            ])
-            ->withCount([
-                'messages as unread_messages_count' => function ($q) {
-                    $q->where('sender_id', '!=', auth()->id())
-                      ->where('is_read', false);
-                }
-            ])
+        $conversations = \App\Models\Conversation::forUser($user->id)
             ->get()
             ->sortByDesc(function ($conv) {
                 return $conv->latestMessage?->created_at ?? $conv->created_at;

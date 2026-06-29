@@ -15,22 +15,7 @@ class ChatController extends Controller
      */
     public function index()
     {
-        $conversations = Conversation::where(function ($query) {
-                $query->where('seeker_id', Auth::id())
-                      ->orWhere('owner_id', Auth::id());
-            })
-            ->with([
-                'seeker',
-                'owner',
-                'property',
-                'latestMessage'
-            ])
-            ->withCount([
-                'messages as unread_messages_count' => function ($q) {
-                    $q->where('sender_id', '!=', auth()->id())
-                      ->where('is_read', false);
-                }
-            ])
+        $conversations = Conversation::forUser(Auth::id())
             ->get()
             ->sortByDesc(function ($conv) {
                 return $conv->latestMessage?->created_at ?? $conv->created_at;
@@ -73,22 +58,7 @@ class ChatController extends Controller
         }
 
         // Muat daftar percakapan untuk sidebar
-        $conversations = Conversation::where(function ($query) {
-                $query->where('seeker_id', Auth::id())
-                      ->orWhere('owner_id', Auth::id());
-            })
-            ->with([
-                'seeker',
-                'owner',
-                'property',
-                'latestMessage'
-            ])
-            ->withCount([
-                'messages as unread_messages_count' => function ($q) {
-                    $q->where('sender_id', '!=', auth()->id())
-                      ->where('is_read', false);
-                }
-            ])
+        $conversations = Conversation::forUser(Auth::id())
             ->get()
             ->sortByDesc(function ($conv) {
                 return $conv->latestMessage?->created_at ?? $conv->created_at;

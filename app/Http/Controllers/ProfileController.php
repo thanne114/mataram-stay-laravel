@@ -41,22 +41,7 @@ class ProfileController extends Controller
         // Pending Bookings for Riwayat Pengajuan Sewa
         $pendingBookings = $bookings->where('status', 'Pending');
 
-        $conversations = \App\Models\Conversation::where(function ($query) use ($user) {
-                $query->where('seeker_id', $user->id)
-                      ->orWhere('owner_id', $user->id);
-            })
-            ->with([
-                'seeker',
-                'owner',
-                'property',
-                'latestMessage'
-            ])
-            ->withCount([
-                'messages as unread_messages_count' => function ($q) {
-                    $q->where('sender_id', '!=', auth()->id())
-                      ->where('is_read', false);
-                }
-            ])
+        $conversations = \App\Models\Conversation::forUser($user->id)
             ->get()
             ->sortByDesc(function ($conv) {
                 return $conv->latestMessage?->created_at ?? $conv->created_at;
@@ -256,8 +241,8 @@ class ProfileController extends Controller
             ], 429);
         }
 
-        // Generate 4 digit OTP
-        $otp = (string) rand(1000, 9999);
+        // Generate 4 digit OTP securely
+        $otp = (string) random_int(1000, 9999);
         
         // Simpan OTP ke session dengan waktu kedaluwarsa 10 menit
         session([
@@ -324,8 +309,8 @@ class ProfileController extends Controller
             ], 429);
         }
 
-        // Generate 4 digit OTP
-        $otp = (string) rand(1000, 9999);
+        // Generate 4 digit OTP securely
+        $otp = (string) random_int(1000, 9999);
         
         // Simpan OTP ke session dengan waktu kedaluwarsa 10 menit
         session([

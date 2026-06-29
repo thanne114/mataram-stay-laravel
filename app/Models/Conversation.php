@@ -66,4 +66,25 @@ class Conversation extends Model
             ->where('is_read', false)
             ->count();
     }
+
+    /** Scope to load conversations for a specific user with required relations and unread counts */
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+                $q->where('seeker_id', $userId)
+                  ->orWhere('owner_id', $userId);
+            })
+            ->with([
+                'seeker',
+                'owner',
+                'property',
+                'latestMessage'
+            ])
+            ->withCount([
+                'messages as unread_messages_count' => function ($q) use ($userId) {
+                    $q->where('sender_id', '!=', $userId)
+                      ->where('is_read', false);
+                }
+            ]);
+    }
 }

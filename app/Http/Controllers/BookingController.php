@@ -358,7 +358,6 @@ class BookingController extends Controller
 
         $booking->update([
             'status'         => 'Cancelled',
-            'payment_status' => 'Unpaid'
         ]);
 
         try {

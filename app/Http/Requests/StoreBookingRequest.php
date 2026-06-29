@@ -8,7 +8,21 @@ class StoreBookingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->isSeeker() && $this->user()->isIdentityVerified();
+        $user = $this->user();
+        if (!$user->isSeeker() || !$user->isIdentityVerified()) {
+            return false;
+        }
+
+        // Seeker cannot book their own property (if they own properties)
+        $roomTypeId = $this->input('room_type_id');
+        if ($roomTypeId) {
+            $roomType = \App\Models\RoomType::with('property')->find($roomTypeId);
+            if ($roomType && $roomType->property && $roomType->property->user_id === $user->id) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function rules(): array
