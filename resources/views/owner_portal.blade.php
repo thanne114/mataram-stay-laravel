@@ -555,10 +555,10 @@
             displayBody = msg.body.substring("Balasan otomatis:".length).trim();
             
             const autoBadge = document.createElement('div');
-            autoBadge.className = 'flex items-center gap-1 text-[9px] font-bold text-secondary uppercase tracking-wider mb-1.5 border-b border-outline-variant/30 pb-1 text-left';
+            autoBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-wider mb-1.5 border border-amber-500/20 text-left';
             autoBadge.innerHTML = `
-                <span class="material-symbols-outlined text-[10px] text-orange-500" style="font-size: 10px;">smart_toy</span>
-                <span>Balasan Otomatis — Sistem</span>
+                <span class="material-symbols-outlined text-[10px]" style="font-size: 10px;">smart_toy</span>
+                <span>Balasan Otomatis</span>
             `;
             bubble.appendChild(autoBadge);
         }

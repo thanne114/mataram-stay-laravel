@@ -167,9 +167,9 @@
                                             <!-- Bubble -->
                                             <div class="p-3.5 rounded-2xl shadow-sm leading-relaxed text-sm {{ $isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20' }}">
                                                 @if($isAutoReply)
-                                                    <div class="flex items-center gap-1 text-[9px] font-bold text-secondary uppercase tracking-wider mb-1.5 border-b border-outline-variant/30 pb-1 text-left">
-                                                        <span class="material-symbols-outlined text-[10px] text-orange-500" style="font-size: 10px;">smart_toy</span>
-                                                        <span>Balasan Otomatis — Sistem</span>
+                                                    <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-wider mb-1.5 border border-amber-500/20 text-left">
+                                                        <span class="material-symbols-outlined text-[10px]" style="font-size: 10px;">smart_toy</span>
+                                                        <span>Balasan Otomatis</span>
                                                     </div>
                                                 @endif
                                                 <p class="whitespace-pre-wrap break-words text-left">{{ $displayBody }}</p>
