@@ -127,21 +127,7 @@ class SearchController extends Controller
 
         // Filter Kampus Hub (Radius Geolocation Query)
         if ($request->filled('kampus')) {
-            $campuses = [
-                'UNRAM' => ['lat' => -8.587063, 'lng' => 116.092185],
-                'UIN_MATARAM' => ['lat' => -8.610029404934442, 'lng' => 116.10061365572658],
-                'UIN_MATARAM_1' => ['lat' => -8.582297, 'lng' => 116.094629],
-                'UIN_MATARAM_2' => ['lat' => -8.610029404934442, 'lng' => 116.10061365572658],
-                'UMMAT' => ['lat' => -8.603922736822168, 'lng' => 116.10314990009388],
-                'POLTEKKES_KEMENKES_MATARAM' => ['lat' => -8.60697944667692, 'lng' => 116.13034004303186],
-                'UT_MATARAM' => ['lat' => -8.615985997292142, 'lng' => 116.0837822198231],
-                'UTM' => ['lat' => -8.592227544759059, 'lng' => 116.09210315753597],
-                'UNBIM' => ['lat' => -8.6050, 'lng' => 116.0850],
-                'IAHN_GDE_PUDJA' => ['lat' => -8.585315823591262, 'lng' => 116.10274343138725],
-                'STIKES_YARSI' => ['lat' => -8.616198152336244, 'lng' => 116.1037731163117],
-                'STIKES_MATARAM' => ['lat' => -8.589637018133999, 'lng' => 116.08274860194847],
-                'UNMAS' => ['lat' => -8.5925, 'lng' => 116.1105],
-            ];
+            $campuses = config('campuses');
 
             $selectedCampus = $request->kampus;
             if (array_key_exists($selectedCampus, $campuses)) {

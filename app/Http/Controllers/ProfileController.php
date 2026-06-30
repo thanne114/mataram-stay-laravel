@@ -372,6 +372,28 @@ class ProfileController extends Controller
     public function deactivate(Request $request)
     {
         $user = Auth::user();
+
+        // Cek jika seeker memiliki sewa/transaksi aktif atau tertunda
+        if ($user->isSeeker()) {
+            $hasActiveOrPending = \App\Models\Booking::where('user_id', $user->id)
+                ->whereIn('status', ['Pending', 'Active'])
+                ->exists();
+            if ($hasActiveOrPending) {
+                return back()->with('error', 'Anda tidak dapat menonaktifkan akun karena memiliki transaksi atau sewa aktif/tertunda.');
+            }
+        }
+
+        // Cek jika owner memiliki kos dengan sewa/transaksi aktif atau tertunda
+        if ($user->isOwner()) {
+            $hasActiveOrPending = \App\Models\Booking::whereHas('roomType.property', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->whereIn('status', ['Pending', 'Active'])
+                ->exists();
+            if ($hasActiveOrPending) {
+                return back()->with('error', 'Anda tidak dapat menonaktifkan akun karena kos Anda memiliki transaksi atau sewa aktif/tertunda.');
+            }
+        }
         
         // Proses logout dan hapus user
         Auth::logout();

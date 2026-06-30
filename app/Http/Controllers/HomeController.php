@@ -9,8 +9,14 @@ class HomeController extends Controller
 {
     public function index()
     {
-        if (Auth::check() && Auth::user()->role === 'seeker') {
-            return redirect('/dashboard-seeker');
+        if (Auth::check()) {
+            if (Auth::user()->role === 'seeker') {
+                return redirect()->route('dashboard.seeker');
+            } elseif (Auth::user()->role === 'owner') {
+                return redirect()->route('dashboard.owner');
+            } elseif (Auth::user()->role === 'admin') {
+                return redirect()->route('dashboard.admin');
+            }
         }
 
         // Jika Guest: tampilkan landing page dengan properti populer

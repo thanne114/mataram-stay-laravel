@@ -7,20 +7,17 @@ use App\Models\User;
 
 class PropertyPolicy
 {
-    /**
-     * Hanya owner dari properti ini yang boleh mengedit.
-     */
     public function update(User $user, Property $property): bool
     {
-        return $user->id === $property->user_id;
+        return $user->id === $property->user_id || $user->isAdmin();
     }
 
     /**
-     * Hanya owner dari properti ini yang boleh menghapus.
+     * Hanya owner dari properti ini atau admin yang boleh menghapus.
      */
     public function delete(User $user, Property $property): bool
     {
-        return $user->id === $property->user_id;
+        return $user->id === $property->user_id || $user->isAdmin();
     }
 
     /**
