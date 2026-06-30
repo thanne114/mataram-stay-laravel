@@ -29,7 +29,7 @@ class StorePropertyRequest extends FormRequest
             'room_name'          => 'required|string|max:255',
             'price_per_month'    => 'required|integer|min:100000',
             'total_rooms'        => 'required|integer|min:1',
-            'available_rooms'    => 'required|integer|min:0',
+            'available_rooms'    => 'required|integer|min:0|lte:total_rooms',
 
             // Fasilitas (checkbox array)
             'facilities'    => 'nullable|array',
@@ -47,6 +47,7 @@ class StorePropertyRequest extends FormRequest
             'price_per_month.required' => 'Harga per bulan wajib diisi.',
             'price_per_month.min'    => 'Harga minimal Rp 100.000.',
             'total_rooms.required'   => 'Total kamar wajib diisi.',
+            'available_rooms.lte'    => 'Jumlah kamar tersedia tidak boleh melebihi total kamar.',
             'main_image.image'       => 'File harus berupa gambar.',
             'main_image.max'         => 'Ukuran gambar maksimal 2MB.',
         ];

@@ -149,4 +149,25 @@ class RealTimeChatWebSocketTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    /**
+     * Test ChatController@start only allows seekers to initiate conversation.
+     */
+    public function test_only_seekers_can_start_chat_with_owner(): void
+    {
+        $this->actingAs($this->seeker);
+        $response1 = $this->post(route('chat.start', $this->property));
+        $response1->assertRedirect();
+
+        $otherOwner = User::create([
+            'name' => 'Other Owner',
+            'username' => 'other_owner',
+            'email' => 'other_owner@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'owner',
+        ]);
+        $this->actingAs($otherOwner);
+        $response2 = $this->post(route('chat.start', $this->property));
+        $response2->assertSessionHas('error', 'Hanya pencari kos yang dapat memulai obrolan.');
+    }
 }

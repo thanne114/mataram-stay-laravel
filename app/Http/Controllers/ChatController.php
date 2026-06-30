@@ -115,6 +115,11 @@ class ChatController extends Controller
      */
     public function start(Request $request, Property $property)
     {
+        // Hanya pencari kos (seeker) yang boleh memulai chat
+        if (!Auth::user()->isSeeker()) {
+            return back()->with('error', 'Hanya pencari kos yang dapat memulai obrolan.');
+        }
+
         $seekerId = Auth::id();
         $ownerId = $property->user_id;
 

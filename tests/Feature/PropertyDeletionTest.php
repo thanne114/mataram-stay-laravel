@@ -129,4 +129,42 @@ class PropertyDeletionTest extends TestCase
             'deleted_at' => null,
         ]);
     }
+
+    public function test_property_creation_fails_if_available_rooms_exceeds_total_rooms(): void
+    {
+        $this->actingAs($this->owner);
+
+        $payload = [
+            'name' => 'Kos Baru',
+            'type' => 'Campur',
+            'area' => 'Mataram',
+            'address' => 'Jl. Baru No. 1',
+            'room_name' => 'Kamar Standard',
+            'price_per_month' => 500000,
+            'total_rooms' => 5,
+            'available_rooms' => 6,
+        ];
+
+        $response = $this->post(route('property.store'), $payload);
+        $response->assertSessionHasErrors(['available_rooms']);
+    }
+
+    public function test_property_update_fails_if_available_rooms_exceeds_total_rooms(): void
+    {
+        $this->actingAs($this->owner);
+
+        $payload = [
+            'name' => 'Kos Lestari Indah',
+            'type' => 'Campur',
+            'area' => 'Sekarbela',
+            'address' => 'Jln. Lestari No. 10, Mataram',
+            'room_name' => 'Kamar Deluxe AC',
+            'price_per_month' => 1500000,
+            'total_rooms' => 5,
+            'available_rooms' => 6,
+        ];
+
+        $response = $this->put(route('property.update', $this->property), $payload);
+        $response->assertSessionHasErrors(['available_rooms']);
+    }
 }

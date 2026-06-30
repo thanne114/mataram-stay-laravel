@@ -123,4 +123,23 @@ class BookingCancellationTest extends TestCase
         $response->assertSee('Pesan Ulang Kamar');
         $response->assertSee(route('booking.create', ['room_type_id' => $this->booking->room_type_id]));
     }
+
+    public function test_seeker_cannot_cancel_pending_booking_if_checking_or_paid(): void
+    {
+        // Test Checking
+        $this->booking->update(['status' => 'Pending', 'payment_status' => 'Checking']);
+        $response1 = $this->actingAs($this->seeker)->post(route('booking.cancel', $this->booking));
+        $response1->assertSessionHas('error', 'Booking ini tidak dapat dibatalkan.');
+        
+        $this->booking->refresh();
+        $this->assertEquals('Pending', $this->booking->status);
+
+        // Test Paid
+        $this->booking->update(['status' => 'Pending', 'payment_status' => 'Paid']);
+        $response2 = $this->actingAs($this->seeker)->post(route('booking.cancel', $this->booking));
+        $response2->assertSessionHas('error', 'Booking ini tidak dapat dibatalkan.');
+        
+        $this->booking->refresh();
+        $this->assertEquals('Pending', $this->booking->status);
+    }
 }

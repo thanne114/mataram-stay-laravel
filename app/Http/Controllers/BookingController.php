@@ -352,7 +352,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        if ($booking->status !== 'Pending') {
+        if ($booking->status !== 'Pending' || in_array($booking->payment_status, ['Checking', 'Paid'])) {
             return back()->with('error', 'Booking ini tidak dapat dibatalkan.');
         }
 
