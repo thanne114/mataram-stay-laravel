@@ -59,7 +59,7 @@ class ProfileDeactivationTest extends TestCase
 
     public function test_seeker_without_active_bookings_can_deactivate(): void
     {
-        $response = $this->actingAs($this->seeker)->post(route('profile.deactivate'));
+        $response = $this->actingAs($this->seeker)->delete(route('profile.deactivate'));
         $response->assertRedirect(route('home'));
         $this->assertDatabaseMissing('users', ['id' => $this->seeker->id]);
     }
@@ -76,7 +76,7 @@ class ProfileDeactivationTest extends TestCase
             'payment_status' => 'Paid',
         ]);
 
-        $response = $this->actingAs($this->seeker)->post(route('profile.deactivate'));
+        $response = $this->actingAs($this->seeker)->delete(route('profile.deactivate'));
         $response->assertSessionHas('error', 'Anda tidak dapat menonaktifkan akun karena memiliki transaksi atau sewa aktif/tertunda.');
         $this->assertDatabaseHas('users', ['id' => $this->seeker->id]);
     }
@@ -93,7 +93,7 @@ class ProfileDeactivationTest extends TestCase
             'payment_status' => 'Paid',
         ]);
 
-        $response = $this->actingAs($this->owner)->post(route('profile.deactivate'));
+        $response = $this->actingAs($this->owner)->delete(route('profile.deactivate'));
         $response->assertSessionHas('error', 'Anda tidak dapat menonaktifkan akun karena kos Anda memiliki transaksi atau sewa aktif/tertunda.');
         $this->assertDatabaseHas('users', ['id' => $this->owner->id]);
     }

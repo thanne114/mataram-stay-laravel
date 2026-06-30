@@ -29,9 +29,9 @@ class AuthControllerRefactorTest extends TestCase
     }
 
     /**
-     * Test owner can access home page.
+     * Test owner is redirected to owner dashboard when accessing home page.
      */
-    public function test_owner_can_access_home_page(): void
+    public function test_owner_is_redirected_to_owner_dashboard(): void
     {
         $user = User::create([
             'name' => 'Owner User',
@@ -40,7 +40,6 @@ class AuthControllerRefactorTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->get('/');
-        $response->assertStatus(200);
-        $response->assertSee('Halo, Owner User');
+        $response->assertRedirect('/dashboard-owner');
     }
 }
