@@ -577,7 +577,9 @@
             compiled += field.value;
         });
         document.getElementById('compiled-email-otp').value = compiled;
-        // REAL-TIME CHAT INTEGRATION VIA PUSHER WEBSOCKETS & LARAVEL ECHO
+    }
+
+    // REAL-TIME CHAT INTEGRATION VIA PUSHER WEBSOCKETS & LARAVEL ECHO
     const currentAuthId = {{ auth()->id() }};
     let activeConversationId = null;
     const subscribedChannels = new Set();
