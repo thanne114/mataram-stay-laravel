@@ -26,7 +26,8 @@
                                     data-property-area="{{ $conv->property ? $conv->property->area : '' }}"
                                     data-property-price="{{ $conv->property ? number_format($conv->property->lowest_price, 0, ',', '.') : '' }}"
                                     data-property-slug="{{ $conv->property ? $conv->property->slug : '' }}"
-                                    data-property-image="{{ $conv->property && $conv->property->main_image ? asset('storage/' . $conv->property->main_image) : '' }}">
+                                    data-property-image="{{ $conv->property && $conv->property->main_image ? asset('storage/' . $conv->property->main_image) : '' }}"
+                                    data-property-room-type-id="{{ $conv->property && $conv->property->roomTypes->count() > 0 ? $conv->property->roomTypes->first()->id : '' }}">
                                 <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-headline font-bold text-primary text-base shrink-0">
                                     {{ strtoupper(substr($partner->name, 0, 1)) }}
                                 </div>
@@ -145,12 +146,20 @@
                                 @forelse($activeMessages as $msg)
                                     @php
                                         $isSelf = $msg->sender_id === auth()->id();
+                                        $isAutoReply = str_starts_with($msg->body, 'Balasan otomatis:');
+                                        $displayBody = $isAutoReply ? trim(substr($msg->body, strlen('Balasan otomatis:'))) : $msg->body;
                                     @endphp
                                     <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
                                         <div class="flex flex-col max-w-[75%] md:max-w-[65%] gap-1">
                                             <!-- Bubble -->
                                             <div class="p-3.5 rounded-2xl shadow-sm leading-relaxed text-sm {{ $isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20' }}">
-                                                <p class="whitespace-pre-wrap break-words">{{ $msg->body }}</p>
+                                                @if($isAutoReply)
+                                                    <div class="flex items-center gap-1 text-[9px] font-bold text-secondary uppercase tracking-wider mb-1.5 border-b border-outline-variant/30 pb-1 text-left">
+                                                        <span class="material-symbols-outlined text-[10px] text-orange-500" style="font-size: 10px;">smart_toy</span>
+                                                        <span>Balasan Otomatis — Sistem</span>
+                                                    </div>
+                                                @endif
+                                                <p class="whitespace-pre-wrap break-words text-left">{{ $displayBody }}</p>
                                             </div>
                                             <!-- Timestamp and status -->
                                             <div class="flex items-center gap-1 text-[9px] text-secondary mt-0.5 {{ $isSelf ? 'justify-end' : 'justify-start' }}">

@@ -306,13 +306,10 @@
 
                 @if(auth()->check())
                     @if(auth()->id() !== $property->user_id)
-                    <form action="{{ route('chat.start', $property) }}" method="POST" class="mt-3">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-label font-bold text-sm transition-all">
-                            <span class="material-symbols-outlined text-lg">forum</span>
-                            Tanya Pemilik Kos
-                        </button>
-                    </form>
+                    <button type="button" onclick="openChatModal()" class="w-full mt-3 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-label font-bold text-sm transition-all">
+                        <span class="material-symbols-outlined text-lg">forum</span>
+                        Tanya Pemilik Kos
+                    </button>
                     @endif
                 @else
                     <a href="{{ route('login') }}" class="w-full mt-3 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-label font-bold text-sm transition-all">
@@ -384,4 +381,87 @@
     });
 </script>
 @endif
+
+<!-- Modal Hubungi Kost (Mamikos Style) -->
+<div id="hubungi-kost-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeChatModal()"></div>
+    <!-- Modal Content -->
+    <div class="relative bg-surface rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-outline-variant/30 animate-in fade-in zoom-in-95 duration-200">
+        <!-- Header -->
+        <div class="p-4 border-b border-outline-variant/30 flex items-center justify-between">
+            <div class="text-left">
+                <h3 class="font-headline text-base font-bold text-on-surface">Hubungi Kost</h3>
+                <p class="text-[10px] text-secondary mt-0.5">Anda akan terhubung dengan pemilik langsung melalui chatroom Mataram Stay</p>
+            </div>
+            <button type="button" onclick="closeChatModal()" class="text-secondary hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+        
+        <!-- Form -->
+        <form action="{{ route('chat.start', $property) }}" method="POST" class="p-4 space-y-4">
+            @csrf
+            <div class="space-y-2 text-left">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-secondary">Pilih Pesan untuk Dikirim</label>
+                <div class="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Saya butuh cepat nih. Bisa booking sekarang?" checked class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Saya butuh cepat nih. Bisa booking sekarang?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Saya ingin survei dulu" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface flex items-center gap-1.5">
+                            <span>Saya ingin survei dulu</span>
+                            <span class="bg-orange-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase">Baru</span>
+                        </span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Masih ada kamar?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Masih ada kamar?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Alamat kos di mana?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Alamat kos di mana?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Ada diskon untuk kos ini?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Ada diskon untuk kos ini?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Boleh tanya-tanya dulu?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Boleh tanya-tanya dulu?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Bisa pasutri?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Bisa pasutri?</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 p-2.5 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                        <input type="radio" name="message" value="Boleh bawa hewan?" class="mt-0.5 text-primary focus:ring-primary">
+                        <span class="text-xs text-on-surface">Boleh bawa hewan?</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-outline-variant/30 flex items-center justify-between text-[9px] text-secondary gap-3">
+                <span class="text-left leading-relaxed">Dengan mengirim pesan, Anda menyetujui komunikasi hanya melalui chatroom Mataram Stay.</span>
+                <button type="submit" class="bg-primary text-on-primary hover:bg-primary/90 px-5 py-2 rounded-xl font-bold text-xs shadow-md transition-all shrink-0 active:scale-95">
+                    Kirim Pesan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openChatModal() {
+        document.getElementById('hubungi-kost-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeChatModal() {
+        document.getElementById('hubungi-kost-modal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+</script>
 </body></html>

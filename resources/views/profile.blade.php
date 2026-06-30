@@ -713,11 +713,22 @@
                     const propName = document.getElementById('chat-property-name');
                     const propDetails = document.getElementById('chat-property-details');
                     const propLink = document.getElementById('chat-property-link');
+                    const bookingBtn = document.getElementById('chat-booking-btn');
+                    
                     if (propName) propName.innerText = targetElement.dataset.propertyName;
                     if (propDetails) {
                         propDetails.innerText = `${targetElement.dataset.propertyArea} • Rp ${targetElement.dataset.propertyPrice}/bln`;
                     }
                     if (propLink) propLink.href = `/kos/${targetElement.dataset.propertySlug}`;
+                    
+                    if (bookingBtn) {
+                        if (targetElement.dataset.propertyRoomTypeId) {
+                            bookingBtn.href = `/booking/create?room_type_id=` + targetElement.dataset.propertyRoomTypeId;
+                            bookingBtn.classList.remove('hidden');
+                        } else {
+                            bookingBtn.classList.add('hidden');
+                        }
+                    }
 
                     const img = document.getElementById('chat-property-image');
                     const placeholder = document.getElementById('chat-property-placeholder');
@@ -793,9 +804,23 @@
         const bubble = document.createElement('div');
         bubble.className = `p-3.5 rounded-2xl shadow-sm leading-relaxed text-sm ${isSelf ? 'bg-primary text-on-primary rounded-tr-none' : 'bg-surface-container-lowest text-on-surface rounded-tl-none border border-outline-variant/20'}`;
         
+        const startsWithAutoReply = msg.body && msg.body.indexOf("Balasan otomatis:") === 0;
+        let displayBody = msg.body;
+        if (startsWithAutoReply) {
+            displayBody = msg.body.substring("Balasan otomatis:".length).trim();
+            
+            const autoBadge = document.createElement('div');
+            autoBadge.className = 'flex items-center gap-1 text-[9px] font-bold text-secondary uppercase tracking-wider mb-1.5 border-b border-outline-variant/30 pb-1 text-left';
+            autoBadge.innerHTML = `
+                <span class="material-symbols-outlined text-[10px] text-orange-500" style="font-size: 10px;">smart_toy</span>
+                <span>Balasan Otomatis — Sistem</span>
+            `;
+            bubble.appendChild(autoBadge);
+        }
+
         const p = document.createElement('p');
-        p.className = 'whitespace-pre-wrap break-words';
-        p.innerText = msg.body;
+        p.className = 'whitespace-pre-wrap break-words text-left';
+        p.innerText = displayBody;
         bubble.appendChild(p);
         
         const meta = document.createElement('div');

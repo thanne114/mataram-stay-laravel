@@ -135,6 +135,54 @@ class ChatController extends Controller
             'property_id' => $property->id,
         ]);
 
+        $messageBody = $request->input('message');
+        if ($messageBody) {
+            // Simpan pesan seeker
+            $seekerMessage = \App\Models\Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $seekerId,
+                'body' => $messageBody,
+                'is_read' => false,
+            ]);
+
+            // Broadcast message sent
+            broadcast(new \App\Events\MessageSent($seekerMessage))->toOthers();
+
+            // Logika Auto-Reply (Balasan Otomatis) dari Owner
+            $autoReply = null;
+            if ($messageBody === 'Saya butuh cepat nih. Bisa booking sekarang?') {
+                $autoReply = "Balasan otomatis: Halo! Silakan ajukan sewa melalui tombol 'Ajukan Sewa' yang tersedia di atas. Kami akan segera memproses pengajuan Anda.";
+            } elseif ($messageBody === 'Saya ingin survei dulu') {
+                $autoReply = "Balasan otomatis: Halo! Silakan beri tahu kami waktu rencana survei Anda (tanggal dan jam). Kami akan mencoba mencocokkan jadwal.";
+            } elseif ($messageBody === 'Masih ada kamar?') {
+                $autoReply = "Balasan otomatis: Halo! Ketersediaan kamar ter-update sesuai dengan informasi di halaman detail kos. Jika tertulis masih tersedia, silakan langsung ajukan sewa.";
+            } elseif ($messageBody === 'Alamat kos di mana?') {
+                $address = $property->address ?? 'Mataram';
+                $autoReply = "Balasan otomatis: Halo! Alamat lengkap kos kami adalah: {$address}. Anda juga dapat melihat lokasi persisnya pada peta interaktif di detail properti.";
+            } elseif ($messageBody === 'Ada diskon untuk kos ini?') {
+                $autoReply = "Balasan otomatis: Halo! Untuk saat ini belum tersedia promo diskon khusus untuk kos ini. Harga yang tertera adalah harga terbaik.";
+            } elseif ($messageBody === 'Boleh tanya-tanya dulu?') {
+                $autoReply = "Balasan otomatis: Halo! Tentu saja, silakan tuliskan pertanyaan Anda di sini. Kami akan menjawab secepat mungkin.";
+            } elseif ($messageBody === 'Bisa pasutri?') {
+                $autoReply = "Balasan otomatis: Halo! Kebijakan mengenai penghuni pasutri disesuaikan dengan tipe kos (Putra/Putri/Campur). Harap pastikan dokumen pendukung (seperti surat nikah) siap jika diperlukan.";
+            } elseif ($messageBody === 'Boleh bawa hewan?') {
+                $autoReply = "Balasan otomatis: Halo! Demi kenyamanan penghuni lain, kami menyarankan untuk mengkonfirmasi jenis hewan peliharaan Anda terlebih dahulu kepada kami.";
+            }
+
+            if ($autoReply) {
+                // Simpan pesan auto-reply dari owner
+                $ownerMessage = \App\Models\Message::create([
+                    'conversation_id' => $conversation->id,
+                    'sender_id' => $ownerId,
+                    'body' => $autoReply,
+                    'is_read' => false,
+                ]);
+
+                // Broadcast auto-reply message sent
+                broadcast(new \App\Events\MessageSent($ownerMessage))->toOthers();
+            }
+        }
+
         // Dialihkan kembali ke dasbor profile dengan tab pesan & conversation_id terbuka otomatis
         return redirect()->route('profile.edit', ['tab' => 'view-pesan', 'conversation_id' => $conversation->id]);
     }
