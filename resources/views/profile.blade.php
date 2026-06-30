@@ -186,6 +186,8 @@
 <x-footer />
 
 <script>
+    let chatPollingInterval = null;
+
     // Logika untuk Pindah Tab Menu
     function switchView(viewId, clickedElement) {
         // Simpan tab aktif di localStorage untuk persistence

@@ -121,6 +121,8 @@
 <x-footer />
 
 <script>
+    let chatPollingInterval = null;
+
     // FUNGSI TAB SWITCHING
     function switchTab(tabId, clickedElement) {
         // Simpan tab aktif di localStorage untuk persistence
