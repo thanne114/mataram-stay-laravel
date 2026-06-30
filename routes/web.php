@@ -146,6 +146,7 @@ Route::middleware(['auth', 'role:seeker'])->group(function () {
 // ============================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard-admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/admin/dashboard-stats', [DashboardController::class, 'adminStats'])->name('admin.dashboard-stats');
     Route::post('/admin/verify-seeker/{user}', [DashboardController::class, 'verifySeeker'])->name('admin.verify-seeker');
     Route::post('/admin/reject-seeker/{user}', [DashboardController::class, 'rejectSeeker'])->name('admin.reject-seeker');
     Route::post('/admin/approve-property/{property}', [DashboardController::class, 'approveProperty'])->name('admin.approve-property');

@@ -38,7 +38,7 @@
                     <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-xl">payments</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">Rp {{ number_format($totalRevenuePlatform, 0, ',', '.') }}</h3>
+                    <h3 id="stat-revenue" class="text-2xl md:text-3xl font-headline font-bold text-on-surface">Rp {{ number_format($totalRevenuePlatform, 0, ',', '.') }}</h3>
                     <p class="text-[11px] text-secondary font-body mt-1">Total komisi & biaya admin</p>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                     <span class="material-symbols-outlined text-secondary bg-surface-variant p-2 rounded-xl">how_to_reg</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $pendingSeekersCount }}</h3>
+                    <h3 id="stat-pending-seekers" class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $pendingSeekersCount }}</h3>
                     <p class="text-[11px] text-secondary font-body mt-1">Pencari kos menunggu review</p>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                     <span class="material-symbols-outlined text-secondary bg-surface-variant p-2 rounded-xl">apartment</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $draftPropertiesCount }}</h3>
+                    <h3 id="stat-draft-properties" class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $draftPropertiesCount }}</h3>
                     <p class="text-[11px] text-secondary font-body mt-1">Listing kos baru (Draft)</p>
                 </div>
             </div>
@@ -74,8 +74,8 @@
                     <span class="material-symbols-outlined text-secondary bg-surface-variant p-2 rounded-xl">group</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $totalSeekers + $totalOwners }}</h3>
-                    <p class="text-[11px] text-secondary font-body mt-1">{{ $totalSeekers }} Pencari, {{ $totalOwners }} Pemilik</p>
+                    <h3 id="stat-total-users" class="text-2xl md:text-3xl font-headline font-bold text-on-surface">{{ $totalSeekers + $totalOwners }}</h3>
+                    <p id="stat-users-breakdown" class="text-[11px] text-secondary font-body mt-1">{{ $totalSeekers }} Pencari, {{ $totalOwners }} Pemilik</p>
                 </div>
             </div>
         </div>
@@ -91,16 +91,20 @@
                 <button onclick="switchTab('seekers')" id="tab-btn-seekers" class="tab-btn px-4 md:px-6 py-5 font-label font-medium text-sm border-b-2 border-transparent text-secondary hover:text-primary transition-all flex items-center gap-2 relative">
                     <span class="material-symbols-outlined text-xl">badge</span>
                     <span>Verifikasi Pencari</span>
-                    @if($pendingSeekersCount > 0)
-                        <span class="absolute top-3 right-0.5 md:right-1 bg-tertiary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $pendingSeekersCount }}</span>
-                    @endif
+                    <span id="badge-seekers-container">
+                        @if($pendingSeekersCount > 0)
+                            <span id="badge-seekers-count" class="absolute top-3 right-0.5 md:right-1 bg-tertiary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $pendingSeekersCount }}</span>
+                        @endif
+                    </span>
                 </button>
                 <button onclick="switchTab('properties')" id="tab-btn-properties" class="tab-btn px-4 md:px-6 py-5 font-label font-medium text-sm border-b-2 border-transparent text-secondary hover:text-primary transition-all flex items-center gap-2 relative">
                     <span class="material-symbols-outlined text-xl">real_estate_agent</span>
                     <span>Persetujuan Kos</span>
-                    @if($draftPropertiesCount > 0)
-                        <span class="absolute top-3 right-0.5 md:right-1 bg-tertiary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $draftPropertiesCount }}</span>
-                    @endif
+                    <span id="badge-properties-container">
+                        @if($draftPropertiesCount > 0)
+                            <span id="badge-properties-count" class="absolute top-3 right-0.5 md:right-1 bg-tertiary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">{{ $draftPropertiesCount }}</span>
+                        @endif
+                    </span>
                 </button>
             </div>
 
@@ -152,12 +156,12 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="bg-surface-variant/20 rounded-2xl border border-outline-variant/30 p-5">
                                     <span class="text-[10px] uppercase font-bold text-secondary tracking-wider block">Total Biaya Admin</span>
-                                    <span class="text-2xl font-headline font-bold text-on-surface block mt-2">Rp {{ number_format($totalAdminFeesCollected, 0, ',', '.') }}</span>
+                                    <span id="detail-admin-fees" class="text-2xl font-headline font-bold text-on-surface block mt-2">Rp {{ number_format($totalAdminFeesCollected, 0, ',', '.') }}</span>
                                     <span class="text-[10px] text-secondary font-body mt-1 block">Dari akumulasi Biaya Layanan</span>
                                 </div>
                                 <div class="bg-surface-variant/20 rounded-2xl border border-outline-variant/30 p-5">
                                     <span class="text-[10px] uppercase font-bold text-secondary tracking-wider block">Total Komisi Sewa</span>
-                                    <span class="text-2xl font-headline font-bold text-on-surface block mt-2">Rp {{ number_format($totalCommissionsCollected, 0, ',', '.') }}</span>
+                                    <span id="detail-commission-fees" class="text-2xl font-headline font-bold text-on-surface block mt-2">Rp {{ number_format($totalCommissionsCollected, 0, ',', '.') }}</span>
                                     <span class="text-[10px] text-secondary font-body mt-1 block">Berdasarkan tarif komisi {{ $commissionRate }}%</span>
                                 </div>
                             </div>
@@ -168,7 +172,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h4 class="text-sm font-label font-bold text-primary uppercase tracking-wider">Total Bersih Platform</h4>
-                                    <span class="text-3xl font-headline font-bold text-on-surface block mt-1">Rp {{ number_format($totalRevenuePlatform, 0, ',', '.') }}</span>
+                                    <span id="detail-net-platform" class="text-3xl font-headline font-bold text-on-surface block mt-1">Rp {{ number_format($totalRevenuePlatform, 0, ',', '.') }}</span>
                                     <p class="text-xs text-secondary font-body mt-2 leading-relaxed">Dana ini mewakili seluruh pendapatan platform yang diproses melalui sistem gerbang pembayaran otomatis. Potongan komisi telah dipisahkan secara otomatis sebelum dana ditarik oleh Pemilik Kos.</p>
                                 </div>
                             </div>
@@ -519,6 +523,79 @@
         document.addEventListener('DOMContentLoaded', () => {
             const savedTab = localStorage.getItem('admin_active_tab') || 'monetization';
             switchTab(savedTab);
+
+            // Fetch initial stats and start polling every 5 seconds
+            fetchDashboardStats();
+            setInterval(fetchDashboardStats, 5000);
         });
+
+        // Dynamic Stats Polling
+        async function fetchDashboardStats() {
+            try {
+                const response = await fetch('/admin/dashboard-stats', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!response.ok) return;
+                const data = await response.json();
+
+                const formatIDR = (num) => 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
+
+                updateElementText('stat-revenue', formatIDR(data.totalRevenuePlatform));
+                updateElementText('stat-pending-seekers', data.pendingSeekersCount);
+                updateElementText('stat-draft-properties', data.draftPropertiesCount);
+                updateElementText('stat-total-users', data.totalUsers);
+                updateElementText('stat-users-breakdown', `${data.totalSeekers} Pencari, ${data.totalOwners} Pemilik`);
+
+                // Update monetization tab details
+                updateElementText('detail-admin-fees', formatIDR(data.totalAdminFeesCollected));
+                updateElementText('detail-commission-fees', formatIDR(data.totalCommissionsCollected));
+                updateElementText('detail-net-platform', formatIDR(data.totalRevenuePlatform));
+
+                // Update tab badges
+                updateTabBadge('badge-seekers-container', 'badge-seekers-count', data.pendingSeekersCount);
+                updateTabBadge('badge-properties-container', 'badge-properties-count', data.draftPropertiesCount);
+
+            } catch (err) {
+                console.error('Error fetching admin dashboard stats:', err);
+            }
+        }
+
+        function updateElementText(id, newText) {
+            const el = document.getElementById(id);
+            if (el && el.innerText.trim() !== String(newText).trim()) {
+                // Add flash style
+                el.style.transition = 'color 0.2s ease-in-out';
+                el.style.color = '#388E3C'; // Soft green flash for positive/active changes
+                setTimeout(() => {
+                    el.innerText = newText;
+                    setTimeout(() => {
+                        el.style.color = '';
+                    }, 300);
+                }, 200);
+            }
+        }
+
+        function updateTabBadge(containerId, badgeId, count) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const existingBadge = document.getElementById(badgeId);
+            if (count > 0) {
+                if (existingBadge) {
+                    if (existingBadge.innerText.trim() !== String(count).trim()) {
+                        existingBadge.innerText = count;
+                    }
+                } else {
+                    container.innerHTML = `<span id="${badgeId}" class="absolute top-3 right-0.5 md:right-1 bg-tertiary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">${count}</span>`;
+                }
+            } else {
+                if (existingBadge) {
+                    existingBadge.remove();
+                }
+            }
+        }
     </script>
 </x-layout>

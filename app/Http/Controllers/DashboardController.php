@@ -176,6 +176,42 @@ class DashboardController extends Controller
     }
 
     /**
+     * Get dynamic stats for admin dashboard (AJAX API)
+     */
+    public function adminStats()
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $totalSeekers = \App\Models\User::where('role', 'seeker')->count();
+        $pendingSeekersCount = \App\Models\User::where('role', 'seeker')
+            ->whereNotNull('identity_photo')
+            ->where('is_verified', false)
+            ->count();
+        $totalOwners = \App\Models\User::where('role', 'owner')->count();
+        $totalProperties = \App\Models\Property::count();
+        $draftPropertiesCount = \App\Models\Property::where('status', 'draft')->count();
+
+        $totalAdminFeesCollected = (int) \App\Models\Booking::where('payment_status', 'Paid')->sum('admin_fee');
+        $totalCommissionsCollected = (int) \App\Models\Booking::where('payment_status', 'Paid')->sum('commission_fee');
+        $totalRevenuePlatform = $totalAdminFeesCollected + $totalCommissionsCollected;
+
+        return response()->json([
+            'totalSeekers' => $totalSeekers,
+            'pendingSeekersCount' => $pendingSeekersCount,
+            'totalOwners' => $totalOwners,
+            'totalProperties' => $totalProperties,
+            'draftPropertiesCount' => $draftPropertiesCount,
+            'totalAdminFeesCollected' => $totalAdminFeesCollected,
+            'totalCommissionsCollected' => $totalCommissionsCollected,
+            'totalRevenuePlatform' => $totalRevenuePlatform,
+            'totalUsers' => $totalSeekers + $totalOwners,
+        ]);
+    }
+
+    /**
      * Verify Seeker Identity
      */
     public function verifySeeker(User $user)
