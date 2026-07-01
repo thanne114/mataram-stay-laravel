@@ -37,12 +37,16 @@
                         </div>
                         @if($ob->escrow_status !== 'refunded')
                             <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
-                                <a href="https://wa.me/6281337594955?text=Halo%20Admin%20Mataram%20Stay,%20saya%20ingin%20mengajukan%20refund%20untuk%20pemesanan%20%23{{ $ob->id }}%20(Kode%20Refund%20{{ $refCode }}).%20Terima%20kasih." target="_blank" class="w-full sm:w-auto bg-[#25d366] hover:bg-[#20ba5a] text-white px-5 py-2.5 rounded-lg font-label font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.472 14.382c-.022-.08-.115-.188-.417-.34-.3-.149-1.777-.878-2.052-.978-.276-.1-.476-.149-.674.15-.198.298-.769.978-.943 1.177-.173.2-.347.224-.647.075-.3-.15-1.266-.467-2.41-1.485-.89-.792-1.492-1.77-1.666-2.07-.174-.3-.019-.462.13-.61.135-.133.3-.348.45-.52.15-.173.2-.3.3-.5.1-.2.05-.375-.025-.524-.075-.15-.675-1.624-.925-2.225-.244-.589-.493-.508-.674-.517-.181-.008-.389-.009-.595-.009-.206 0-.54.078-.823.386-.283.308-1.08 1.055-1.08 2.57 0 1.517 1.01 2.977 1.15 3.177.14.2 1.983 3.027 4.806 4.242.673.29 1.2.463 1.61.593.675.215 1.288.185 1.772.113.539-.08 1.62-.663 1.848-1.27.228-.607.228-1.127.16-1.226-.068-.1-.247-.149-.549-.3zM12 2c-5.52 0-10 4.48-10 10 0 1.91.54 3.7 1.56 5.23L2.03 22l4.9-1.28C8.38 21.49 10.13 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.66 0-3.23-.46-4.57-1.27l-.33-.2-2.9.76.77-2.82-.22-.35C3.89 14.88 3.4 13.5 3.4 12c0-4.74 3.86-8.6 8.6-8.6 4.74 0 8.6 3.86 8.6 8.6S16.74 20 12 20z"/>
-                                    </svg>
-                                    <span>Ajukan Klaim Refund ke Admin</span>
-                                </a>
+                                @if($ob->roomType && $ob->roomType->property)
+                                    <form action="{{ route('chat.start', $ob->roomType->property) }}" method="POST" class="w-full sm:w-auto inline">
+                                        @csrf
+                                        <input type="hidden" name="message" value="Halo, pemesanan saya untuk kos ini dibatalkan karena overbooked (Pemesanan #{{ $ob->id }}, Kode Refund {{ $refCode }}). Bagaimana kelanjutan proses refund saya?">
+                                        <button type="submit" class="w-full bg-primary text-on-primary hover:bg-primary-container px-5 py-2.5 rounded-lg font-label font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2">
+                                            <span class="material-symbols-outlined text-sm">chat</span>
+                                            <span>Tanya Pemilik Kos via Chat</span>
+                                        </button>
+                                    </form>
+                                @endif
                                 <p class="text-[10px] text-red-700 italic">Tim kami akan mengembalikan dana 100% tanpa potongan.</p>
                             </div>
                         @else
