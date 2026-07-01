@@ -356,4 +356,86 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('error', 'Booking tidak memenuhi syarat untuk refund.');
     }
+
+    /**
+     * Get dynamic live transactions and stats for Owner Portal (AJAX API)
+     */
+    public function ownerLiveTransactions(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user || ($user->role !== 'owner' && $user->role !== 'admin')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($user->role === 'admin') {
+            $properties = Property::all();
+        } else {
+            $properties = Property::where('user_id', $user->id)->get();
+        }
+        $propertyIds = $properties->pluck('id');
+
+        if ($user->role === 'admin') {
+            $allBookingsQuery = Booking::query();
+        } else {
+            $allBookingsQuery = Booking::whereHas('roomType', function ($query) use ($propertyIds) {
+                $query->whereIn('property_id', $propertyIds);
+            });
+        }
+
+        $totalRevenue = (int) $allBookingsQuery->clone()->where('payment_status', 'Paid')->sum('net_owner_amount');
+        $successCount = $allBookingsQuery->clone()->where('payment_status', 'Paid')->count();
+        $pendingCount = $allBookingsQuery->clone()->whereIn('status', ['Pending'])->count();
+
+        if ($user->role === 'admin') {
+            $bookings = Booking::with(['user', 'roomType.property'])
+                ->latest()
+                ->paginate(15);
+        } else {
+            $bookings = Booking::whereHas('roomType', function ($query) use ($propertyIds) {
+                    $query->whereIn('property_id', $propertyIds);
+                })
+                ->with(['user', 'roomType.property'])
+                ->latest()
+                ->paginate(15);
+        }
+
+        $html = view('owner.partials.transactions_rows', compact('bookings'))->render();
+        $paginationHtml = $bookings->hasPages() ? $bookings->links()->render() : '';
+
+        return response()->json([
+            'totalRevenue' => 'Rp ' . number_format($totalRevenue, 0, ',', '.'),
+            'successCount' => $successCount,
+            'pendingCount' => $pendingCount,
+            'html' => $html,
+            'paginationHtml' => $paginationHtml,
+            'hasPages' => $bookings->hasPages()
+        ]);
+    }
+
+    /**
+     * Get dynamic live transactions for Seeker Profile (AJAX API)
+     */
+    public function seekerLiveTransactions(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'seeker') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $bookings = Booking::where('user_id', $user->id)
+            ->with(['roomType.property'])
+            ->latest()
+            ->get();
+
+        $hasPendingTransaction = Booking::where('user_id', $user->id)
+            ->where('status', 'Pending')
+            ->exists();
+
+        $html = view('profile.partials.transactions_cards', compact('bookings', 'hasPendingTransaction'))->render();
+
+        return response()->json([
+            'hasPendingTransaction' => $hasPendingTransaction,
+            'html' => $html
+        ]);
+    }
 }

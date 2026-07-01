@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 
     // Transaksi Owner (booking masuk ke properti)
     Route::get('/owner/transactions', [TransactionController::class, 'ownerIndex'])->name('transactions.owner');
+    Route::get('/owner/live-transactions', [DashboardController::class, 'ownerLiveTransactions'])->name('owner.live-transactions');
 
     // Verifikasi & Update Status Booking
     Route::post('/booking/{booking}/verify', [BookingController::class, 'verify'])->name('booking.verify');
@@ -136,6 +137,7 @@ Route::middleware(['auth', 'role:seeker'])->group(function () {
 
     // Transaksi Seeker (booking miliknya)
     Route::get('/seeker/transactions', [TransactionController::class, 'seekerIndex'])->name('transactions.seeker');
+    Route::get('/seeker/live-transactions', [DashboardController::class, 'seekerLiveTransactions'])->name('seeker.live-transactions');
 
     // Review
     Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

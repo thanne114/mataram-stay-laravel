@@ -187,6 +187,7 @@
 
 <script>
     let chatPollingInterval = null;
+    let seekerTransactionsPollingInterval = null;
 
     // Logika untuk Pindah Tab Menu
     function switchView(viewId, clickedElement) {
@@ -199,6 +200,16 @@
                 clearInterval(chatPollingInterval);
                 chatPollingInterval = null;
             }
+        }
+
+        // Hentikan/Mulai polling transaksi seeker
+        if (viewId !== 'view-transaksi') {
+            if (seekerTransactionsPollingInterval) {
+                clearInterval(seekerTransactionsPollingInterval);
+                seekerTransactionsPollingInterval = null;
+            }
+        } else {
+            startSeekerTransactionsPolling();
         }
 
         // Sembunyikan semua section view
@@ -239,6 +250,54 @@
         }
     }
 
+    // FUNGSI POLLING TRANSAKSI SEEKER
+    function startSeekerTransactionsPolling() {
+        if (seekerTransactionsPollingInterval) return;
+
+        const poll = async () => {
+            if (document.hidden) return; // Pause if tab is inactive
+
+            try {
+                const response = await fetch('/seeker/live-transactions', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+                const data = await response.json();
+
+                // 1. Update pending warning
+                const warningEl = document.getElementById('seeker-pending-warning-container');
+                if (warningEl) {
+                    if (data.hasPendingTransaction) {
+                        warningEl.classList.remove('hidden');
+                    } else {
+                        warningEl.classList.add('hidden');
+                    }
+                }
+
+                // 2. Update list kartu jika ada perubahan
+                const containerEl = document.getElementById('seeker-transactions-cards-container');
+                if (containerEl && containerEl.innerHTML.trim() !== data.html.trim()) {
+                    containerEl.style.transition = 'opacity 0.2s ease-in-out';
+                    containerEl.style.opacity = '0.5';
+                    setTimeout(() => {
+                        containerEl.innerHTML = data.html;
+                        containerEl.style.opacity = '1';
+                    }, 200);
+                }
+
+            } catch (err) {
+                console.error('Error polling seeker transactions:', err);
+            }
+        };
+
+        poll();
+        seekerTransactionsPollingInterval = setInterval(poll, 5000);
+    }
+
     // Load active tab on page load
     document.addEventListener('DOMContentLoaded', () => {
         const sessionTab = "{{ session('active_tab') }}";
@@ -248,6 +307,21 @@
         if (tabButton) {
             switchView(activeTab, tabButton);
         }
+
+        // Visibility API to pause/resume polling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (seekerTransactionsPollingInterval) {
+                    clearInterval(seekerTransactionsPollingInterval);
+                    seekerTransactionsPollingInterval = null;
+                }
+            } else {
+                const activeTab = localStorage.getItem('active_seeker_tab') || 'view-settings';
+                if (activeTab === 'view-transaksi') {
+                    startSeekerTransactionsPolling();
+                }
+            }
+        });
     });
 
     // Profile photo upload trigger and preview

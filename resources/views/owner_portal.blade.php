@@ -122,6 +122,7 @@
 
 <script>
     let chatPollingInterval = null;
+    let transactionsPollingInterval = null;
 
     // FUNGSI TAB SWITCHING
     function switchTab(tabId, clickedElement) {
@@ -134,6 +135,16 @@
                 clearInterval(chatPollingInterval);
                 chatPollingInterval = null;
             }
+        }
+
+        // Hentikan/Mulai polling transaksi
+        if (tabId !== 'transaksi') {
+            if (transactionsPollingInterval) {
+                clearInterval(transactionsPollingInterval);
+                transactionsPollingInterval = null;
+            }
+        } else {
+            startTransactionsPolling();
         }
 
         // 1. Sembunyikan semua tab content
@@ -172,6 +183,99 @@
         }
     }
 
+    // FUNGSI POLLING TRANSAKSI OWNER
+    function startTransactionsPolling() {
+        if (transactionsPollingInterval) return;
+
+        const poll = async () => {
+            if (document.hidden) return; // Pause if tab is inactive
+
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const page = urlParams.get('page') || 1;
+
+                const response = await fetch(`/owner/live-transactions?page=${page}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) return;
+                const data = await response.json();
+
+                // 1. Update stats dengan efek visual flash
+                updateElementWithFlash('owner-total-revenue', data.totalRevenue);
+                updateElementWithFlash('owner-success-count', data.successCount);
+                
+                const pendingText = `${data.pendingCount} <span class="text-sm font-body font-normal text-secondary">Pesanan</span>`;
+                updateElementWithFlash('owner-pending-count', pendingText, true);
+
+                const warningEl = document.getElementById('owner-pending-warning');
+                if (warningEl) {
+                    if (data.pendingCount > 0) {
+                        warningEl.classList.remove('hidden');
+                    } else {
+                        warningEl.classList.add('hidden');
+                    }
+                }
+
+                // 2. Update baris tabel jika ada perubahan
+                const rowsEl = document.getElementById('owner-transactions-rows');
+                if (rowsEl && rowsEl.innerHTML.trim() !== data.html.trim()) {
+                    rowsEl.style.transition = 'opacity 0.2s ease-in-out';
+                    rowsEl.style.opacity = '0.5';
+                    setTimeout(() => {
+                        rowsEl.innerHTML = data.html;
+                        rowsEl.style.opacity = '1';
+                    }, 200);
+                }
+
+                // 3. Update pagination jika ada perubahan
+                const pagEl = document.getElementById('owner-pagination-container');
+                if (pagEl) {
+                    if (data.hasPages && pagEl.innerHTML.trim() !== data.paginationHtml.trim()) {
+                        pagEl.innerHTML = `<div class="px-8 py-4 border-t border-outline-variant/30">${data.paginationHtml}</div>`;
+                    } else if (!data.hasPages) {
+                        pagEl.innerHTML = '';
+                    }
+                }
+
+            } catch (err) {
+                console.error('Error polling transactions:', err);
+            }
+        };
+
+        function updateElementWithFlash(id, newContent, isHtml = false) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const currentContent = isHtml ? el.innerHTML : el.innerText;
+            if (currentContent.trim() !== String(newContent).trim()) {
+                if (isHtml) {
+                    el.innerHTML = newContent;
+                } else {
+                    el.innerText = newContent;
+                }
+
+                // Efek visual flash (highlight warna oranye/primary-fixed)
+                const originalBg = el.style.backgroundColor;
+                const originalTransition = el.style.transition;
+                el.style.transition = 'background-color 0.2s ease';
+                el.style.backgroundColor = 'rgba(194, 101, 42, 0.15)';
+                el.style.borderRadius = '4px';
+                el.style.padding = '0 4px';
+                setTimeout(() => {
+                    el.style.backgroundColor = originalBg;
+                    el.style.transition = originalTransition;
+                }, 800);
+            }
+        }
+
+        poll();
+        transactionsPollingInterval = setInterval(poll, 5000);
+    }
+
     // Load active tab on page load
     document.addEventListener('DOMContentLoaded', () => {
         const sessionTab = "{{ session('active_tab') }}";
@@ -180,6 +284,21 @@
         if (tabButton) {
             switchTab(activeTab, tabButton);
         }
+
+        // Visibility API to pause/resume polling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (transactionsPollingInterval) {
+                    clearInterval(transactionsPollingInterval);
+                    transactionsPollingInterval = null;
+                }
+            } else {
+                const activeTab = localStorage.getItem('active_owner_tab') || 'dashboard';
+                if (activeTab === 'transaksi') {
+                    startTransactionsPolling();
+                }
+            }
+        });
     });
 
     // Profile photo upload trigger and preview
