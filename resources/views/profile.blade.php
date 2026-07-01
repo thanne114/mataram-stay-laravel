@@ -278,7 +278,18 @@
                     }
                 }
 
-                // 2. Update list kartu jika ada perubahan
+                // 2. Update overbooked warning
+                const overbookedEl = document.getElementById('seeker-overbooked-container');
+                if (overbookedEl && overbookedEl.innerHTML.trim() !== data.overbookedHtml.trim()) {
+                    overbookedEl.style.transition = 'opacity 0.2s ease-in-out';
+                    overbookedEl.style.opacity = '0.5';
+                    setTimeout(() => {
+                        overbookedEl.innerHTML = data.overbookedHtml;
+                        overbookedEl.style.opacity = '1';
+                    }, 200);
+                }
+
+                // 3. Update list kartu jika ada perubahan
                 const containerEl = document.getElementById('seeker-transactions-cards-container');
                 if (containerEl && containerEl.innerHTML.trim() !== data.html.trim()) {
                     containerEl.style.transition = 'opacity 0.2s ease-in-out';

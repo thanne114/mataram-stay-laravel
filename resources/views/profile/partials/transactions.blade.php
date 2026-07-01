@@ -13,6 +13,11 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Seeker Overbooked Refund Warning Container -->
+            <div id="seeker-overbooked-container">
+                @include('profile.partials.transactions_overbooked_alerts')
+            </div>
             
             <!-- Seeker Transactions Cards Container -->
             <div id="seeker-transactions-cards-container" class="space-y-6">

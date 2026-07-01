@@ -432,10 +432,12 @@ class DashboardController extends Controller
             ->exists();
 
         $html = view('profile.partials.transactions_cards', compact('bookings', 'hasPendingTransaction'))->render();
+        $overbookedHtml = view('profile.partials.transactions_overbooked_alerts', compact('bookings'))->render();
 
         return response()->json([
             'hasPendingTransaction' => $hasPendingTransaction,
-            'html' => $html
+            'html' => $html,
+            'overbookedHtml' => $overbookedHtml
         ]);
     }
 }
