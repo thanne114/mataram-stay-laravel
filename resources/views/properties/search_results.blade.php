@@ -394,7 +394,7 @@
             harga_maksimal: '{{ $filters['harga_maksimal'] ?? '' }}',
             harga_minimal_display: '',
             harga_maksimal_display: '',
-            fasilitas: {!! json_encode(request('fasilitas') ?? []) !!},
+            fasilitas: @json(request('fasilitas') ?? []),
             isLoading: false,
 
             init() {

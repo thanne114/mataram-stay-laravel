@@ -372,7 +372,7 @@
         shadowSize: [33, 33]
     });
 
-    var nearbyCampuses = {!! json_encode($property->nearby_campuses) !!};
+    var nearbyCampuses = @json($property->nearby_campuses);
     nearbyCampuses.forEach(function (c) {
         if (c.lat && c.lng) {
             L.marker([c.lat, c.lng], { icon: campusIcon }).addTo(map)
