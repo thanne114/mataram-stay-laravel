@@ -519,14 +519,39 @@
             document.getElementById('reject-seeker-modal').classList.add('hidden');
         }
 
+        let adminPollingInterval = null;
+
+        function startAdminPolling() {
+            if (!adminPollingInterval) {
+                // Fetch stats immediately when starting/resuming
+                fetchDashboardStats();
+                adminPollingInterval = setInterval(fetchDashboardStats, 5000);
+            }
+        }
+
+        function stopAdminPolling() {
+            if (adminPollingInterval) {
+                clearInterval(adminPollingInterval);
+                adminPollingInterval = null;
+            }
+        }
+
         // Restore active tab on load
         document.addEventListener('DOMContentLoaded', () => {
             const savedTab = localStorage.getItem('admin_active_tab') || 'monetization';
             switchTab(savedTab);
 
-            // Fetch initial stats and start polling every 5 seconds
-            fetchDashboardStats();
-            setInterval(fetchDashboardStats, 5000);
+            // Start initial polling
+            startAdminPolling();
+
+            // Visibility API to pause/resume polling
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAdminPolling();
+                } else {
+                    startAdminPolling();
+                }
+            });
         });
 
         // Dynamic Stats Polling
