@@ -115,14 +115,34 @@ class ProfileController extends Controller
             'selfie_photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
-        // Hapus foto lama jika ada
+        // Arsipkan foto lama jika ada alih-alih menghapusnya dari server
         if ($user->identity_photo) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($user->identity_photo);
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->identity_photo);
+            $oldIdentityPath = $user->identity_photo;
+            $archiveIdentityPath = 'identities/archive/' . time() . '_' . basename($oldIdentityPath);
+            
+            \Illuminate\Support\Facades\Storage::disk('local')->makeDirectory('identities/archive');
+            if (\Illuminate\Support\Facades\Storage::disk('local')->exists($oldIdentityPath)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->move($oldIdentityPath, $archiveIdentityPath);
+            }
+            
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('identities/archive');
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldIdentityPath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->move($oldIdentityPath, $archiveIdentityPath);
+            }
         }
         if ($user->selfie_photo) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($user->selfie_photo);
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->selfie_photo);
+            $oldSelfiePath = $user->selfie_photo;
+            $archiveSelfiePath = 'identities/archive/' . time() . '_' . basename($oldSelfiePath);
+            
+            \Illuminate\Support\Facades\Storage::disk('local')->makeDirectory('identities/archive');
+            if (\Illuminate\Support\Facades\Storage::disk('local')->exists($oldSelfiePath)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->move($oldSelfiePath, $archiveSelfiePath);
+            }
+            
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('identities/archive');
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldSelfiePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->move($oldSelfiePath, $archiveSelfiePath);
+            }
         }
 
         $identityPhoto = $request->file('identity_photo');
