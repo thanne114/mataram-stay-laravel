@@ -42,12 +42,16 @@ async function run() {
 
         // 3. Seeker Views
         { url: 'http://127.0.0.1:8000/auth/bypass/seeker', name: 'seeker_dashboard.png' },
-        { url: 'http://127.0.0.1:8000/seeker/transactions', name: 'seeker_transactions.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-transaksi', name: 'seeker_transactions.png' },
         { url: 'http://127.0.0.1:8000/booking/1', name: 'seeker_booking_detail_pending.png' },
         { url: 'http://127.0.0.1:8000/booking/3', name: 'seeker_booking_detail_active.png' },
         { url: 'http://127.0.0.1:8000/booking/create?room_type_id=1', name: 'seeker_booking_create.png' },
         { url: 'http://127.0.0.1:8000/chat', name: 'seeker_chat.png' },
-        { url: 'http://127.0.0.1:8000/profile', name: 'seeker_profile.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-settings', name: 'seeker_profile.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-kossaya', name: 'seeker_my_kos.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-riwayatpengajuan', name: 'seeker_booking_history.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-riwayatkos', name: 'seeker_kos_history.png' },
+        { url: 'http://127.0.0.1:8000/profile?tab=view-verifikasi', name: 'seeker_verification.png' },
 
         // 4. Owner Views
         { url: 'http://127.0.0.1:8000/auth/bypass/owner', name: 'owner_dashboard.png' },
