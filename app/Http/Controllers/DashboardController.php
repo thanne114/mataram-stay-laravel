@@ -159,6 +159,11 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
+        // Riwayat Semua Transaksi
+        $transactions = Booking::with(['user', 'roomType.property'])
+            ->latest()
+            ->paginate(15);
+
         return view('admin_dashboard', compact(
             'totalSeekers',
             'pendingSeekersCount',
@@ -171,7 +176,8 @@ class DashboardController extends Controller
             'totalCommissionsCollected',
             'totalRevenuePlatform',
             'pendingSeekers',
-            'draftProperties'
+            'draftProperties',
+            'transactions'
         ));
     }
 

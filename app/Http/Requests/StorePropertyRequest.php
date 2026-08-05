@@ -8,7 +8,7 @@ class StorePropertyRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->isOwner();
+        return $this->user()->isOwner() || $this->user()->isAdmin();
     }
 
     public function rules(): array

@@ -106,6 +106,10 @@
                         @endif
                     </span>
                 </button>
+                <button onclick="switchTab('transactions')" id="tab-btn-transactions" class="tab-btn px-4 md:px-6 py-5 font-label font-medium text-sm border-b-2 border-transparent text-secondary hover:text-primary transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-xl">receipt_long</span>
+                    <span>Riwayat Transaksi</span>
+                </button>
             </div>
 
             <!-- Tab Contents -->
@@ -351,6 +355,76 @@
                             @endforeach
                         </div>
                     @endif
+                </div>
+
+                <!-- Tab 4: Transactions -->
+                <div id="tab-content-transactions" class="tab-content space-y-6 hidden">
+                    <div class="border-b border-outline-variant/40 pb-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-headline font-bold text-on-surface">Riwayat Semua Transaksi</h3>
+                            <p class="text-xs text-secondary font-body mt-1">Daftar lengkap seluruh transaksi dari semua properti kos.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden mt-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left font-body border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-variant/30 border-b border-outline-variant/30">
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Penyewa & Kos</th>
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Tipe Kamar</th>
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Durasi</th>
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Total Biaya</th>
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary">Potongan</th>
+                                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-secondary text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant/20">
+                                    @forelse($transactions as $booking)
+                                    @php
+                                        $prop = $booking->roomType->property ?? null;
+                                        $statusColors = [
+                                            'Pending' => 'bg-orange-100 text-orange-700',
+                                            'Active' => 'bg-green-100 text-green-700',
+                                            'Completed' => 'bg-blue-100 text-blue-700',
+                                            'Cancelled' => 'bg-red-100 text-red-700',
+                                        ];
+                                    @endphp
+                                    <tr class="hover:bg-surface-container-low/30 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-on-surface">{{ $booking->user->name ?? '-' }}</div>
+                                            <div class="text-[11px] text-secondary mt-0.5">{{ $prop->name ?? '-' }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium text-secondary">{{ $booking->roomType->name ?? '-' }}</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <div>{{ $booking->check_in_date->format('d M Y') }}</div>
+                                            <div class="text-[11px] text-secondary mt-0.5">{{ $booking->duration_months }} Bulan</div>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <div class="text-primary font-bold">+Rp {{ number_format($booking->admin_fee ?? 0, 0, ',', '.') }} <span class="text-[10px] text-secondary font-normal">(Admin)</span></div>
+                                            <div class="text-primary font-bold mt-0.5">+Rp {{ number_format($booking->commission_fee ?? 0, 0, ',', '.') }} <span class="text-[10px] text-secondary font-normal">(Komisi)</span></div>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $booking->status }}</span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-12 text-center text-secondary">
+                                            <span class="material-symbols-outlined text-3xl text-outline mb-2 block">receipt_long</span>
+                                            <p class="font-bold text-sm">Belum ada transaksi di platform.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="px-6 py-3 border-t border-outline-variant/30">
+                            {{ $transactions->links() }}
+                        </div>
+                    </div>
                 </div>
 
             </div>
